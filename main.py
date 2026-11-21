@@ -37,9 +37,10 @@ class PipelineOrchestrator:
     manages their lifecycle.
     """
 
-    def __init__(self, enable_screen: bool = True, enable_audio: bool = True):
+    def __init__(self, enable_screen: bool = True, enable_audio: bool = True, enable_web: bool = True):
         self.enable_screen = enable_screen
         self.enable_audio = enable_audio
+        self.enable_web = enable_web
 
         # Shared stop signal for all threads
         self.stop_event = threading.Event()
@@ -71,44 +72,52 @@ class PipelineOrchestrator:
         logger.info("  Ambient Context Engine — Initializing")
         logger.info("=" * 60)
 
-        # Storage
-        logger.info("[1/4] Initializing database...")
+        # Step 1: Storage
+        logger.info("[1/6] Initializing database...")
         from storage.db import DatabaseManager
         self.db = DatabaseManager()
 
-        # Embeddings
-        logger.info("[2/4] Loading embedding model...")
+        # Step 2: Embeddings
+        logger.info("[2/6] Loading embedding model...")
         from processing.embed import EmbeddingGenerator
         self.embedder = EmbeddingGenerator()
 
-        # OCR
+        # Step 3: OCR
         if self.enable_screen:
-            logger.info("[3/4] Initializing OCR processor...")
+            logger.info("[3/6] Initializing OCR processor...")
             from processing.ocr import OCRProcessor
             self.ocr_processor = OCRProcessor()
         else:
-            logger.info("[3/4] Screen capture disabled — skipping OCR")
+            logger.info("[3/6] Screen capture disabled — skipping OCR")
 
-        # Whisper
+        # Step 4: Whisper
         if self.enable_audio:
-            logger.info("[4/4] Loading Whisper model...")
+            logger.info("[4/6] Loading Whisper model...")
             from processing.transcribe import Transcriber
             self.transcriber = Transcriber()
         else:
-            logger.info("[4/4] Audio capture disabled — skipping Whisper")
+            logger.info("[4/6] Audio capture disabled — skipping Whisper")
 
-        # Redactor
+        # Redactor (lightweight, no step needed)
         from processing.redact import PIIRedactor
         self.redactor = PIIRedactor()
 
-        # Start Web UI
-        logger.info("[2/4] Starting Web UI server...")
-        from interface.app import start_server
-        self.web_thread = start_server(self.db, self.embedder, port=5000)
+        # Step 5: Web UI (optional, non-blocking)
+        if self.enable_web:
+            logger.info("[5/6] Starting Web UI server...")
+            try:
+                from interface.app import start_server
+                self.web_thread = start_server(self.db, self.embedder, port=5000)
+            except Exception as e:
+                logger.warning(
+                    f"Web UI failed to start (non-fatal, capture continues): {e}"
+                )
+                self.web_thread = None
+        else:
+            logger.info("[5/6] Web UI disabled (--no-web)")
 
-        # Start Capture Threads
-        logger.info("[3/4] Starting Capture Threads...")
-        """Start the background capture threads."""
+        # Step 6: Capture Threads
+        logger.info("[6/6] Starting capture threads...")
         if self.enable_screen:
             from capture.screen_capture import ScreenCaptureThread
             self.screen_thread = ScreenCaptureThread(
@@ -259,12 +268,15 @@ class PipelineOrchestrator:
 
     def _log_stats(self):
         """Log pipeline statistics."""
+        if not self._start_time or not self.db:
+            return
+            
         elapsed = time.time() - self._start_time
         elapsed_min = elapsed / 60
 
         stats = self.db.get_stats()
-        screen_stats = self.screen_thread.stats if self.screen_thread else {}
-        audio_stats = self.audio_thread.stats if self.audio_thread else {}
+        screen_stats = self.screen_thread.stats if self.screen_thread and self.screen_thread.is_alive() else {}
+        audio_stats = self.audio_thread.stats if self.audio_thread and self.audio_thread.is_alive() else {}
 
         logger.info(
             f"📊 Pipeline stats ({elapsed_min:.0f} min): "
@@ -348,6 +360,10 @@ def main():
         help="Disable screen capture (audio-only mode)"
     )
     parser.add_argument(
+        "--no-web", action="store_true",
+        help="Disable web UI (headless data collection mode)"
+    )
+    parser.add_argument(
         "--log-level", default=LOG_LEVEL,
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
         help="Set logging level"
@@ -369,6 +385,7 @@ def main():
     orchestrator = PipelineOrchestrator(
         enable_screen=not args.no_screen,
         enable_audio=not args.no_audio,
+        enable_web=not args.no_web,
     )
     orchestrator.start()
 

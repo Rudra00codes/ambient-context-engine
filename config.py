@@ -17,7 +17,7 @@ DB_PATH = DATA_DIR / "context.db"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # ─── Capture Settings ────────────────────────────────────────────────
-CAPTURE_INTERVAL_SECS = 3          # Screen capture frequency (seconds)
+CAPTURE_INTERVAL_SECS = 5          # Screen capture frequency (seconds)
 AUDIO_CHUNK_SECS = 30              # Audio buffer duration before transcription
 AUDIO_SAMPLE_RATE = 16000          # Whisper expects 16kHz mono
 FRAME_DIFF_THRESHOLD = 500         # Min changed pixels to trigger OCR

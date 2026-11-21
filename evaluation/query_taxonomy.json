@@ -1,0 +1,234 @@
+{
+  "version": "1.0",
+  "description": "Evaluation query taxonomy for OmniContext retrieval + generation pipeline. 4 categories, ~6 queries each. Ground-truth annotations to be filled in after 2-3 days of real captured data.",
+  "categories": [
+    {
+      "id": "temporal",
+      "name": "Pure Temporal",
+      "description": "Queries with time-only constraints, no semantic content. Tests time-range filtering and temporal decomposition without relying on embedding quality.",
+      "queries": [
+        {
+          "id": "T1",
+          "template": "What was I doing at {time}?",
+          "example": "What was I doing at 3pm?",
+          "expected_behavior": "Must return captures from a window around the specified time. Answer should cite timestamps and window/app names.",
+          "evaluation_criteria": ["temporal_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "T2",
+          "template": "What apps did I use {time_period}?",
+          "example": "What apps did I use this morning?",
+          "expected_behavior": "Must aggregate distinct process_name/window_title values from captures in the specified period. Should list them, not just return one.",
+          "evaluation_criteria": ["temporal_precision", "completeness"],
+          "ground_truth": null
+        },
+        {
+          "id": "T3",
+          "template": "What was I doing between {start_time} and {end_time}?",
+          "example": "What was I doing between 2pm and 4pm?",
+          "expected_behavior": "Must scope captures to the exact time range. Answer should provide a chronological summary.",
+          "evaluation_criteria": ["temporal_precision", "grounding", "completeness"],
+          "ground_truth": null
+        },
+        {
+          "id": "T4",
+          "template": "How long did I spend on {app} {time_period}?",
+          "example": "How long did I spend on VS Code today?",
+          "expected_behavior": "Must compute approximate duration from capture timestamps where process_name matches. Should express uncertainty if gaps exist.",
+          "evaluation_criteria": ["temporal_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "T5",
+          "template": "What was the last thing I was doing {time_period}?",
+          "example": "What was the last thing I was doing yesterday?",
+          "expected_behavior": "Must return the latest capture(s) from the specified period. Answer should cite the timestamp.",
+          "evaluation_criteria": ["temporal_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "T6",
+          "template": "When did I start working {time_period}?",
+          "example": "When did I start working today?",
+          "expected_behavior": "Must find the earliest capture of the day/period. Should report the timestamp clearly.",
+          "evaluation_criteria": ["temporal_precision", "grounding"],
+          "ground_truth": null
+        }
+      ]
+    },
+    {
+      "id": "semantic",
+      "name": "Pure Semantic",
+      "description": "Queries with content-only constraints, no time reference. Tests embedding quality and keyword search independently of temporal filtering.",
+      "queries": [
+        {
+          "id": "S1",
+          "template": "Find that error message I saw about {topic}",
+          "example": "Find that error message I saw about ModuleNotFoundError",
+          "expected_behavior": "Must return captures containing or semantically similar to the error text. Keyword search should help here.",
+          "evaluation_criteria": ["retrieval_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "S2",
+          "template": "Where did I see the word '{keyword}'?",
+          "example": "Where did I see the word 'refactor'?",
+          "expected_behavior": "Must use keyword search (FTS5) to find exact matches. Should cite window title and timestamp.",
+          "evaluation_criteria": ["retrieval_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "S3",
+          "template": "What was I reading about {topic}?",
+          "example": "What was I reading about database schemas?",
+          "expected_behavior": "Must return captures with semantically relevant content. Should use hybrid search.",
+          "evaluation_criteria": ["retrieval_precision", "completeness"],
+          "ground_truth": null
+        },
+        {
+          "id": "S4",
+          "template": "Which files was I editing related to {topic}?",
+          "example": "Which files was I editing related to authentication?",
+          "expected_behavior": "Must identify file names from window titles (e.g., 'auth.py - VS Code'). Should aggregate across captures.",
+          "evaluation_criteria": ["retrieval_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "S5",
+          "template": "What websites was I visiting about {topic}?",
+          "example": "What websites was I visiting about Python threading?",
+          "expected_behavior": "Must identify browser window titles containing relevant URLs or page titles.",
+          "evaluation_criteria": ["retrieval_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "S6",
+          "template": "Find where I was looking at {specific_content}",
+          "example": "Find where I was looking at a git diff",
+          "expected_behavior": "Must retrieve captures where OCR text contains diff-like patterns or semantic matches.",
+          "evaluation_criteria": ["retrieval_precision", "grounding"],
+          "ground_truth": null
+        }
+      ]
+    },
+    {
+      "id": "hybrid",
+      "name": "Hybrid (Temporal + Semantic)",
+      "description": "The core thesis query type: queries with both time and content constraints. Tests temporal decomposition + semantic retrieval working together. This is the category that naive RAG fails at.",
+      "queries": [
+        {
+          "id": "H1",
+          "template": "What repo was I looking at {time_ref}?",
+          "example": "What repo was I looking at around 3pm yesterday?",
+          "expected_behavior": "Must decompose into temporal filter (~3pm yesterday) + semantic search (repo/code context). Answer should cite the specific repo/window.",
+          "evaluation_criteria": ["temporal_precision", "retrieval_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "H2",
+          "template": "What was I debugging {time_ref}?",
+          "example": "What was I debugging this morning?",
+          "expected_behavior": "Must filter to morning captures, then find those with error/debug semantic content. Should cite specific errors or files.",
+          "evaluation_criteria": ["temporal_precision", "retrieval_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "H3",
+          "template": "What documentation was I reading {time_ref}?",
+          "example": "What documentation was I reading yesterday afternoon?",
+          "expected_behavior": "Must filter to afternoon + find browser/docs captures. Should cite specific docs pages from window titles.",
+          "evaluation_criteria": ["temporal_precision", "retrieval_precision", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "H4",
+          "template": "What was I working on in {app} {time_ref}?",
+          "example": "What was I working on in VS Code after lunch?",
+          "expected_behavior": "Must combine app filter (process_name) + time filter + semantic summary of the content.",
+          "evaluation_criteria": ["temporal_precision", "retrieval_precision", "completeness"],
+          "ground_truth": null
+        },
+        {
+          "id": "H5",
+          "template": "Did I look at {topic} {time_ref}?",
+          "example": "Did I look at the pull request around 4pm?",
+          "expected_behavior": "Must give a yes/no answer grounded in evidence. If no matching captures, must say so rather than guess.",
+          "evaluation_criteria": ["temporal_precision", "retrieval_precision", "grounding", "refusal_accuracy"],
+          "ground_truth": null
+        },
+        {
+          "id": "H6",
+          "template": "Summarize what I did on {specific_task} {time_ref}",
+          "example": "Summarize what I did on the database migration yesterday",
+          "expected_behavior": "Must find time-scoped captures about the task and produce a coherent narrative, not just list captures.",
+          "evaluation_criteria": ["temporal_precision", "retrieval_precision", "grounding", "completeness"],
+          "ground_truth": null
+        }
+      ]
+    },
+    {
+      "id": "ambiguous",
+      "name": "Ambiguous / Low-Confidence",
+      "description": "Queries where the system SHOULD refuse, hedge, or express uncertainty. Tests the grounded generation refusal path — the system must say 'I don't have enough context' rather than confabulate.",
+      "queries": [
+        {
+          "id": "A1",
+          "template": "What did {other_person} say about {topic}?",
+          "example": "What did my colleague say about the budget?",
+          "expected_behavior": "If no audio captures exist or no relevant audio found, must explicitly refuse rather than fabricate a conversation.",
+          "evaluation_criteria": ["refusal_accuracy", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "A2",
+          "template": "What was I doing {far_past_time}?",
+          "example": "What was I doing three months ago?",
+          "expected_behavior": "If outside retention window or no data exists for that period, must clearly state data is unavailable.",
+          "evaluation_criteria": ["refusal_accuracy", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "A3",
+          "template": "Why was I looking at {topic}?",
+          "example": "Why was I looking at that Stack Overflow page?",
+          "expected_behavior": "Must distinguish between what it can observe (you viewed X at time Y) and what it cannot know (your internal motivation). Should report observations, not infer intent.",
+          "evaluation_criteria": ["refusal_accuracy", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "A4",
+          "template": "What will I be working on {future_time}?",
+          "example": "What will I be working on tomorrow?",
+          "expected_behavior": "Must refuse — the system captures past activity, it cannot predict the future. Should say so clearly.",
+          "evaluation_criteria": ["refusal_accuracy"],
+          "ground_truth": null
+        },
+        {
+          "id": "A5",
+          "template": "Did I finish {task}?",
+          "example": "Did I finish the code review?",
+          "expected_behavior": "Must express uncertainty — the system can see screen activity but cannot determine task completion status with certainty. Should describe what it observed and hedge.",
+          "evaluation_criteria": ["refusal_accuracy", "grounding"],
+          "ground_truth": null
+        },
+        {
+          "id": "A6",
+          "template": "What was on my screen when {unobservable_event}?",
+          "example": "What was on my screen when the power went out?",
+          "expected_behavior": "Cannot correlate with external events it has no data for. Must acknowledge the limitation.",
+          "evaluation_criteria": ["refusal_accuracy", "grounding"],
+          "ground_truth": null
+        }
+      ]
+    }
+  ],
+  "evaluation_criteria_definitions": {
+    "temporal_precision": "Retrieved captures fall within the correct time window specified by the query. Measured as % of retrieved results within the target time range.",
+    "retrieval_precision": "Retrieved captures are topically relevant to the query's semantic content. Measured as precision@k against manual relevance judgments.",
+    "completeness": "The answer covers all relevant activities/captures, not just the first match. Measured as recall against known-relevant captures.",
+    "grounding": "Every factual claim in the generated answer is directly supported by a retrieved capture with a cited timestamp. Measured as % of claims with verifiable source.",
+    "refusal_accuracy": "The system correctly refuses to answer (or expresses uncertainty) when data is insufficient, rather than confabulating. Measured as % of low-confidence queries correctly handled."
+  },
+  "annotation_instructions": "After 2-3 days of pipeline data accumulation, instantiate 20-25 of these template queries with real parameters from your captured data. For each, manually verify the correct answer by inspecting the DB (use scripts/check_data.py and the CLI 'recent' command). Record the expected answer and relevant capture IDs as ground truth."
+}

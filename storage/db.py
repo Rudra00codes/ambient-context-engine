@@ -423,6 +423,158 @@ class DatabaseManager:
 
         return results
 
+    # ─── Episode Search (Chunk 2) ────────────────────────────────────
+
+    def search_episodes(
+        self,
+        query_embedding: Optional[np.ndarray],
+        query_text: Optional[str] = None,
+        limit: int = 10,
+        time_range: Optional[Tuple[str, str]] = None,
+    ) -> list[dict]:
+        """
+        Episode-level retrieval (Chunk 2): rank episodes via cosine similarity
+        of query embedding vs episode centroid + BM25 over representative text (RRF),
+        respecting the time window filter.
+        """
+        conditions = []
+        params = []
+        if time_range:
+            start_w, end_w = time_range
+            conditions.append("end_time >= ?")
+            params.append(start_w)
+            conditions.append("start_time <= ?")
+            params.append(end_w)
+
+        where_clause = " WHERE " + " AND ".join(conditions) if conditions else ""
+        cur = self.conn.cursor()
+        ep_rows = cur.execute(
+            f"""
+            SELECT id, start_time, end_time, process_name, dominant_title,
+                   capture_count, centroid, representative_text, representative_capture_id
+            FROM episodes
+            {where_clause}
+            ORDER BY start_time ASC
+            """,
+            params,
+        ).fetchall()
+
+        if not ep_rows:
+            return []
+
+        has_text = bool(query_text and query_text.strip())
+        if not has_text and query_embedding is None:
+            if len(ep_rows) <= limit:
+                selected_eps = ep_rows
+            else:
+                indices = np.linspace(0, len(ep_rows) - 1, limit, dtype=int)
+                selected_eps = [ep_rows[i] for i in indices]
+
+            results = []
+            for ep in selected_eps:
+                cids = [
+                    r[0]
+                    for r in cur.execute(
+                        "SELECT capture_id FROM episode_captures WHERE episode_id = ? ORDER BY capture_id ASC",
+                        (ep["id"],),
+                    ).fetchall()
+                ]
+                results.append({
+                    "id": ep["id"],
+                    "episode_id": ep["id"],
+                    "timestamp": ep["start_time"],
+                    "start_time": ep["start_time"],
+                    "end_time": ep["end_time"],
+                    "process_name": ep["process_name"],
+                    "dominant_title": ep["dominant_title"],
+                    "window_title": ep["dominant_title"],
+                    "capture_count": ep["capture_count"],
+                    "text_content": ep["representative_text"],
+                    "representative_text": ep["representative_text"],
+                    "representative_capture_id": ep["representative_capture_id"],
+                    "capture_ids": cids,
+                    "source": "episode",
+                    "score": 1.0,
+                })
+            return results
+
+        rank_vec = {}
+        candidate_ids = [r["id"] for r in ep_rows]
+        candidate_id_set = set(candidate_ids)
+
+        if query_embedding is not None:
+            centroids = [np.frombuffer(r["centroid"], dtype=np.float32) for r in ep_rows]
+            C_mat = np.stack(centroids)
+            q_norm_val = np.linalg.norm(query_embedding)
+            q_vec = query_embedding / q_norm_val if q_norm_val > 0 else query_embedding
+            sims = np.dot(C_mat, q_vec)
+            order = np.argsort(-sims)
+            for r_idx, idx in enumerate(order):
+                rank_vec[ep_rows[idx]["id"]] = r_idx
+
+        rank_fts = {}
+        if has_text:
+            fts_q = _fts_query(query_text)
+            if fts_q:
+                try:
+                    fts_matches = cur.execute(
+                        """
+                        SELECT rowid, rank FROM episodes_fts
+                        WHERE episodes_fts MATCH ?
+                        ORDER BY rank
+                        """,
+                        (fts_q,),
+                    ).fetchall()
+                    current_rank = 0
+                    for rowid, _ in fts_matches:
+                        if rowid in candidate_id_set:
+                            rank_fts[rowid] = current_rank
+                            current_rank += 1
+                except sqlite3.OperationalError:
+                    pass
+
+        rrf_scores = {}
+        for ep_id in candidate_ids:
+            score = 0.0
+            if ep_id in rank_vec:
+                score += 1.0 / (RRF_K + rank_vec[ep_id])
+            if ep_id in rank_fts:
+                score += 1.0 / (RRF_K + rank_fts[ep_id])
+            rrf_scores[ep_id] = score
+
+        sorted_ids = sorted(candidate_ids, key=lambda eid: rrf_scores[eid], reverse=True)[:limit]
+        ep_map = {r["id"]: r for r in ep_rows}
+
+        results = []
+        for ep_id in sorted_ids:
+            ep = ep_map[ep_id]
+            cids = [
+                r[0]
+                for r in cur.execute(
+                    "SELECT capture_id FROM episode_captures WHERE episode_id = ? ORDER BY capture_id ASC",
+                    (ep_id,),
+                ).fetchall()
+            ]
+            results.append({
+                "id": ep["id"],
+                "episode_id": ep["id"],
+                "timestamp": ep["start_time"],
+                "start_time": ep["start_time"],
+                "end_time": ep["end_time"],
+                "process_name": ep["process_name"],
+                "dominant_title": ep["dominant_title"],
+                "window_title": ep["dominant_title"],
+                "capture_count": ep["capture_count"],
+                "text_content": ep["representative_text"],
+                "representative_text": ep["representative_text"],
+                "representative_capture_id": ep["representative_capture_id"],
+                "capture_ids": cids,
+                "source": "episode",
+                "score": rrf_scores[ep_id],
+            })
+
+        return results
+
     # ─── Query Operations ────────────────────────────────────────────
 
     def get_captures_in_range(

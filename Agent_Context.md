@@ -130,5 +130,24 @@ When implementing features:
     - **Refusal Recall (Should Refuse):** 50.0% (Δ +50.0% vs baseline)
     - **False Refusal Rate:** 0.0% (0/18)
     - Pure Temporal category Temporal Precision: 100.0%, P@5: 73.3%.
+- **Chunk 2 — Episode Segmentation & Deduplication (tag: `episodes`) COMPLETED**:
+  - Implemented single-pass episode segmenter in `intelligence/segmenter.py` (`build_episodes`, `ensure_episodes`) tracking running centroid, process continuity, and gap constraints without over-splitting on browser tab title changes.
+  - Created tables `episodes`, `episode_captures`, and FTS virtual table `episodes_fts` with automated SQLite triggers in `storage/schema.sql`.
+  - Added `search_episodes` in `storage/db.py` with candidate window pre-filtering, exact centroid cosine scoring in NumPy, BM25 text ranking, and RRF rank fusion.
+  - Integrated episode retrieval and prompt context formatting into `intelligence/rag.py`, switchable via `config.USE_EPISODES`.
+  - Created batch management script `scripts/build_episodes.py` and parameter sweep script `scripts/sweep_episodes.py`.
+  - Performed threshold sweep across [0.80, 0.85, 0.90, 0.95] (selected `EPISODE_SIM_THRESHOLD = 0.85` for optimal compression-semantic trade-off).
+  - 43 unit tests passing in `tests/test_segmenter.py` and `tests/test_temporal.py`.
+  - Evaluation results (`evaluation/results/episodes_results.json` and `episodes_summary.md`):
+    - **Temporal Precision:** 85.4% (Δ +6.2% vs `temporal`)
+    - **Precision@5:** 40.0% (Δ -0.8% vs `temporal`)
+    - **Hybrid Category Temporal Precision:** 68.3% (Δ +13.3% vs `temporal`)
+    - **Grounding Rate:** 27.1%
+    - **Refusal Recall (Should Refuse):** 50.0%
+    - **False Refusal Rate (Non-Refuse):** 0.0% (0/18)
+    - **Database Compression Ratio:** 1.09x
+    - **Mean Distinct Episodes @ 5:** 4.38 / 5
+    - **Mean Context Characters:** 3,610 chars
+    - **Mean Query Latency:** 24.9 ms
 - Next steps:
-  1. Chunk 2 — Session/event segmentation and deduplication (collapsing contiguous near-duplicates into episodes before indexing, tag: `episodes`).
+  1. Chunk 3 — Retrieval-conditioned generation with grounding and low-confidence refusal (tag: `grounding`).

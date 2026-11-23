@@ -120,6 +120,7 @@ def compute_temporal_precision(
 ) -> Optional[float]:
     """
     Compute temporal precision: % of retrieved sources within expected time window.
+    Supports both point-in-time captures and interval-based episodes.
     Returns None if expected_window is not specified (e.g. Pure Semantic queries).
     """
     if not expected_window or "start" not in expected_window or "end" not in expected_window:
@@ -136,12 +137,15 @@ def compute_temporal_precision(
 
     in_window_count = 0
     for s in sources:
-        ts_str = s.get("timestamp")
-        if not ts_str:
+        start_str = s.get("start_time") or s.get("timestamp")
+        end_str = s.get("end_time") or s.get("timestamp")
+        if not start_str:
             continue
         try:
-            ts_dt = datetime.fromisoformat(ts_str)
-            if start_dt <= ts_dt <= end_dt:
+            s_dt = datetime.fromisoformat(start_str)
+            e_dt = datetime.fromisoformat(end_str) if end_str else s_dt
+            # Overlaps the expected window
+            if s_dt <= end_dt and e_dt >= start_dt:
                 in_window_count += 1
         except (ValueError, TypeError):
             continue
@@ -156,7 +160,8 @@ def compute_precision_at_k(
     should_refuse: bool,
 ) -> Optional[float]:
     """
-    Compute Precision@k: fraction of top-k retrieved sources that are in relevant_ids.
+    Compute Precision@k: fraction of top-k retrieved sources that match relevant_ids.
+    For episodes (Chunk 2), an episode is relevant if it contains ANY ground-truth capture ID.
     If relevant_ids is empty and should_refuse is True:
         Returns 1.0 if 0 sources retrieved, 0.0 otherwise.
     """
@@ -171,7 +176,20 @@ def compute_precision_at_k(
     if not top_k_sources:
         return 0.0
 
-    hits = sum(1 for s in top_k_sources if s.get("id") in rel_set)
+    hits = 0
+    for s in top_k_sources:
+        cap_ids = s.get("capture_ids")
+        if cap_ids:
+            if (
+                any(cid in rel_set for cid in cap_ids)
+                or s.get("id") in rel_set
+                or s.get("representative_capture_id") in rel_set
+            ):
+                hits += 1
+        else:
+            if s.get("id") in rel_set:
+                hits += 1
+
     return hits / len(top_k_sources)
 
 
@@ -399,6 +417,10 @@ def run_evaluation(
         p_at_k = compute_precision_at_k(sources, relevant_ids, k, should_refuse)
         grounding = compute_grounding_rate(answer, sources, should_refuse, is_refusal)
 
+        top_k_srcs = sources[:k]
+        d_eps = len(set(s.get("episode_id", s.get("id")) for s in top_k_srcs))
+        c_chars = sum(len(s.get("text_content") or s.get("representative_text") or "") for s in top_k_srcs)
+
         # Dual refusal metrics:
         # 1. Was it a should_refuse query that was correctly refused? (Recall)
         # 2. Was it a non-refuse query that was falsely refused? (False Refusal)
@@ -416,6 +438,8 @@ def run_evaluation(
                 "total_time_ms": total_eval_time,
                 "retrieved_count": len(sources),
                 "retrieved_ids": retrieved_ids[:k],
+                "distinct_episodes": d_eps,
+                "context_chars": c_chars,
                 "is_refusal": is_refusal,
                 "refusal_reason": rag_output.get("refusal_reason"),
             },
@@ -427,6 +451,7 @@ def run_evaluation(
                 "falsely_refused": falsely_refused,
             },
             "answer": answer,
+            "sources": sources[:k],
         }
         query_results.append(query_record)
 
@@ -478,6 +503,15 @@ def run_evaluation(
     all_non_refuse_qs = [q for q in query_results if not q["ground_truth"]["should_refuse"]]
     all_false_refuse_hits = sum(1 for q in all_non_refuse_qs if q["execution"]["is_refusal"])
 
+    # Chunk 2 Episode & Efficiency metrics
+    total_caps_in_db = db.conn.execute("SELECT count(*) FROM captures").fetchone()[0]
+    total_eps_in_db = db.conn.execute("SELECT count(*) FROM episodes").fetchone()[0]
+    db_compression_ratio = round(total_caps_in_db / total_eps_in_db, 2) if total_eps_in_db > 0 else 1.0
+
+    distinct_eps_list = [q["execution"].get("distinct_episodes", 1) for q in query_results]
+    context_chars_list = [q["execution"].get("context_chars", 0) for q in query_results]
+    gen_lat_list = [q["execution"].get("total_time_ms", 0.0) for q in query_results]
+
     overall_summary = {
         "total_queries": len(query_results),
         "temporal_precision": round(sum(all_t_precs) / len(all_t_precs), 4) if all_t_precs else None,
@@ -490,6 +524,10 @@ def run_evaluation(
         "refusal_recall_count": f"{all_refuse_hits}/{len(all_refuse_qs)}",
         "false_refusal_rate": round(all_false_refuse_hits / len(all_non_refuse_qs), 4) if all_non_refuse_qs else None,
         "false_refusal_count": f"{all_false_refuse_hits}/{len(all_non_refuse_qs)}",
+        "compression_ratio": db_compression_ratio,
+        "distinct_episodes_at_k": round(sum(distinct_eps_list) / len(distinct_eps_list), 2) if distinct_eps_list else 0.0,
+        "mean_context_chars": round(sum(context_chars_list) / len(context_chars_list), 1) if context_chars_list else 0.0,
+        "mean_generation_latency_ms": round(sum(gen_lat_list) / len(gen_lat_list), 1) if gen_lat_list else 0.0,
     }
 
     full_results = {
@@ -508,7 +546,12 @@ def run_evaluation(
 
     # Load baseline for delta comparison if available
     baseline_data = None
-    target_compare = compare_tag or ("baseline" if tag != "baseline" else None)
+    if compare_tag:
+        target_compare = compare_tag
+    elif tag == "episodes":
+        target_compare = "temporal" if (output_dir / "temporal_results.json").exists() else "baseline"
+    else:
+        target_compare = "baseline" if tag != "baseline" else None
     if target_compare:
         base_file = output_dir / f"{target_compare}_results.json"
         if base_file.exists():
@@ -609,6 +652,19 @@ def generate_markdown_summary(
         f"| **Overall** | **{overall['total_queries']}** | **{fmt_stat(overall['temporal_precision'], overall['temporal_precision_count'])}** | **{fmt_stat(overall['precision_at_k'], overall['precision_at_k_count'])}** | **{fmt_stat(overall['grounding_rate'], overall['grounding_rate_count'])}** | **{fmt_stat(overall['refusal_recall'], overall['refusal_recall_count'])}** | **{fmt_stat(overall['false_refusal_rate'], overall['false_refusal_count'])}** |",
         f"",
     ])
+
+    if "compression_ratio" in overall and overall.get("compression_ratio") is not None:
+        lines.extend([
+            f"## Episode & System Efficiency Metrics (Chunk 2)",
+            f"",
+            f"| Metric | Value |",
+            f"|---|:---:|",
+            f"| **Database Compression Ratio (Captures ÷ Episodes)** | {overall.get('compression_ratio')}x |",
+            f"| **Mean Distinct Episodes @ {meta['k']}** | {overall.get('distinct_episodes_at_k')} / {meta['k']} |",
+            f"| **Mean Context Characters per Query** | {overall.get('mean_context_chars')} chars |",
+            f"| **Mean Query Latency** | {overall.get('mean_generation_latency_ms')} ms |",
+            f"",
+        ])
 
     # Delta table if baseline data is provided
     if baseline_data and "overall" in baseline_data:

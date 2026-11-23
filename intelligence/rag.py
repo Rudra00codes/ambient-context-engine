@@ -21,11 +21,12 @@ import numpy as np
 
 from config import (
     OLLAMA_BASE_URL, OLLAMA_MODEL, LLM_CONTEXT_MAX_CHARS, SEARCH_TOP_K,
-    USE_TEMPORAL, CAPTURE_INTERVAL_SECS
+    USE_TEMPORAL, USE_EPISODES, CAPTURE_INTERVAL_SECS
 )
 from storage.db import DatabaseManager
 from processing.embed import EmbeddingGenerator
 from intelligence.temporal import parse_temporal, TemporalParse
+from intelligence.segmenter import ensure_episodes
 
 logger = logging.getLogger(__name__)
 
@@ -94,12 +95,21 @@ class RAGAgent:
         total_chars = 0
 
         for i, r in enumerate(results, 1):
-            source_icon = "🖥️" if r["source"] == "screen" else "🎤"
-            window_info = ""
-            if r.get("window_title"):
-                window_info = f" | Window: {r['window_title']}"
+            if r.get("source") == "episode":
+                source_icon = "📦"
+                app_info = f"App: {r.get('process_name') or 'Unknown'}"
+                title_info = f" | Title: {r.get('dominant_title') or r.get('window_title') or 'Unknown'}"
+                count_info = f" ({r.get('capture_count', 1)} captures)"
+                time_info = f"{r.get('start_time')} to {r.get('end_time')}"
+                header = f"[{i}] {source_icon} Episode {r.get('id', i)} [{time_info}] {app_info}{title_info}{count_info}"
+            else:
+                source_icon = "🖥️" if r.get("source") == "screen" else "🎤"
+                window_info = ""
+                if r.get("window_title"):
+                    window_info = f" | Window: {r['window_title']}"
+                header = f"[{i}] {source_icon} {r.get('timestamp')}{window_info}"
 
-            text = r["text_content"]
+            text = r.get("text_content") or r.get("representative_text") or ""
 
             # Truncate individual entries if needed
             if total_chars + len(text) > LLM_CONTEXT_MAX_CHARS:
@@ -108,10 +118,7 @@ class RAGAgent:
                     break
                 text = text[:remaining] + "..."
 
-            entry = (
-                f"[{i}] {source_icon} {r['timestamp']}{window_info}\n"
-                f"    {text}"
-            )
+            entry = f"{header}\n    {text}"
             entries.append(entry)
             total_chars += len(text)
 
@@ -300,41 +307,111 @@ class RAGAgent:
                     )
 
                 elif parse.intent == "latest":
-                    lat_rows = self.db.conn.execute(
-                        """
-                        SELECT id, timestamp, source, text_content, window_title, process_name
-                        FROM captures
-                        WHERE timestamp BETWEEN ? AND ?
-                        ORDER BY timestamp DESC
-                        LIMIT ?
-                        """,
-                        (parse.start, parse.end, top_k),
-                    ).fetchall()
-                    sources = [dict(r) for r in lat_rows]
+                    if USE_EPISODES:
+                        ensure_episodes(self.db, start=parse.start, end=parse.end)
+                        lat_rows = self.db.conn.execute(
+                            """
+                            SELECT id, start_time, end_time, process_name, dominant_title,
+                                   capture_count, representative_text, representative_capture_id
+                            FROM episodes
+                            WHERE start_time BETWEEN ? AND ?
+                            ORDER BY end_time DESC
+                            LIMIT ?
+                            """,
+                            (parse.start, parse.end, top_k),
+                        ).fetchall()
+                        sources = []
+                        for ep in lat_rows:
+                            cids = [r[0] for r in self.db.conn.execute("SELECT capture_id FROM episode_captures WHERE episode_id = ? ORDER BY capture_id ASC", (ep["id"],)).fetchall()]
+                            sources.append({
+                                "id": ep["id"],
+                                "episode_id": ep["id"],
+                                "timestamp": ep["start_time"],
+                                "start_time": ep["start_time"],
+                                "end_time": ep["end_time"],
+                                "process_name": ep["process_name"],
+                                "dominant_title": ep["dominant_title"],
+                                "window_title": ep["dominant_title"],
+                                "capture_count": ep["capture_count"],
+                                "text_content": ep["representative_text"],
+                                "representative_text": ep["representative_text"],
+                                "representative_capture_id": ep["representative_capture_id"],
+                                "capture_ids": cids,
+                                "source": "episode",
+                            })
+                    else:
+                        lat_rows = self.db.conn.execute(
+                            """
+                            SELECT id, timestamp, source, text_content, window_title, process_name
+                            FROM captures
+                            WHERE timestamp BETWEEN ? AND ?
+                            ORDER BY timestamp DESC
+                            LIMIT ?
+                            """,
+                            (parse.start, parse.end, top_k),
+                        ).fetchall()
+                        sources = [dict(r) for r in lat_rows]
+
                     if sources:
                         last_c = sources[0]
+                        title = last_c.get("dominant_title") or last_c.get("window_title")
                         structured_ans = (
                             f"The last activity recorded on {parse.start[:10]} was at {last_c['timestamp']} "
-                            f"in window '{last_c['window_title']}' ({last_c['process_name']})."
+                            f"in window '{title}' ({last_c['process_name']})."
                         )
 
                 elif parse.intent == "earliest":
-                    ear_rows = self.db.conn.execute(
-                        """
-                        SELECT id, timestamp, source, text_content, window_title, process_name
-                        FROM captures
-                        WHERE timestamp BETWEEN ? AND ?
-                        ORDER BY timestamp ASC
-                        LIMIT ?
-                        """,
-                        (parse.start, parse.end, top_k),
-                    ).fetchall()
-                    sources = [dict(r) for r in ear_rows]
+                    if USE_EPISODES:
+                        ensure_episodes(self.db, start=parse.start, end=parse.end)
+                        ear_rows = self.db.conn.execute(
+                            """
+                            SELECT id, start_time, end_time, process_name, dominant_title,
+                                   capture_count, representative_text, representative_capture_id
+                            FROM episodes
+                            WHERE start_time BETWEEN ? AND ?
+                            ORDER BY start_time ASC
+                            LIMIT ?
+                            """,
+                            (parse.start, parse.end, top_k),
+                        ).fetchall()
+                        sources = []
+                        for ep in ear_rows:
+                            cids = [r[0] for r in self.db.conn.execute("SELECT capture_id FROM episode_captures WHERE episode_id = ? ORDER BY capture_id ASC", (ep["id"],)).fetchall()]
+                            sources.append({
+                                "id": ep["id"],
+                                "episode_id": ep["id"],
+                                "timestamp": ep["start_time"],
+                                "start_time": ep["start_time"],
+                                "end_time": ep["end_time"],
+                                "process_name": ep["process_name"],
+                                "dominant_title": ep["dominant_title"],
+                                "window_title": ep["dominant_title"],
+                                "capture_count": ep["capture_count"],
+                                "text_content": ep["representative_text"],
+                                "representative_text": ep["representative_text"],
+                                "representative_capture_id": ep["representative_capture_id"],
+                                "capture_ids": cids,
+                                "source": "episode",
+                            })
+                    else:
+                        ear_rows = self.db.conn.execute(
+                            """
+                            SELECT id, timestamp, source, text_content, window_title, process_name
+                            FROM captures
+                            WHERE timestamp BETWEEN ? AND ?
+                            ORDER BY timestamp ASC
+                            LIMIT ?
+                            """,
+                            (parse.start, parse.end, top_k),
+                        ).fetchall()
+                        sources = [dict(r) for r in ear_rows]
+
                     if sources:
                         first_c = sources[0]
+                        title = first_c.get("dominant_title") or first_c.get("window_title")
                         structured_ans = (
                             f"The earliest activity recorded on {parse.start[:10]} started at {first_c['timestamp']} "
-                            f"in window '{first_c['window_title']}' ({first_c['process_name']})."
+                            f"in window '{title}' ({first_c['process_name']})."
                         )
 
                 search_time = (time.time() - search_start) * 1000
@@ -371,12 +448,21 @@ class RAGAgent:
             else:
                 query_embedding = None
 
-            results = self.db.search_hybrid(
-                effective_query,
-                query_embedding,
-                limit=top_k,
-                time_range=time_range,
-            )
+            if USE_EPISODES:
+                ensure_episodes(self.db, start=parse.start, end=parse.end)
+                results = self.db.search_episodes(
+                    query_embedding=query_embedding,
+                    query_text=effective_query,
+                    limit=top_k,
+                    time_range=time_range,
+                )
+            else:
+                results = self.db.search_hybrid(
+                    effective_query,
+                    query_embedding,
+                    limit=top_k,
+                    time_range=time_range,
+                )
             search_time = (time.time() - search_start) * 1000
 
             if not results:
@@ -417,7 +503,16 @@ class RAGAgent:
         query_embedding = self.embedder.generate(question)
 
         search_start = time.time()
-        results = self.db.search_hybrid(question, query_embedding, limit=top_k)
+        if USE_EPISODES:
+            ensure_episodes(self.db)
+            results = self.db.search_episodes(
+                query_embedding=query_embedding,
+                query_text=question,
+                limit=top_k,
+                time_range=None,
+            )
+        else:
+            results = self.db.search_hybrid(question, query_embedding, limit=top_k)
         search_time = (time.time() - search_start) * 1000
 
         if not results:

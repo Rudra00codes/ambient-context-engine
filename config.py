@@ -66,5 +66,10 @@ USE_GROUNDING = os.environ.get("USE_GROUNDING", "false").lower() in ("true", "1"
 # Temporal Decomposition Settings
 AROUND_WINDOW_MINUTES = int(os.environ.get("AROUND_WINDOW_MINUTES", "15"))
 
+# Episode Segmentation Settings (Chunk 2)
+EPISODE_MAX_GAP_SECS = int(os.environ.get("EPISODE_MAX_GAP_SECS", "120"))
+EPISODE_SIM_THRESHOLD = float(os.environ.get("EPISODE_SIM_THRESHOLD", "0.85"))
+EPISODE_REPRESENTATIVE_MAX_CHARS = int(os.environ.get("EPISODE_REPRESENTATIVE_MAX_CHARS", "1000"))
+
 # ─── Logging ─────────────────────────────────────────────────────────
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")

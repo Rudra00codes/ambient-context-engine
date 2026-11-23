@@ -97,3 +97,54 @@ CREATE TABLE IF NOT EXISTS nudges (
 );
 CREATE INDEX IF NOT EXISTS idx_graph_source ON graph_edges(source_id);
 CREATE INDEX IF NOT EXISTS idx_graph_target ON graph_edges(target_id);
+
+-- ─── Episodes Table (Chunk 2) ───────────────────────────────────────
+-- Semantically clustered contiguous captures representing cohesive activity episodes.
+CREATE TABLE IF NOT EXISTS episodes (
+    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    start_time                  TEXT    NOT NULL,
+    end_time                    TEXT    NOT NULL,
+    process_name                TEXT,
+    dominant_title              TEXT,
+    capture_count               INTEGER NOT NULL DEFAULT 1,
+    centroid                    BLOB,               -- float32 array bytes
+    representative_text         TEXT,               -- capture text nearest centroid
+    representative_capture_id   INTEGER REFERENCES captures(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_episodes_time ON episodes(start_time, end_time);
+CREATE INDEX IF NOT EXISTS idx_episodes_process ON episodes(process_name);
+
+-- ─── Episode Membership (Chunk 2) ───────────────────────────────────
+CREATE TABLE IF NOT EXISTS episode_captures (
+    episode_id  INTEGER NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
+    capture_id  INTEGER NOT NULL REFERENCES captures(id) ON DELETE CASCADE,
+    PRIMARY KEY (episode_id, capture_id)
+);
+CREATE INDEX IF NOT EXISTS idx_ep_cap_capture ON episode_captures(capture_id);
+
+-- ─── Full-Text Search for Episodes (Chunk 2) ────────────────────────
+CREATE VIRTUAL TABLE IF NOT EXISTS episodes_fts USING fts5(
+    representative_text,
+    dominant_title,
+    process_name,
+    content=episodes,
+    content_rowid=id
+);
+
+CREATE TRIGGER IF NOT EXISTS episodes_fts_insert AFTER INSERT ON episodes BEGIN
+    INSERT INTO episodes_fts(rowid, representative_text, dominant_title, process_name)
+    VALUES (new.id, new.representative_text, new.dominant_title, new.process_name);
+END;
+
+CREATE TRIGGER IF NOT EXISTS episodes_fts_delete AFTER DELETE ON episodes BEGIN
+    INSERT INTO episodes_fts(episodes_fts, rowid, representative_text, dominant_title, process_name)
+    VALUES ('delete', old.id, old.representative_text, old.dominant_title, old.process_name);
+END;
+
+CREATE TRIGGER IF NOT EXISTS episodes_fts_update AFTER UPDATE ON episodes BEGIN
+    INSERT INTO episodes_fts(episodes_fts, rowid, representative_text, dominant_title, process_name)
+    VALUES ('delete', old.id, old.representative_text, old.dominant_title, old.process_name);
+    INSERT INTO episodes_fts(rowid, representative_text, dominant_title, process_name)
+    VALUES (new.id, new.representative_text, new.dominant_title, new.process_name);
+END;

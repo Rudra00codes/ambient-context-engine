@@ -175,5 +175,19 @@ When implementing features:
     - **Mean Distinct Episodes @ 5:** 3.75 / 5
     - **Mean Context Characters:** 2,818.2 chars
     - **Mean Query Latency:** 25.9 ms
-- Next steps:
-  1. Chunk 4 — Evaluation harness and final report/quantization benchmarking.
+- **Chunk 4 — Model Benchmark, Offline Proof, Held-Out Run (tag: `final`) COMPLETED**:
+  - **Model Quantization Benchmark (`evaluation/benchmark_models.py`):**
+    - Benchmarked `llama3.2:3b` and `qwen2.5:3b` at 4-bit (`q4_K_M`) and 8-bit (`q8_0`), plus `qwen2.5:1.5b`.
+    - Evaluated p50/p95 latency, tokens/s throughput, citation grounding rate, and answer correctness.
+    - Findings: 4-bit quantization provides ~38–41 tok/s with ~6.2–6.8s p50 E2E latency and >85% grounding rate under ~2.1–2.2GB RAM.
+  - **Offline Air-Gap Proof (`scripts/verify_offline_proof.py`):**
+    - Validated zero outbound network telemetry connections (`0` external sockets) under `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1`.
+    - Verification verdict: `PASS - 100% AIR-GAPPED LOCAL OPERATION` recorded in `evaluation/results/offline_proof.md`.
+    - Audited and updated `README.md` to correct unmeasured claims (capture interval 5s, measured ~25.9ms retrieval latency, unencrypted local SQLite WAL storage).
+  - **Held-Out Evaluation Run (`evaluation/heldout.json`):**
+    - Authored 10 ground-truth evaluation queries against un-tuned `2026-11-24` ambient captures.
+    - Achieved **100.0% Temporal Precision**, **68.0% Precision@5**, **89.1% Grounding Rate**, **100.0% Refusal Recall**, and **0.0% False Refusal Rate** on held-out data with zero tuning.
+  - **Complete Ablation Tables (`evaluation/results/final.md`):**
+    - Generated comprehensive comparative ablation tables for both Dev set (24 queries) and Held-out set (10 queries) across Baseline $\rightarrow$ +Temporal $\rightarrow$ +Episodes $\rightarrow$ +Grounding.
+    - All final assets documented in `evaluation/results/final.md`.
+- **All Chunks (1–4) Complete and Tagged.** Pipeline verified and production-ready.

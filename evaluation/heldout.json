@@ -1,0 +1,160 @@
+{
+  "version": "1.0",
+  "description": "Held-out evaluation query set authored on un-tuned 2026-11-24 captures (Chunk 4).",
+  "reference_now": "2026-11-24T03:55:00",
+  "categories": [
+    {
+      "id": "temporal",
+      "name": "Pure Temporal",
+      "description": "Held-out temporal queries testing time boundaries and aggregation.",
+      "queries": [
+        {
+          "id": "HT1",
+          "query": "What was I working on in Arduino IDE between 2:20 AM and 2:40 AM on November 24?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [1584, 1585, 1586, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1600, 1605, 1610, 1620],
+            "expected_time_window": {
+              "start": "2026-11-24T02:20:00",
+              "end": "2026-11-24T02:40:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Working on esp32_cam_streamer in Arduino IDE."
+          }
+        },
+        {
+          "id": "HT2",
+          "query": "What apps did I use between 3:10 AM and 3:20 AM on November 24?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [2000, 2010, 2020, 2030, 2035, 2045, 2055, 2060, 2070],
+            "expected_time_window": {
+              "start": "2026-11-24T03:10:00",
+              "end": "2026-11-24T03:20:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Google Chrome (Monkeytype), Arduino IDE, WindowsTerminal, and Antigravity IDE."
+          }
+        },
+        {
+          "id": "HT3",
+          "query": "When did I start working on November 24?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [597, 598, 599, 600, 601, 622, 623],
+            "expected_time_window": {
+              "start": "2026-11-24T00:00:00",
+              "end": "2026-11-24T00:30:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Earliest activity started around midnight at 00:00 / 00:03 AM."
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic",
+      "name": "Pure Semantic",
+      "description": "Held-out semantic retrieval queries testing embedding retrieval without temporal filters.",
+      "queries": [
+        {
+          "id": "HS1",
+          "query": "Find captures where esp32_cam_streamer was open",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [1289, 1371, 1372, 1374, 1376, 1580, 1581, 1584, 1585, 1586, 1748],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "esp32_cam_streamer.ino in Antigravity IDE and Arduino IDE."
+          }
+        },
+        {
+          "id": "HS2",
+          "query": "Where was I using Monkeytype typing test?",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "In Google Chrome on the Monkeytype website."
+          }
+        },
+        {
+          "id": "HS3",
+          "query": "Find where Pinterest was open",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "In Microsoft Edge window titled Pinterest."
+          }
+        }
+      ]
+    },
+    {
+      "id": "hybrid",
+      "name": "Hybrid",
+      "description": "Held-out hybrid queries combining temporal constraint with semantic intent.",
+      "queries": [
+        {
+          "id": "HH1",
+          "query": "What project demo launcher was open in Windows Terminal around 2:30 AM on November 24?",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [1614, 1615, 1616, 1618, 1625],
+            "expected_time_window": {
+              "start": "2026-11-24T02:15:00",
+              "end": "2026-11-24T02:45:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "AeroStreamID - End Sem Project Demo Launcher in WindowsTerminal.exe."
+          }
+        },
+        {
+          "id": "HH2",
+          "query": "What file was I editing in Antigravity IDE between 3:40 AM and 3:45 AM on November 24?",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [2286, 2287, 2288, 2289, 2290, 2291, 2292, 2293, 2294, 2295],
+            "expected_time_window": {
+              "start": "2026-11-24T03:40:00",
+              "end": "2026-11-24T03:45:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Chunk4.md in InternProject."
+          }
+        }
+      ]
+    },
+    {
+      "id": "ambiguous",
+      "name": "Ambiguous / Low-Confidence",
+      "description": "Held-out queries requiring deterministic refusal or hedging.",
+      "queries": [
+        {
+          "id": "HA1",
+          "query": "What did the other person say during the WhatsApp call at 2:00 AM on November 24?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": null,
+            "should_refuse": true,
+            "expected_answer": "Refusal: No audio recordings captured for call."
+          }
+        },
+        {
+          "id": "HA2",
+          "query": "What will I be coding tomorrow morning at 10 AM?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": null,
+            "should_refuse": true,
+            "expected_answer": "Refusal: System cannot predict future activities."
+          }
+        }
+      ]
+    }
+  ]
+}

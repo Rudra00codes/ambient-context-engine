@@ -1,0 +1,1090 @@
+{
+  "metadata": {
+    "tag": "heldout_temporal",
+    "timestamp": "20261124_040040",
+    "db_path": "X:\\InternProject\\ambient-context-engine\\data\\context.db",
+    "queries_path": "X:\\InternProject\\ambient-context-engine\\evaluation\\heldout.json",
+    "reference_now": "2026-11-24T03:55:00",
+    "k": 5
+  },
+  "overall": {
+    "total_queries": 10,
+    "temporal_precision": 1.0,
+    "temporal_precision_count": "5/10",
+    "precision_at_k": 0.34,
+    "precision_at_k_count": "10/10",
+    "grounding_rate": 0.3,
+    "grounding_rate_count": "10/10",
+    "refusal_recall": 0.5,
+    "refusal_recall_count": "1/2",
+    "false_refusal_rate": 0.0,
+    "false_refusal_count": "0/8",
+    "compression_ratio": 1.43,
+    "distinct_episodes_at_k": 4.5,
+    "mean_context_chars": 4463.3,
+    "mean_generation_latency_ms": 22.2
+  },
+  "by_category": {
+    "ambiguous": {
+      "query_count": 2,
+      "temporal_precision": null,
+      "temporal_precision_count": "0/2",
+      "precision_at_k": 0.5,
+      "precision_at_k_count": "2/2",
+      "grounding_rate": 0.5,
+      "grounding_rate_count": "2/2",
+      "refusal_recall": 0.5,
+      "refusal_recall_count": "1/2",
+      "false_refusal_rate": null,
+      "false_refusal_count": "N/A"
+    },
+    "hybrid": {
+      "query_count": 2,
+      "temporal_precision": 1.0,
+      "temporal_precision_count": "2/2",
+      "precision_at_k": 0.1,
+      "precision_at_k_count": "2/2",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "2/2",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/2"
+    },
+    "semantic": {
+      "query_count": 3,
+      "temporal_precision": null,
+      "temporal_precision_count": "0/3",
+      "precision_at_k": 0.2667,
+      "precision_at_k_count": "3/3",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "3/3",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/3"
+    },
+    "temporal": {
+      "query_count": 3,
+      "temporal_precision": 1.0,
+      "temporal_precision_count": "3/3",
+      "precision_at_k": 0.4667,
+      "precision_at_k_count": "3/3",
+      "grounding_rate": 0.6667,
+      "grounding_rate_count": "3/3",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/3"
+    }
+  },
+  "queries": [
+    {
+      "id": "HT1",
+      "category": "temporal",
+      "query": "What was I working on in Arduino IDE between 2:20 AM and 2:40 AM on November 24?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          1584,
+          1585,
+          1586,
+          1588,
+          1589,
+          1590,
+          1591,
+          1592,
+          1593,
+          1594,
+          1600,
+          1605,
+          1610,
+          1620
+        ],
+        "expected_time_window": {
+          "start": "2026-11-24T02:20:00",
+          "end": "2026-11-24T02:40:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Working on esp32_cam_streamer in Arduino IDE."
+      },
+      "execution": {
+        "search_time_ms": 36.35668754577637,
+        "generate_time_ms": 4.343271255493164,
+        "total_time_ms": 45.66240310668945,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          1582,
+          1586,
+          1643,
+          1634,
+          1635
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 5450,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.2,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`",
+      "sources": [
+        {
+          "id": 1582,
+          "timestamp": "2026-11-24T02:21:08.059079",
+          "source": "screen",
+          "text_content": "A Ob OM chitin UD @ an tuk) mp GOOUL1\u00ae - o\nQOHe\u00a2o=] een =\n(O] \u00a9 8 Gramum=negsenp 8 > OS age 7,\n| Wasosieami > timedic en? can eae ) Oni. On en | = \u2018c \\ bapor Pxopect\nAerosteeimD\\ firewire esp 3) Feaa st cease c\\esp 32) - oe a >oqmem\no Cana ME>GRDED \u00a9 CG= Gama (ao lamp ern (emm) 0 OF \u00a9, Elites |o\n0 CaRRee AN az) \u2014_\u2014\u2014--__---\u2014---, Br % \u2014_\nfoTCPU Frequency: [rau (wit i781 )) . ry . . Ee _ ; eS\ncom> | ? \u2014\u2014 oot 8\nOng flashing Completes, prexs the RST button on ite ESL \u2014\u2014 \u2014\nflashing completes p (Z| pony ity IDE \\s peace 6)\nap \u00ae Ey 4 aS\n; mS | Ogg @\nbeaeu <= [Ok ns)\n\u00b0 \u00a9 . . . a\n| Es oxi\na | (@) asm ont = | Soman\noagmisa | ae | > ScEEIEID\n[select 121} (ive: Drone Stream Dema)eineutomatcaly le > eee SOCHEINIES\nS_\u00a5ons wal cbreeeve tal preriflll mc veMen ts NW (etc In Fe Ps PRD 3 Ota\n| OXoMGD AED 0 isettings) ; > > 8\u00b018\n800 ow {\u00a9} caocemgp | : s\n, 0\n(ce) focecisre crotecuonsotina: |\nCHINA OOREINMCID \u00b0\neen ni iL ght: ye \u00ae oa A\n\u2014 rn\nMS H@eaSOH@eRBOOUD AOA . eB woes",
+          "window_title": "Search",
+          "process_name": "SearchHost.exe",
+          "fts_rank": -2.636537001855844,
+          "rrf_score": 0.03252247488101534,
+          "score": 0.03252247488101534,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1586,
+          "timestamp": "2026-11-24T02:21:43.128418",
+          "source": "screen",
+          "text_content": "Giespi) Cam steamer | Arduino IDE 2 t11 e\u00ab \u00ae@ 8\n@ Gh and td aD\nQOOEO@ & PAL Thinker SP 52\u00b0C AM \u00b0 } >\ner mer \u2014\nO \u00abCSD CUD Wy Cy CaS Ca EE OS EC CE\n@ |\u00b0 @mm7 LED (Gay 0 CD Tai IP Crp arta casi)\u00bb\nBS lo Etre] Etter //192 GE VAN TL BU/ St perem\n\u00a9)!  |o\n@ |0 e Gum Cxtta Caatd TIED CD cAetina COS 7 at\u00e9ils Grae\n\u00b0 tm\nfh} 2 |\u00bb\n&\n\u00a9 teatm\n& eine loo\n@\u00ae feu ceprikhop\n[2 wine ludeL<lwip/soc kets ho\nQ \u00a9 ut dtm\neine lode en ptt imcet tad\n\u00a9 eu\neine locks\n\u00a9 teat,\n& iit\nPat wine lodepe vex /rte Vent [rep the\nP27 BE eine ludekee-pihttpeecrver hy\nom 7\n[sorial Monitor xg Out puta C AWINDOWS\\ System s\\n exe, YY OFF0\nNet connected See: ta poet onde pertto conics! automat say iD Tine nin ky\nAY Thinker ESP 22-CAM on COM [not connected) & So",
+          "window_title": "esp32_cam_streamer | Arduino IDE 2.3.11",
+          "process_name": "Arduino IDE.exe",
+          "fts_rank": -9.040292424838034,
+          "rrf_score": 0.03252247488101534,
+          "score": 0.03252247488101534,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1643,
+          "timestamp": "2026-11-24T02:30:08.958645",
+          "source": "screen",
+          "text_content": "e \u00a9 8&8\n@ G2 amd &D ED\nOO\u00ae [\u00a2 ammaeman o] $@\nfem -\n2 [cut \u00ab c>thamien cepetorsy EIOED Aktra Cea Oda\n1\u00b0\n8 O mercer COMEiar NDE CHD CAND 0 CED erred)\n8 oa eet rT A aD Se came ers\nis g \u00b0 tp ctand Cy Coie Ga) en\n[) o Naaman O cetmay CONES\n9 |\u00b0 o& Gert ep Cabraate Dads ante) fap Weel Gare\n& \u00ae e & GEIS TS ams Gata eaeD Coax ime\nQ @ |e 8 ae Os Ge tag cau ID cari xt\n\u00ae |\u00b0 eect oto ae oh apne Be\n& \u00a2 & \u20acB08 Ga=> Go Chiat) Gomi ode\nw ie q Sins ban Gk op anaem ofa be ato cite\n\u00ae \u00a2 Benen me Se lee tS ape eo a eee\nimmed {onttwore) (nrpernn son erodvrenfermr ty ( eas,\ncotati ertinm emu Gh Gad) cd atad Camas Chi\n[serial Monto dx iE Output AWINDOWS\\ System 3a\\cind exe) GOO\n(warn [DtardwsreQopecBi nityreturned [ox 10ogfral Ling backpvopnative}yuva27 Be sw BIPkG we\n(succrss | [canerapacnsorp initializedpauccesstully\nPN) CID CEE Cite CAKE, CH Cit Es Comp\n(WEED Biniticlizing.iiaty Pert ormancepaccens[ Point [socewen\n(Wier Faccenn] rointgcreatad!]\n(Wier Bsatwor kiss IDE BAe rost reanvuay,\noF\nCi) imo \u00bb\u00a2 EAHA\nTI) GED 9 Mao\nStarting] Nigh sthroughputparccuning}acrveryony port goad\n\u00ae poo Acrostreun D|TurboY rr anaes tery is] READY \"Pee\nPal tanker SP) CANON\u2019 Onda OME CS]",
+          "window_title": "esp32_cam_streamer | Arduino IDE 2.3.11",
+          "process_name": "Arduino IDE.exe",
+          "fts_rank": -2.386353182166919,
+          "rrf_score": 0.02393753200204813,
+          "score": 0.02393753200204813,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1634,
+          "timestamp": "2026-11-24T02:29:23.866871",
+          "source": "screen",
+          "text_content": "e \u00a9 8&8\n@ G2 amd &D ED\nOO\u00ae [\u00a2 ammaeman o] $@\nfem -\n2 [cut \u00ab c>thamien cepetorsy EIOED Aktra Cea Oda\n1\u00b0\n8 O mercer COMEiar NDE CHD CAND 0 CED erred)\n8 oa eet rT A aD Se came ers\nis g \u00b0 tp ctand Cy Coie Ga) en\n[) o Naaman O cetmay CONES\n9 |\u00b0 o& Gert ep Cabraate Dads ante) fap Weel Gare\n& 2 \u00a2 Se CETERA TED esas Cota eas [ere Parner) cima\nQ i lo & quocams on Gauge gt eames Pte cata a\n\u00ae |\u00b0 eect oto ae oh apne Be\n& \u00a2 & \u20acB08 Ga=> Go Chiat) Gomi ode\nw ie q Sins ban Gk op anaem ofa be ato cite\n\u00ae \u00a2 Benen me Se lee tS ape eo a eee\nimmed {onttwore) (nrpernn son erodvrenfermr ty ( eas,\ncotati ertinm emu Gh Gad) cd atad Camas Chi\n[serial Monto dx iE Output AWINDOWS\\ System 3a\\cind exe) GOO\n[is (905) Fqpie: opicVinanalWiarFaervice (268): GPIOv arQaerviceful readyBinatal led\n(success carerafsennorBinitiali zed!\n(inFol[sensor{connected') Gas GUNAY CHD Ge EMS CxO)\n(WEED Biniticlizing.iiaty Pert ormancepaccens[ Point [socewen\n(ier Faccenn] roint\u00a5creatad\n(Wier BsatworkZss IDE BAcrost reanvuay,\n(Wier Beatwork [runs] commen\nCi) imo \u00bb\u00a2 CAA\n(wiet streamlunr Dnt p 7/1920 oaeee el /at rear)\nStart ing|Widhethrouhputbatreaning}scrverfony port alg\n2yePAerostrcantDATurboperaneae: ler is] READY Bec)\n(3 (STREAM ] [cane raQcaptureddropped}ayt rare)\n[57RRAM [Canc raTcapturezdroppad fat rama:\nPal tanker SP) CANON\u2019 Onda OME CS]",
+          "window_title": "esp32_cam_streamer | Arduino IDE 2.3.11",
+          "process_name": "Arduino IDE.exe",
+          "fts_rank": -2.318263362834136,
+          "rrf_score": 0.022727272727272728,
+          "score": 0.022727272727272728,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1635,
+          "timestamp": "2026-11-24T02:29:28.890474",
+          "source": "screen",
+          "text_content": "2\u00b0 \u00a9 8\n@ G2 amd &D ED\nOO\u00ae [\u00a2 ammaeman o] $@\nfem -\n2 [cut \u00ab c>thamien cepetorsy EIOED Aktra Cea Oda\n1\u00b0\n8 O mercer COMEiar NDE CHD CAND 0 CED erred)\n8 oa eet rT A aD Se came ers\nis g \u00b0 tp ctand Cy Coie Ga) en\n[) o Naaman O cetmay CONES\n9 |\u00b0 o& Gert ep Cabraate Dads ante) fap Weel Gare\n& 2 \u00a2 Se CETERA TED esas Cota eas [ere Parner) cima\nQ i lo & quocams on Gauge gt eames Pte cata a\n\u00ae |\u00b0 eect oto ae oh apne Be\n& \u00a2 & \u20acB08 Ga=> Go Chiat) Gomi ode\nw ie q Sins ban Gk op anaem ofa be ato cite\n\u00ae \u00a2 Benen me Se lee tS ape eo a eee\nimmed {onttwore) (nrpernn son erodvrenfermr ty ( eas,\ncotati ertinm emu Gh Gad) cd atad Camas Chi\n[serial Monto dx iE Output AWINDOWS\\ System 3a\\cind exe) GOO\n[success Caroraysensorzinitialized>uccenstully!\n(inrolQsensorfconnected (ra: fax 140M Ton Fox 00 ttt 11. 0x00)\n(WEED Biniticlizing.iiaty Pert ormancepaccens[ Point [socewen\n(ier Faccenn] roint\u00a5creatad\n(Wier BsatworkZss IDE BAcrost reanvuay,\nFD (SEED Gao 8 Comat\nCi) imo \u00bb\u00a2 CAA\n(wiet streamlunr Dnt p 7/1920 oaeee el /at rear)\nStart ing|Widhethrouhputbatreaning}scrverfony port alg\n2yePAerostrcantDATurboperaneae: ler is] READY Bec)\n(STREAM ] [cane raQcaptureddropped}ayt rare)\n(3 (STREAM ][(cancraQcapturezdropped tay! rare)\n[S7RRAM | [[CancraQcaptureydroppad fat rama,\nPal tanker SP) CANON\u2019 Onda OME CS]",
+          "window_title": "esp32_cam_streamer | Arduino IDE 2.3.11",
+          "process_name": "Arduino IDE.exe",
+          "fts_rank": -2.3439868165852413,
+          "rrf_score": 0.02247681396617567,
+          "score": 0.02247681396617567,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        }
+      ]
+    },
+    {
+      "id": "HT2",
+      "category": "temporal",
+      "query": "What apps did I use between 3:10 AM and 3:20 AM on November 24?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          2000,
+          2010,
+          2020,
+          2030,
+          2035,
+          2045,
+          2055,
+          2060,
+          2070
+        ],
+        "expected_time_window": {
+          "start": "2026-11-24T03:10:00",
+          "end": "2026-11-24T03:20:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Google Chrome (Monkeytype), Arduino IDE, WindowsTerminal, and Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 0.4127025604248047,
+        "generate_time_ms": 18.934011459350586,
+        "total_time_ms": 19.733190536499023,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          2000,
+          2001,
+          2002,
+          2003,
+          2004
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 154,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.2,
+        "grounding_rate": 1.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "Applications and windows used between 2026-11-24T03:10:00 and 2026-11-24T03:20:00:\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Preview Chunk3.md)\n- Antigravity IDE.exe (Window: Major Project - Antigravity IDE)\n- Arduino IDE.exe (Window: esp32_cam_streamer | Arduino IDE 2.3.11)\n- SearchHost.exe (Window: Search)\n- WindowsTerminal.exe (Window: AeroStreamID - End Sem Project Demo Launcher)\n- chrome.exe (Window: WhatsApp call - Google Chrome)\n- chrome.exe (Window: OmniContext - Claude - Google Chrome)\n- chrome.exe (Window: Monkeytype | A minimalistic, customizable typing test)\n- chrome.exe (Window: Monkeytype)\n- explorer.exe (Window: Task Switching)",
+      "sources": [
+        {
+          "id": 2000,
+          "timestamp": "2026-11-24T03:10:02.926806",
+          "source": "screen",
+          "text_content": "\\\noe oe 7 @ @(@)",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": 2001,
+          "timestamp": "2026-11-24T03:10:07.939919",
+          "source": "screen",
+          "text_content": "@Qammemmp ees we\ni |\nBe Oe eae",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": 2002,
+          "timestamp": "2026-11-24T03:10:12.944156",
+          "source": "screen",
+          "text_content": "@utmmmmpy eeesesess\u2014aeses\u2014(i\u2018<iaiaie we\nie a o :\nGe Oo - @ |",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": 2003,
+          "timestamp": "2026-11-24T03:10:17.967538",
+          "source": "screen",
+          "text_content": "oe os ~ | \u00ae",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": 2004,
+          "timestamp": "2026-11-24T03:10:22.966437",
+          "source": "screen",
+          "text_content": "i | a i ee :\n| : ere :\nOe Oo ~ @ @(e)",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe"
+        }
+      ]
+    },
+    {
+      "id": "HT3",
+      "category": "temporal",
+      "query": "When did I start working on November 24?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          597,
+          598,
+          599,
+          600,
+          601,
+          622,
+          623
+        ],
+        "expected_time_window": {
+          "start": "2026-11-24T00:00:00",
+          "end": "2026-11-24T00:30:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Earliest activity started around midnight at 00:00 / 00:03 AM."
+      },
+      "execution": {
+        "search_time_ms": 0.2117156982421875,
+        "generate_time_ms": 4.053354263305664,
+        "total_time_ms": 5.190372467041016,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          597,
+          598,
+          599,
+          600,
+          601
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 6987,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "grounding_rate": 1.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "The earliest activity recorded on 2026-11-24 started at 2026-11-24T00:00:04.184559 in window 'Mail - RUDRA PRATAP SINGH - Outlook' (olk.exe).",
+      "sources": [
+        {
+          "id": 597,
+          "timestamp": "2026-11-24T00:00:04.184559",
+          "source": "screen",
+          "text_content": "@ |@AMITY| Gates (Qamm \u00ae=@- os\nje S & Gap tm mp\nmm |G\u00b0 SI GeO O14 & @ -|Ov S| Oamap > Oyu Oo Be DOr Scl@l@lPlol\n@ | > Guts Go frocused] [Othe \u2018(21 Me Welcome. to Epic Web: Services Internship, Confirmation] ((j,semmaue ita ema)\n, . ol\n& oan nen aoe ace Other Emails (21) Thal kotesretiigs will este hank. z in clesigna 3 caaroqea ~ hed wartrits od applications, whee\nacne seomnit = . ienerrabiy wll fey yu harchy on eapevionor integrin ad cant lege feat wnt wrtrites sod pplication\nPct w Atlassian UNIDAYS Atlossken Community, GB for bxcel rec Ki lngside our chili prakerdonahy You wl br aagraee Kw projets terior Tecetoeahir ured faa prac thea Popov 1)\ngd \" tadintcy took \u2018and wortslawn\nPoms ee I\nPemmm \u00bb Xemmtamim 20d CT irnerrahig Ouretion. 7510 hans 7075 to Aer, 7075)\nFinal Blech End Term Project {MTech Dissertation Vie Co] Role: Web ruin and Urvelonamenst Intern\n&| Gorse 5 | Oey D 0 Ce EM ET ATED\noy @oterd Students, Re porting \u00a30, Supervisors(MajOx/ Minor Proj f+] Reporting Manager. Priyanks Kuen]\n\u00a9 4 D r) Fel Working Days: Naxxtuy to Sutrd.ry,\nGagan CANAD\n10/00 AM to6:00 PM\n= @ (B) Guidelines End lertinl valuation Majol/Miniox Project at Ql uae\n(Archive) | Werapest a panther uttitudhy supe sti to krartivand ustiong axvenitment throuphors the kiteembign (hn will bea great\nComme Q \u00b0 @e Opportunity tocihune your fechilael and onuthar skal\u2019\ncumnvonCudielines for Industrial reining Report at TFurther detygik repcding onbow ding, pxOject muiieline ined eomeneanication shucruths wall be charted shen thy\nOem D 0} ae pepatresco \u2018tart date, feel (ee to reply to this ein) oc conde? ts at he de plowabsarviog com.\n@eminti > Pe] Ut pig Web Service] (Onan ypinwccegtatuli ncaa] welcome tol pic Web Servier!\nWelcome to t pic Web Services: Interasbip Contimatic 8 a; \u00b0 S\n\u00b0 \u00b0\n&8.G0 to,Groups \u00b0\no tip (Best wnshe\n[Add account] \u201c> | Ss\nFoMAddaccount o@) PrannyKomargl wor) AY a) | Sateen\nPlacement Opportunity with Net Solution | 1s 39) Epi >| eer ie]\nUpdote, Dear Studentsa lhe HR team hastxtended . pic rat slopeamtecrecaany fa\nfSonali Sheikha exceeds\niss] Meeting with Dearie 8. lech tinal Yeat Stude ag OF 27 Qo\nror ctudentulhnen tomformyou tite meeting \u2014\u2014\n| (KeXew)] Kekeera] (P= )]\nyy 0 o \"\n4 0c SS",
+          "window_title": "Mail - RUDRA PRATAP SINGH - Outlook",
+          "process_name": "olk.exe"
+        },
+        {
+          "id": 598,
+          "timestamp": "2026-11-24T00:00:09.181793",
+          "source": "screen",
+          "text_content": "@ |@AMITY | Gites (Qa id \u00ae-@- oO\njo| & @ ge w& w\n(Comm -l/G\u00b0 SI SO O\u00a9|% & & -|Ov G| Oaremp \u00a2 Oxy! Ov Bo \u00a9 @- Be @1O)Pl-] \u00b0\n@ | > Gaze Go Lrocused)gOthed \u2018(21 Me Welcome. to Epic Web: Services Internship, Confirmation] ((j,semmaue ita ema)\nA 9 Weare plraus! to jokorn you that you have been selected for a 2-month intomihip in Web Oosign and Development at Epic, ry\n(Som nd U0'3.singh20@s amity.edu Other Emails (21) Wt Service\nFAUssian UNIDAYS, Atlessker Community, GPL for Excel 7\no || Sua Pa\nea yg fi os reefer\nzg [Drafts] @ \u00a7 Pein alongsch our dlind prokeiorahe You wall ber invasgnedd Keer projeete\u2019ceerwr roretorchinn und pare\u2019 pron Heal capoviere Tos\no ladintcy took \u2018and workskawn\nPenns \u00bb Stuimtumttep O\u201dd\nTindl Blech tte) erm Project / M.Tech Disses tation Vie\n&| Goro e | Ee rrerochs Ouran 7511 heer 7075 0 VAR 7275)\n[OaGectanjali Babbar 0)\n(i) Fol Rota: Wee Drupal Develoyret Inte\noO @oterd Students, Re porting \u00a30, Supervisors(MajOx/ Minor Proj\nCT iocetion: Den No 145, arc ooe Ont opratice Wally Raat ps, Mita uty 1200)\nOar One 20 otto\nSans Guidelines End Term Evaluation Majol/Minot Project at oO Dyas Waxwing ta Sutter\nSemememoy | \u00bb gy Moma OOP oCGAENINEND\n5a Submission Guidelines for Industial Training Reportar Wil rapect a pantie Utd supe Toes to learn and uv stcong cameltoe? Ev oughoas the texnibign Ths wll be a peat\nCann Sani tae Moa oe ee eased ST FA\nemanan my) [pic Web Service] 0)\nCR eae ST\n9 ty\n& (qq) Sati AY @ureths,\nPlacement Opportunity with Net Solution Ls 39]\nUpsgte Dear Students\u2019 The HR team has extended: Manesh Koren\n| ab | Sioeteren\nEpic >| eer B\n[Sonali Shekhag erat elotiemantbariineee\ns Meeting with Divten Bech Final Yeat Stade SOF 277 wet tenne | CRE) [ea\nDror studentl bres tomforn you theater meeting\nQOaemmmm\n\u00a9 Ose j ae\n1e:/ ..c\u2014c\u2014\u2014\u2014\u2014\u2014eee_\u2014",
+          "window_title": "Mail - RUDRA PRATAP SINGH - Outlook",
+          "process_name": "olk.exe"
+        },
+        {
+          "id": 599,
+          "timestamp": "2026-11-24T00:00:14.186982",
+          "source": "screen",
+          "text_content": "@ [@AMITY | Gates [Qamm \u00ae=@- os\nmm |G\u00b0 SI GeO O14 & @ -|Ov S| Oamap > Oyu Oo Be DOr Scl@l@lPlol\n@ | > Guts Go frocused] [Othe \u2018(21 Me Welcome. to Epic Web: Services Internship, Confirmation] ((j,semmaue ita ema)\n9 e -)\nFoc Bhd iud'a singh20@s amity.edu \u2018Other Emails (21) @. GORSAIDIO\nFAULSsiat UNIDAYS, Atlassiel Community, GPL for Excel Pe 5 RUORA PRALAD Suvc24\nQD (G2) inbox} 156) J Ct Prpartia Korn \u00abpc yarkatiepe wrtvatvere.ccen >\nPom es er: |e es\nPemmm \u00bb Xemmtamim ey)\ntinal B.Tech End. Term Project 7 M.Tech Dissertation Vix Epic Wab Service\nQ| Wotamm 0 |\n(i) [Oo SGeetanjali Babbar) (0) This intemship will offer you hands-on uxperianos in designing and developing real-world websites und applications, while\noO @oron Students, Reporting to Supenisors[Majoc/ Minor Proyes rmorking dlonyj\u00a500 GUT skiod proteanionle\u201d You wil be assigned the profacta: tcave mantarshigr and wan practical\n! EX PONUTE tO iINdUstry tOOls and workflows\"\n@um Once 20\n=] a rin Guidelines End Term Evaluation Majol/Minot Project at EY irtasnships Durations 2h june 207510 30h Aux 2073)\n> Submission Guidelines, for Industrial Training Report at Bel Location: Unit No. 343, Third Floc, Orbit Signature Walk, VIP Rox, Zkpus, Mohali, Punjsts-1 40603]\n{Soutbox] D re] Reporting Managnr: Priyanke Kumari\n@emarem es a ne oe Eo werting Onyx Muncy (osu)\n, ColTiminga: 10:00401106.00 71]\n9 hoday] Wo uxpoct a pouithe nttituda, eagamess (0 lean, and a strong commitment throughout the intemabip. This will be a Root\n& ' r) 7 opportunity to bnhimect your technical und cromive skiltal\n> Cuma. CED Furthar detaits rogiding onbosrding.. project guidelines, and communication channuls will be shared shorty.\niss] Meeting with Dearie 8. lech tinal Yeot Sill Mon 09 27 Gu exten\nDeon Student hs is to inform you thet e meeting CS (00 0c a | \u00b0\n. 9) 0 OO OSCSCOCOCOCOCOCOCOCO gn 6",
+          "window_title": "Mail - RUDRA PRATAP SINGH - Outlook",
+          "process_name": "olk.exe"
+        },
+        {
+          "id": 600,
+          "timestamp": "2026-11-24T00:00:34.219664",
+          "source": "screen",
+          "text_content": "\u00a9) @ (OQ ammnar & (@cmpann B|\u00b0 Cees)) \u00ab\u00a7 @ B\ne\u00a2\u00a95E664 Moc sqooglecon/forns/d/e/ FAIpOLStIAKsmjgt JOH TDON3/ MIyBESY/ca/NoIpNutCaUnk InkSaNw/view!orn BI@CBISA SB\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\nName of Company where pursuing internship/industrial training (In case of tn\nhouse internship specify ASET, AMITY UNIVERSITY PUNJAB)\nEpic Web Service\nNs /\nra nN\nAddress of Company (Specify Full Address with City and State) (In case of In\nhouse internship, write name of Project Supervisor)\nalk, VIP Read, Zirakpur, Mohali, Punjab- 140603\nNs /\nra nN\nInternship Start Date *\nDate\ndd-mm-yyyy oS\nNs /\nra nN\nInternship End Date *\nDate\ndd-mm-yyyy oS\nro) Ns /\nra nN",
+          "window_title": "Internship Detail - Google Chrome",
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": 601,
+          "timestamp": "2026-11-24T00:00:59.242126",
+          "source": "screen",
+          "text_content": "\u00a9) @ (OQ ammnar & (@cmpann B|\u00b0 Cees)) \u00ab\u00a7 @ B\ne\u00a2\u00a95E664 Moc sqooglecon/forns/d/e/ FAIpOLStIAKsmjgt JOH TDON3/ MIyBESY/ca/NoIpNutCaUnk InkSaNw/view!orn BI@CBISA SB\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\ndd-mm-yyyy &\n\u00a9 insis.a requires cuestion\nx \u2019\nc x\nInternship End Date *\nbate\ndd-mm-yyyy S\nx \u2019\nc x\nMode of internship *\n\u00a9 ontne\nx \u2019\nc x\nStipend( write NA if not applicable) *\nYour answer\nx \u2019\nc x\nHow you you got the internship? *\n@ \u00a9 salt",
+          "window_title": "Internship Detail - Google Chrome",
+          "process_name": "chrome.exe"
+        }
+      ]
+    },
+    {
+      "id": "HS1",
+      "category": "semantic",
+      "query": "Find captures where esp32_cam_streamer was open",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          1289,
+          1371,
+          1372,
+          1374,
+          1376,
+          1580,
+          1581,
+          1584,
+          1585,
+          1586,
+          1748
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "esp32_cam_streamer.ino in Antigravity IDE and Arduino IDE."
+      },
+      "execution": {
+        "search_time_ms": 23.8039493560791,
+        "generate_time_ms": 3.8716793060302734,
+        "total_time_ms": 28.07140350341797,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          1803,
+          1798,
+          1811,
+          321,
+          1812
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 7012,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`",
+      "sources": [
+        {
+          "id": 1803,
+          "timestamp": "2026-11-24T02:49:25.918282",
+          "source": "screen",
+          "text_content": "- \u00a9 8\n@ G2 amd &D ED\nOe@EL \u00b0 } &\nRoma -\n= P )\n8 ole - \u00a9 8\n(1) Vi vejwebcaa (AeroStreaml D[withpHot ionkCoapensat ion)\naD (2) i VeJoroneystreaa] Oeao(ESP325CAHKVialWigk iPAR)\nTRY a (3) [sides bysSide\u00a5Comparison{(Sasel inegvspAeroStreaal0)\nPan MC) RecordfVideo est\u00a5cvip) (from) WebcamforJOrone) Stream)\np36] (5) [Waanct Grounds TruthPAnnotationBTool\u00a7(annotate\u00a5gt py )\n& oD (6) \u2014RanHor, Evaluation[s[benchaarky Comparison\n(7 )icheckYesp322cah[Hardware\u00a7Streaa\\status\na (8]fecuYecatures| Oem Tiling he yPrivacy[elurkgReliability)\nQ|\\2 ) Gra\na ,\n@p | |G qin (ae 9\nee wy\n& Coemmcheck) ESP32,CANEStrean}Statushia a)\nPM (EnterJESP32=CAMBIPA(Oetault P192\"168eUe1) -192e168sue1\nap pp\n-coMMM1)feingingp192\"168\"Ue1 5\nmamma [Pinging PLAN cht & Cytas oO Cotes | a\nMenayrti [Rep lygfromp192\u00a5168 \"UNI Mi bytes-32Kt ime-Uns, Partin Of\nPemmmemen (Reply Ei roapl92\"16a\u00a5u\") Bbytes=32 Rt imes27as i\nCD oy\nDoo Ks lpingistatist icsRrorg192 61680402)\n(SUCCESS | Backet\u2019s BSent\u00a5-}2 @lReceived=F2 vost} 50 te)\n[i rnroi'sc fApproximatepround tripktisesBingailligseconds\nHinimual=[das qi Naxiaua)-827asQ@Averages-\u201415as\nCag &\nfiwrerfact(2 )Probing[streamJuRtgatyhttp://1928168.4\"1:81/streaayeryy\n[iwiri ifs [( (WARN; 6030087 )\u20145 lobal\u00aecap\u00a5ttapeg\u00a5iaplWhpp.u53MopencvY{fapeg\u00a5interrupt@cal lback|Streaakt iacoutktriggeredPatter#3003U47]\nCI MH GXED cs\nCae Gy\nCI) Ghia \u2014e ce\n(starting[ nigh throughputpatreaming}scrverzony por kal gd\nDoo Pacrost res De turbody fanart. ter Bi eT READY Be <<)\n\u00a9 | Ga cam cat a Gacy amon\nBute ladce tell Al Thine: EMI? DARf oe COMM (2 LJ",
+          "window_title": "AeroStreamID - End Sem Project Demo Launcher",
+          "process_name": "WindowsTerminal.exe",
+          "distance": 0.9977076053619385,
+          "rrf_score": 0.01639344262295082,
+          "score": 0.01639344262295082,
+          "keyword_match": false,
+          "cosine_sim": 0.5022897671014732
+        },
+        {
+          "id": 1798,
+          "timestamp": "2026-11-24T02:48:50.845517",
+          "source": "screen",
+          "text_content": "- \u00a9 8\n@ G2 amd &D ED\nOe@EL \u00b0 } &\nRoma -\n= P )\n5 8 ole - \u00a9 8\n2) faSTechyHajorgProject\u00a7(Oissertat ion Bo gend\u00a7Seajevaluat ion]\na exe ah Cw Coad Cama) = Gd Go Gxia\nTRY o& (1) Vi vejwebcaa (AeroStreaml D[withpHot ionkCoapensat ion)\n@ bi [e) Tive Orone\u00a5Streaa) emoX( ESD325CAN fyiawi-Fipar)\n& (3) [sides bysSide\u00a5Comparison{(Sasel inegvspAeroStreaal0)\n& aD (a) [RecorafvideoprestKClipy( trom WebcaaQorJOroneg Stream)\n(5) ftaunch\u00a5croundzTruth\u00a5annotat ionBtool( annotate\u00a5gt\u2122py )\n4 (6) [[RunJnofe Valuations [benchmark {conparison\nQ 2 (7) icheck ESP32= CAM) Hardware\u00a7StreaajStatus)\nae (8) [cal Yreatares|Oeaoh (Tiling ke yprivacy{BlurwdReliability)\n@D (elfexit\n2 | |Guxm qatkn (ae 9\n&\nP/M a &check Je SP32-.caniStrean|stat usk\nGD [EnterJESP32=CAMBIPM[ Default -M192\u20ac1685ue1) M192 168eue\nmann. {(:1')] [REDACTED_PHONE_NUMBER] | a\nbum Poet\n7 Pingingg1926168 deigwith (3afbytesKofKuata,) i\nfiwann [tt Reply pfroap192\"168\u00b0u\"l Bbytes=32[t ime=uas\nEY 0m Ks[Replygtronp192i6atuNr pbytes=32Rtimes27as\n[SUCCESS |\n(inrome[PingystatisticsRforg192=168\u00b0qe1 |\nbackets sent Wy2\" Received|-\u20142 lost\u00a5-Jak( Ge hloss)y\n[iwiriific Approximateyroundktripkt imesPingailligseconds:\nCa a Hinimual=[das qi Naxiaua)-827asQ@Averages-\u201415as\nCH oy\nGap cu istreamJUR@atUhttp://[REDACTED_PHONE_NUMBER];81/streaamyey\nCaw\nCI) Ghia \u2014e ce\n(starting[ nigh throughputpatreaming}scrverzony por kal gd\nDoo Pacrost res De turbody fanart. ter Bi eT READY Be <<)\n\u00a9 | Ga cam cat a Gacy amon\nBute ladce tell Al Thine: EMI? DARf oe COMM (2 LJ",
+          "window_title": "AeroStreamID - End Sem Project Demo Launcher",
+          "process_name": "WindowsTerminal.exe",
+          "distance": 1.0542320013046265,
+          "rrf_score": 0.016129032258064516,
+          "score": 0.016129032258064516,
+          "keyword_match": false,
+          "cosine_sim": 0.44429744371262103
+        },
+        {
+          "id": 1811,
+          "timestamp": "2026-11-24T02:50:20.977096",
+          "source": "screen",
+          "text_content": "A Ob ah cam wy @ an tut) ED CAgToROA NAD GBOEOOS1\u00ae - o\n@a 6\u00b0o0@ ep =\nQ frmates ancaey SA Major roject ole\n, * * * VOD\nen S@omd\nee [cieanty take PSRAM] &)\nCAR A CRAR NON PP TY) SOqm=zD\n[pong] outetetcton butters continously; J L oman\n. ole > \u00a9 Seam &\nb@tamnionaras\neroStreaal0p-gAirborne|persongldentificationppipeline 5 game\nHow to Re Flas BXrech[tajorgproject(Oissertat ion )[efend|Sealevaluation TO xr) 8\nGEEREEEEEEEEEE EEE Eee eee eee eee eee eee eee eee oar]\nTinAidving (DE fe C2) BUivel Webcam (AeroStreaml D[withpHot ionkCoapensat ion) Gen \u00ae\npramrwmmres Bia (2) [Ti ve] OroneJStreaa] Demo (ESP325CANKVia\\wigk iYAD) B Sexy e\nnara a (3) [sides bysSide\u00a5Comparison{(Sasel inegvspAeroStreaal0) Yorn\nPerma (a) [RecorafvideoprestKClipy( trom WebcanQorJOroneystrean) youn i)\nCY (G}) fern GroundZTruthPannotationBloo lg annotate\u00a5gt\u2122py) Ogi o\npynempaanaee (6 )BRUNY HOT, Evaluat ionfs|eenchmarkt (Comparison Oommen\narn 7) RCHeckMESP32\u00a2CAN[Hardware\u00a7stream\\Status \u2122\naD (8) [cal Yreatares|Oeaoh (Tiling ke yprivacy{BlurwdReliability) Ocugamm\n| (Cy) Ga og\noxgcni \u2014\nGx cn (De 2 Ocoimm\neae eam\nFed iveESP325CAN|Orone\\streaah Oaiiaxp\nIne sueamnil x (EnterystreamfURI@ [Default Bhttp://192\"168eu\"1:81/streaa]\" Soman\n\u2018quahty snct suit) DLENCT: KM DOCS,\nq OMIDTERMS DOS,\n| O@pampz 4 Dpereosny\n, Otitis\n> Memeo\n000 wm\n[ask anythin 2. to mentions / tor acon\n\u00a9 extammmpe pax\nj i | Patematine, i\nBe CeO on iE @ cA aK cca CU Cee Ok Cen Cee te}",
+          "window_title": "AeroStreamID - End Sem Project Demo Launcher",
+          "process_name": "WindowsTerminal.exe",
+          "distance": 1.0633989572525024,
+          "rrf_score": 0.015873015873015872,
+          "score": 0.015873015873015872,
+          "keyword_match": false,
+          "cosine_sim": 0.43459132885714524
+        },
+        {
+          "id": 321,
+          "timestamp": "2026-11-23T23:13:14.537988",
+          "source": "screen",
+          "text_content": "(\u00a2) Ocm>cmmmme 8 (Oamm-emm B\\e (Ceexs)] \u00ab @ 8\n8) Someones Clarpan OGtrrmay Commmmm Tem So Camm SED, \u00a2 ein \u00ae\nGoogle wan @scers) 810 @ SB\nDownload Stremio Service >\nEO\n\u00bb\nLeeann nee ee \u2014EE\n[More results trom stremeo com 9)\nOe\nGoin 6\nStremiog Freedom to Stream\nCOTA Overview)\nStremio is @ freevopan=source media center, and content aggregator that organizes,\nMovies iTV, shows, live TV,and web.channels in.one place 'itdoes not host its own\nmedia library; instead, it relies on official and third: party add-ons to pull streams and\n\u2018catalogs\u2019 \u00a9) summon)\nKey, Features\u2019\nfom Add-on System: Install official or community add-ons to browse catalogs, access\n\u2018streaming sources, or add subtitles: Because add-ons run remotely rather, than\n\u2018executing local cade_on your device, they do not directly run local scripts on your,\n0 Barta Qi Qi weeRery cee ite eray ANCES OES ES",
+          "window_title": "stremio - Google Search - Google Chrome",
+          "process_name": "chrome.exe",
+          "distance": 1.069525957107544,
+          "rrf_score": 0.015625,
+          "score": 0.015625,
+          "keyword_match": false,
+          "cosine_sim": 0.42805711353659603
+        },
+        {
+          "id": 1812,
+          "timestamp": "2026-11-24T02:50:25.978070",
+          "source": "screen",
+          "text_content": "A Ob ah cam wy @ an tut) ED CAgToROA NAD GBOEOOS1\u00ae - o\n@a 6\u00b0o0@ ep =\nQ [rrete tmiey Shion Poet ol\u00ae\n, * * * VOD\nexc .oomo\non xy CHRD >\n. ole \u00a9 \u00a9 8 \u00bbea &\nPS RaEAEAEAG\nReroStreamllpaqAirbornebersongldentiticat ionpoipeline 5 game\nHow to Re Flas BXrech[tajorgproject(Oissertat ion )[efend|Sealevaluation TO xr) 8\nGEEREEEEEEEEEE EEE Eee eee eee eee eee eee eee eee oar]\nTinAidving (DE fe C2) BUivel Webcam (AeroStreaml D[withpHot ionkCoapensat ion) Gen \u00ae\npramrwmmres Bia (2) [Ti ve] OroneJStreaa] Demo (ESP325CANKVia\\wigk iYAD) B Sexy e\n5 (3) Sides by5sidefCoaparison}( Basel inegvspAeroStreaalD) B cre\n2-Click Upload (4 > analy eK ~\n(a) [Recora{videoprestKC lip, ( trom[webcanQor]OroneyStreaa), youn\nmace MES Baunch\u00a5GroundsTruthYAnnotat ionblool@(annotate\u00a5gt\u00a5py), Od\n: aunch oun ru\u2019 nnotation oo annotatefgt.py Ogi oe\npp-eanpumare a (6 Run HOT@e va luation\u00a5<|[benchaark [Comparison Oanmunysgmm\nara, U7 Check ME SP32=CAN[Hardware|Stream\\Status =\naD (8) [cal Yreatares|Oeaoh (Tiling ke yprivacy{BlurwdReliability) Ocugamm\n1 () Gn oCisknz)\noxgionts \u2014\nGx cn (De 2 Ocoimm\neae eam\nFed iveESP325CAN|Orone\\streaah Oaiiaxp\nIne sueamnil x (EnterystreamfURI@ [Default Bhttp://192\"168eu\"1:81/streaa]\" Soman\nRjuahty and ste) COVENDT: RM DOCS,\nTCINEO J] Executing EC :\\Users\\rudra\\Desktop\\ProjectWorks\\NajorJProject \\AeroStreaalD\\veny\\Scripts\\pythonvexe, (src/main\u00a5pymos) SCENTS\nBi taechonaedt, Pounce hetpey/192 1 6atuNaT81/ stream mwaotionncompensationkoacontidencestlaghergaprinterpolationfe-s lowe latency, Dieeen ny\n\u2018JLINEO[Pressko Minsidexthepvideowindowktogstops Dinter Repent pal)\nOtrmtiyme\n000m\n[ask anythin 2. to mentions / tor acon\n\u00a9 extammmpe pax\n| | | Dy Tamadine |\nBe CeO on iE @ cA aK cca CU Cee Ok Cen Cee te}",
+          "window_title": "AeroStreamID - End Sem Project Demo Launcher",
+          "process_name": "WindowsTerminal.exe",
+          "distance": 1.0764265060424805,
+          "rrf_score": 0.015384615384615385,
+          "score": 0.015384615384615385,
+          "keyword_match": false,
+          "cosine_sim": 0.4206529885445889
+        }
+      ]
+    },
+    {
+      "id": "HS2",
+      "category": "semantic",
+      "query": "Where was I using Monkeytype typing test?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          2029,
+          2030,
+          2031,
+          2032,
+          2033,
+          2034,
+          2035,
+          2036,
+          2037,
+          2038
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "In Google Chrome on the Monkeytype website."
+      },
+      "execution": {
+        "search_time_ms": 20.31087875366211,
+        "generate_time_ms": 2.996206283569336,
+        "total_time_ms": 23.55194091796875,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          2030,
+          2032,
+          309,
+          814,
+          2047
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 3291,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.4,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`",
+      "sources": [
+        {
+          "id": 2030,
+          "timestamp": "2026-11-24T03:13:08.225540",
+          "source": "screen",
+          "text_content": "(0) exten Q _\u2014 1\n=) monkeytype kama wi mes) a8\nfH ee\nCe Pall\n| Camm Oana imu,\nEE . .. -ff  [oRP itigh form auch person can)\nt- oo (allolfelrlieiiw lols: Joleliy)\nae Se fellelol\u00a2ilol@ilaiaiall sits |\neR VG a yo (ai[siieleolololle I. i(a)\n(+) o qa GD\nCS o eS om\nBe Oo & Came Oa gm Cams Cem Qum Oamay Ooacy Can axe pmae |",
+          "window_title": "Monkeytype | A minimalistic, customizable typing test",
+          "process_name": "chrome.exe",
+          "fts_rank": -9.776759870208863,
+          "rrf_score": 0.031754032258064516,
+          "score": 0.031754032258064516,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 2032,
+          "timestamp": "2026-11-24T03:13:18.236962",
+          "source": "screen",
+          "text_content": "\u2014 \u201ces ; .\n(0) existe Q _\u2014\nvty\neS ae MELT \u00a9 & 8 O 0 8 |\nt \u201cahh\n| | CNA lh Gems Om Oa fam Camp OGD iad AdiwweD\nWe eval\nrin Byoukcango lsoxchangegal Imthesegsett ingsRauick lymusingetrezcoranchl ene}\nCE) @ ewe)\nwe aw al, l ce, Y bahawilor\nco ge conn 7. Normalfis\\the]clossich typing [test {experiencespexpert} fails\naf oo oo . : | che[cest|i ffyouTsubni t} (pressYspace ) fanJincorrect}word\u2122 porn? foxpes) feasted\ngt 2 . Se hastergfaiis[i tlyouTpress{a[single} incorrect] key] (caning } you)\nDad ae an mo haveftoYachieve}i aes faccuracy)\u2122\n2 : 0 : we an Press|tabs \u2018orgentergtolquickly|restartythe,test @orgto)\ni ye . en quickly, WORE theJcest}page |neseVopt ions[disablc} ron ot] & > feotey\n. eS ee : navigationlonyeost] parts, of grhefwobsi teMuSing[ency esc\noe get - wr - . voption]willYmovelopeningstheYcommandline}tolthe] tab) key 5\noo a . \u2018yg 5 This}setting[changes\\the when[ typing\n\u2014 - . \u2014 ot \u2014\nyoulrestart{whilcltypings\nQehw ax\n[errorsyorg incorrect {words[are]highlighted she lps] you}to} CD\nYonJrow!specd $I ffenabled YquickYend]is}recommenacd\u2122\nBdiap ap axh tama\n\u2018option,willfautomat ical ly{show]the,words|historyfatgtne]\n\u2018offtheltcst Gf Con[causc}slight}lag[withyaplotYot{words\u2122\n\u2018De Oe & eau teen ancanad tno\n. an ; \u2014 an J) WenJonadicd Gi tlwill {show the{comeand}1 ine]wi th 011 Kcomeands, (een) 4",
+          "window_title": "Monkeytype",
+          "process_name": "chrome.exe",
+          "fts_rank": -13.38770892750985,
+          "rrf_score": 0.03047794966520434,
+          "score": 0.03047794966520434,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 309,
+          "timestamp": "2026-11-23T23:11:29.381885",
+          "source": "screen",
+          "text_content": "(c) Ocmpemame 5 (9 expemenD B|\u00b0 (Ceexs)] \u00ab @ 8\ne@d 8 @ Roogle com/seateh?g IF seat chBog GE seatchgs. lo pg? jal WbWUyBGgAEEUYOTHCAEQABIABDIHGAIOABIABDIHCAM OABIABDIHCACQABIABDIHCAUQAS Q @) \u00ae \u00ae 0@ 6\n8) Someones Clarpan OGtrrmay Commmmm Tem So Camm SED, \u00a2 ein \u00ae\nGoogle\u2019 819 @ 8B &\nOO Gs Gyp tm @ape bo\nCOTA Overview)\nSearchis the act of looking carefully for someone or something Yor,using a tool oy\n\u2018System=such asa web search enginasxto find information or, records! Qwaerd si) 8\nDefinition and Usage Rmantchergarn nsaarchappicnion (hot ll Sie\nMCV TKS Towa paGeT and cthees s i a\nfel Verb: To look through a place, person; database,or, the internet to find something Pan?\nspecific (e.g.nsearch fora job,\"search through files*search the _\u2014 ee\nce) O Gm) 8\nfel Noun: An attempt to find someone or something.a careful examinationyor,the act of, \u2018Hae,\n\u2018querying a database or search engine (e.gwa job search*run a | Gy groans J |\neee\nom\nTaps fherww Googie Com > sec |\nGoogle Search\nex\nVideos]\n\u2014\u2014\u2014\u2014",
+          "window_title": "/search - Google Search - Google Chrome",
+          "process_name": "chrome.exe",
+          "fts_rank": -4.401816760713642,
+          "rrf_score": 0.028309409888357256,
+          "score": 0.028309409888357256,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 814,
+          "timestamp": "2026-11-24T01:10:21.316620",
+          "source": "screen",
+          "text_content": "[\u00a9 wrscton cat cooge nome) WwhateApg call Gacdie Chrome e @ 8\n@Qommm ee rrrrrrrrrrrrrr\u2122r\u2122\u2014\u201cOOCOCOM\nje eet\nPar Bos Hasty. a See ee Ser\nee. Fs Ta Mea cee | * : We] j [ae\nEEX. BER ag\u201d 2S, Se WSS\neen arate pe ee TUE RA wey\nFe Sap pet Z- MT OU Sate -\nCon BE OS TREES BRT\nTEST: Whe eax\u201d oo RR AS sed\nSa sc FS ES\n\u201cwe axa % \u201cQe 4 , &\na\n\u2014\u2014' _ _. . Eas _ + .y\nBe Oo @",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe",
+          "fts_rank": -5.018196847571144,
+          "rrf_score": 0.02797339593114241,
+          "score": 0.02797339593114241,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 2047,
+          "timestamp": "2026-11-24T03:14:33.385365",
+          "source": "screen",
+          "text_content": "[KEmeersam OD OM\nS - 8 a O Charatan PMT Q@e6be 8\nil 7 ez] monkeytypele ww MMS) 08\nFZ 7\u201d \"a ; -- i ~ : ] - c+) : 9 00\nov af QMO 5 \u00a7 oo tb eo ee\n. . . re testi:\na && aren 531/07 0Y.9 69% Be\n: be ; stopponplerted\n. . pA Esignfingtofervefyougresy it)\nLo oa o emu\n\u2018De Oe & Camm Oem Oar Cann Comm Nom Camp Oomxp Camm panama",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe",
+          "distance": 1.156281590461731,
+          "rrf_score": 0.01639344262295082,
+          "score": 0.01639344262295082,
+          "keyword_match": false,
+          "cosine_sim": 0.33150644177964494
+        }
+      ]
+    },
+    {
+      "id": "HS3",
+      "category": "semantic",
+      "query": "Find where Pinterest was open",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          1667,
+          1668,
+          1669,
+          1670,
+          1671,
+          1672,
+          1673,
+          1674,
+          1675,
+          1676
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "In Microsoft Edge window titled Pinterest."
+      },
+      "execution": {
+        "search_time_ms": 18.74995231628418,
+        "generate_time_ms": 3.039836883544922,
+        "total_time_ms": 21.963834762573242,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          1667,
+          1710,
+          1668,
+          1765,
+          1768
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 1225,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.4,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`",
+      "sources": [
+        {
+          "id": 1667,
+          "timestamp": "2026-11-24T02:36:04.584597",
+          "source": "screen",
+          "text_content": "O \u20ac& CSC Pintetest \u201d a x\nHitps /inpinkered comm\nxeipaee\nZ, \\ q\n() Business hub = B RudraxD v Q fag & q & v\nXx 7\nRudraXD Merchant status Event quality score\nGY @passionate_pencil_OO + Other + Claim your website \u00a9 Start review process \u00a9 Sctuptracking\nIs Pinterest a good fit for your brand?\nCreate Pins and ads to find out\nia \u2018\nFind your audience on Pinterest View Audience Insights A View Trends\nia awa \u2018\nTop ages and interests across Pinterest Ca\n7*< 4\nDarArrear",
+          "window_title": "Pinterest",
+          "process_name": "msedge.exe",
+          "fts_rank": -16.455092379010303,
+          "rrf_score": 0.03252247488101534,
+          "score": 0.03252247488101534,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1710,
+          "timestamp": "2026-11-24T02:38:24.895013",
+          "source": "screen",
+          "text_content": "OS CS Pinterest \u201d o x\n@ Pinterest = @ Radaxt Q fad & co @ ~- 1\n< Orv Q ty oes Mine & v\nBD atson?\ni IOVE N@ALING Greeroms rons .\nyour voice don't\never shut up\nG\n(aaa comment \u00a9 & 8) _\nSS\n0 1 rr",
+          "window_title": "Pinterest",
+          "process_name": "msedge.exe",
+          "fts_rank": -7.496110771963507,
+          "rrf_score": 0.031746031746031744,
+          "score": 0.031746031746031744,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1668,
+          "timestamp": "2026-11-24T02:36:09.600565",
+          "source": "screen",
+          "text_content": "O & CG Pinterest 7 oO x\n@ Home teed = @ RudraXxXD Q fad & a) & \u00a5 |\nAll",
+          "window_title": "Pinterest",
+          "process_name": "msedge.exe",
+          "fts_rank": -6.894890034723487,
+          "rrf_score": 0.03131881575727918,
+          "score": 0.03131881575727918,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1765,
+          "timestamp": "2026-11-24T02:44:50.512703",
+          "source": "screen",
+          "text_content": "O & CG Pinterest 7 om Xx\nee on CT\nC Rudraxd \u2018\\ ty 5 v\n() Pinterest = B RudraXD \u201co Q fad & a) &\n~ mae Zp ( as | BR SENS 7) Be tt\nfe) a Ae - :\nEY camiaGomes & i) WH DD Dette oY | s\ni Addacom.. \u00a9 & 8 ! BSAS( Ax, ~S . ae\na o AND . ; kad\n\u00e9 > Ny \u00a5 \\ Laps 4 5 Smart Girl Character Sketch ...",
+          "window_title": "Pinterest",
+          "process_name": "msedge.exe",
+          "fts_rank": -7.173328636502023,
+          "rrf_score": 0.030776515151515152,
+          "score": 0.030776515151515152,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1768,
+          "timestamp": "2026-11-24T02:45:05.531665",
+          "source": "screen",
+          "text_content": "aa o x\nO \u20ac& CS Pinterest\nee on =\nC Medraxd \u2018\u201c v\n() Pinterest = B RudraxD \u2018) Q fag & q \u00ae\nee ee | ease\" || paren\noy, WAN SMOG: ae es . || plese\naC om \u201cAy Fe Ny ~ PO\" Roe. ES A\n' . fh 5 Sey a net yy: ie, ay | ZW NY) a ene",
+          "window_title": "Pinterest",
+          "process_name": "msedge.exe",
+          "fts_rank": -7.363573694016844,
+          "rrf_score": 0.030330882352941176,
+          "score": 0.030330882352941176,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        }
+      ]
+    },
+    {
+      "id": "HH1",
+      "category": "hybrid",
+      "query": "What project demo launcher was open in Windows Terminal around 2:30 AM on November 24?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          1614,
+          1615,
+          1616,
+          1618,
+          1625
+        ],
+        "expected_time_window": {
+          "start": "2026-11-24T02:15:00",
+          "end": "2026-11-24T02:45:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "AeroStreamID - End Sem Project Demo Launcher in WindowsTerminal.exe."
+      },
+      "execution": {
+        "search_time_ms": 26.7181396484375,
+        "generate_time_ms": 3.3152103424072266,
+        "total_time_ms": 30.481815338134766,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          1757,
+          1652,
+          1620,
+          1662,
+          1756
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 4853,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`",
+      "sources": [
+        {
+          "id": 1757,
+          "timestamp": "2026-11-24T02:43:20.369062",
+          "source": "screen",
+          "text_content": "fAcroStreamO= End Sem Project Oemo Launcher, Major Projects Antigtiavity IDE (63 exp32.cam streamer | Arduino IDE 2 3.1\n=aaee a a ; +0.\n; erences Sf PS =\u201d BS Rae oo\nSa ee = BS fh Pipes \u2018\n1 Gioe Ree foe Caracal om, Stier femme =a BR G2 FSS.\n(ESS ae \u2014y he\n20 =\u2014_ eS = =~ rn ay\nee = = ne .\n: = == se\nao =| |e\nBES =\n==> 78 SS ee a | ;\nSe oo | Ogres Agrees a enn 7 .\n[Destion Oesktop 2) [New desktop]\ntee 3\" Ke ie",
+          "window_title": "Task View",
+          "process_name": "explorer.exe",
+          "fts_rank": -11.82010621746995,
+          "rrf_score": 0.03252247488101534,
+          "score": 0.03252247488101534,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1652,
+          "timestamp": "2026-11-24T02:34:14.363018",
+          "source": "screen",
+          "text_content": "Q& @ GQ Ciuts ti E> Aw tue) op COOOLS1@ - \u00a9 &\n\u00a9] \u00a9 8 Ganumnesuenp 0 > @(Oasem=amemm | eqigmgraar &| 2O\u00a29=)/ en om (c)\nPAE ORT Comm OU ea Ea EOC ar gman becpscx\nQ 7 eee PCED 2\nomy \u00b0\nqmemmnt aay 2|| (comtraxm -appematen oom aoe ie cap fas |\n\u00b0 hoes OO\nenh mnacyeD 8 : iw >\n6|| | ccmamm cone GOD GAD GID 0 CEND Oxom) ie) Sqmet\n8 9 Saat Caatnenn Geotetnty CUNTD Slap Siar Gua> BOTS COR =e sou &\nee FES Ea o@temiemens\n9 || | ocageamns 0 cam Gate al | | eamencmny \u00a9\n9 \u00b0 [Jing Cee ID eT Fh | SOGEEID\n@) (oS Cea Gmcrp apap iar fee aD | | cop 8\n[ir yurproenaneetosun) \u00b0 0 Been Ne Seo edi oe Ef coxa aoe ee Seam \u00a9)\n66 Hes $ a i oe COATT CNG GD GE CLE a> Ho\n=o : DCO SEy Ox == | eas\npe \u00ae 2 BORerp cm Orin) armen aE FSS | pee i)\n\u00a5 @|| |o 9 Sieg tien Gob ep Mem pln te GDC, a <a al\u201d\ngee | |o agmemem Darrah mmManatme Fe | Como\n{Choos 17 I] ive Drone Stream Demo}y @|| |o Renae Capa Iild -pacirm CEE SD TaD GIO DOD Pea cs CHa\nLonruanrectly tam Poershet] 2 bd Cai COPEIRD GGA OLS CGY) x0 cad ATED \u2014 Cum\n66) | 2| coma ee Be)\nGamat) 2 2 \u00b0 GOED GOD Cte Cafe Bra raeIaD Sip DOTS ase ean Ocomn\n\u00b0 Crete\nWhat you will observe: 2 $ \u00b0 SEEDED EIED Calon C2ETD SERED CO TEAM 0 CG OEETTOS ee \u2014\u2014 > Som\nSo re\nBY eet irnrrn berctecraysnostiersndterpersel pl |\u201d Fea | OOCREINIES\nOMe CIEE DEY YE | O|) cote temp =\nQitinciiad ana @ Cid\u2019 cemcteT ee Otzrtuimy=n\nee form) eax Goan? 0G Ife\nPAC AL res Youd a DeskTop Pro jc tHOrks WA jor Pro jee T\\Arrost cram} Es] oO]\no= 1\u201d De} 17are! aay) 131797 RE ADM Tad .\n= o hen ca thongs 0\nConte) o_ 107117 A700 PAI /MtyaL aT\n\u00b0 emo CEYAEDLTD\nJ 8 Ae EEA RC et eT aeeeeeoe alte !\nBy CeO on or @ cA aK 1c cape Cee er) (el GEER Gaus CO O ao Citi CElem Genny Ckintare> Is)",
+          "window_title": "Major Project - Antigravity IDE - esp32_cam_streamer.ino",
+          "process_name": "Antigravity IDE.exe",
+          "fts_rank": -2.8698329406447294,
+          "rrf_score": 0.025779967159277502,
+          "score": 0.025779967159277502,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1620,
+          "timestamp": "2026-11-24T02:27:08.676026",
+          "source": "screen",
+          "text_content": "(2) \u00a9amp 8 (Om B\\o (Sesexs9)) = @ 8B\n\u00a2OR8@ @I1e@ A e\n6 ) \u00a9ae~mr> Jemtomm~m Sem=ey Cam oan Eau Oa @orzm eeneRers JPA beeen)\nI I\nabdhes LiSMt ety\nOra PAG)\nafd : a ett bei tgeet\n. ap ea\nFes tage\nses st fs 2s oss $\nhes wes that eh i\ni histsiteycanjt{belreachied] (O) eas\nw ==)\nERC hecking the connection)\n\u00b0 (0)\nfe Running Windows Network Diagnostics) \\, J\nCONNOR OU",
+          "window_title": "Scan QR Code",
+          "process_name": "chrome.exe",
+          "fts_rank": -6.141113459168345,
+          "rrf_score": 0.025525990099009903,
+          "score": 0.025525990099009903,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1662,
+          "timestamp": "2026-11-24T02:35:19.471515",
+          "source": "screen",
+          "text_content": "QA OD @@ cits (> \u00a9 ap tut) mp CO0OS16 - \u00a9 &\n@a 6o@ [ eapgemrmmat \u00a33 | O@\u00a292/] en o\n\u2018Pe siren) yet rg 2 Ta ere ep) Tan vicar ae ee, OE\nQ| Caiman 8 = |vOammm o |\nCnmaamenD 8|| [amt -arpaarmgn ante Ee Mee Cai Oem Ps S@GmD\nBi] jo Beemer &\n6|| | ccm cone BAD GAD GIN 0 CED Crm) [a | SSamar> &\n\u00a9|| | C@ematm Gamap Grader CER CRED CORD CEP CACTI CDOS ra =p| SOc &\n\u2014\u2014\u2014\u2014 eo] |\u00b0 Gi CPGaEO Co Cp CaN GG) KE eh Seas\neo] |e BL oe tamara\n9 || | camper 0 ammy Gutman al | | eamencmny \u00a9\n|| |9 &aparte Peieaar9 LD NED Ga> OS APES Erm | cement\n|) |o cee een Gam ear aly Ca GEA PSR GACATATD Le | seep 8\n\u2014 Bl |s a emp aneees ee: =\n2 pamage Oamm Die emma ee | Seay @\neC) \u00a96) |} 9/ 2 o OD Gidget CMD OI ODN | oon\nD io Cnn GRR ORE pe | Seas\nLooe) \u00ae| |o sane emanms arma enon metD FSS | pean 8\n@| \\o aamoe em GUD Mee ete ten GO CAID, = Oa @\nae\nBrose? Ive Orone stream Demo) ol |o a@uscemem CHD cap Gama Co Grae ERO cxanGnsO, Fa Ca\nLor rundiectly tram Powershett) @| 2 So anne CT OD TE CRY SOONG ETD OOD rai ne Ocommamnyagme\n2 bd GION CPI GEN Ge GD GD) ant asad came a Out]\nSmee ee Oqrigmim\nmm CCH) OG ce So | oom\ncapitate egetetingy eer @|| |e \u00ab COED GID) Cale CRapmODs Oxi2p aaa ED GD D09 asET> Peep Cagmm3\nChior ect pada @| |\u00b0 Gm pomp aap OOD Uae Goa a> :\n: Bg \u00b0 cee\n@| |\u00b0 \u00abED gm ats Gop am MeioN TO 7c tam La | Soman\nEY emery well natecably smoothes ances porate) Bl le CER TOLD ad\noO MemiirpAMIE MIDI \u00ab| m ee | emu!\n\u00a9 || tem teams = Resute -\n@|| Gidtzb amit a omnis\nBOO ux an epee (aa) o> eG 9 Orem fh 9 108\nPAC AL res Youd a DeskTop Pro jc tHOrks WA jor Pro jee T\\Arrost cram} Es] oO\nggg o=\u00bb 7 De} 17are! ayaa) rod i)\noa BER Gey Ppcmpiaca ier 0\n= ON | he oa\no= ine een PtHP OL OVEN\n\u00a9 exon \u00a9 peut\n8 PSC \\hes (oud a \\Desk Lop Pro jee tiorks \\AD jor, Pro jee D\\Aecostor aml Dy stich CEL\n| Petit Tsar cio tap n fae THENCE AML Jet Po fine ARSE alot |\nBy CeO on or @ cA aK 1c cape ETD) (Cl) CHEERED Ces CL OF GO Uns) Chi Comme Chine ts)",
+          "window_title": "Major Project - Antigravity IDE - esp32_cam_streamer.ino",
+          "process_name": "Antigravity IDE.exe",
+          "fts_rank": -2.5858782398845777,
+          "rrf_score": 0.024922600619195046,
+          "score": 0.024922600619195046,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1756,
+          "timestamp": "2026-11-24T02:43:15.371599",
+          "source": "screen",
+          "text_content": "(\u00a23)] fewp32 cam streames | Arduino IDE 2 3.11 Major Project Antigravity IOE \u2018xq i> AP AcroStreamlO End Sem Project Demo Launcher,\nea a= al y rd \u2014 ee \u2014\u2014\u2014 Cr)\n7 \u2014 i eee eo) Reet on,\nA See a Poon ere ee ery\n\u00a9) =i Ey SS DNAS Sel aa\nal: \u2014\u2014 2 = i Shen\naE Food | eet sectegtamensr\nBees = a e= a ese Tics gnee m5\n. Ae = == aon (el .\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014_\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014 rr a fase, Se ie ir tnee nears\n) See = 3==\npete am fe eres\nBased\nSoy \u2014\u2014____.. fF EA \u201cE> c\nee == 2 emer :\noe be = = A Pena be ae .\n= \u2014 = boas\n\"5. : terse S\n! !",
+          "window_title": "Task View",
+          "process_name": "explorer.exe",
+          "fts_rank": -17.059156189102982,
+          "rrf_score": 0.02439344262295082,
+          "score": 0.02439344262295082,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        }
+      ]
+    },
+    {
+      "id": "HH2",
+      "category": "hybrid",
+      "query": "What file was I editing in Antigravity IDE between 3:40 AM and 3:45 AM on November 24?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          2286,
+          2287,
+          2288,
+          2289,
+          2290,
+          2291,
+          2292,
+          2293,
+          2294,
+          2295
+        ],
+        "expected_time_window": {
+          "start": "2026-11-24T03:40:00",
+          "end": "2026-11-24T03:45:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Chunk4.md in InternProject."
+      },
+      "execution": {
+        "search_time_ms": 13.775110244750977,
+        "generate_time_ms": 5.160808563232422,
+        "total_time_ms": 19.336938858032227,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          2298,
+          2288,
+          2301,
+          2303,
+          2299
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 13799,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.2,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`",
+      "sources": [
+        {
+          "id": 2298,
+          "timestamp": "2026-11-24T03:42:26.076500",
+          "source": "screen",
+          "text_content": "QA Gh OM Sits tt @ tm tute) op InterTPRCgUete tipanaty IOC Pear) COOOLS1@ - \u00a9 &\n\u00a9} @ & oma 0\u00b0 @ (Gaze [oemms| OG80e\u00a20\u00b0] en = [6\n@ aE Nan irs >, 28 ( Funk\u2019 2 > pacctel bench knothiie pron! Nek! Out an UOPy fn) winter mopech 2\nPAu equnements tor Chunk 3 sx outlined steneac hurk wad cred) [xvaeets xn] Samp\n[a sremet Conte: ni [have been implemented texted, evahaeted an] wa Chania 4 Nodal] benchaark Jott line/ proof reid ovtT und (tan Be tino!) eS | e@atarmm Oo &,\nPe ommtted under at 1) aeons] (coment ot aa )) 6] ot) Camtots>cip dad Og: Gp ohh a) cua Seam \u00ae\nO9V@IO Gime) dip dentim ee ae >| SOamp &\nHH > CERNE a cD CGI 3) fo SID Sap\nGi: veai\nCO) pee TEE @\n1' Summary of Changes\u2019 r) sJoc2Jorriinelproot isefoet pit Hee ON LINE =P cunt he[dineon[ ind Lnauery Twos lange le ous\nCin Gm Cag REE ELI) Exe Ch Noy cate \u00a9 \u00ae&\nUinuine citations & Prompt Engineering { @fintel linen r/roet7y.)) ee ae GEER dita dip anand cama) Rade D sas\ncrm? @ db amin) @ ADaD Wan azirum> CREED | fi\nCTC antert erties formatted yathy stabie xfenbters [Ts (ic) [toe canoe e|| o oan)\nLesvirare woth time spaare neh commmt apphesteanresndT (3) Ipma 6] St CRiaacolh wimiigay Beograd Saree aaa to Oman \u00ae\n[eepture entre) Cam qpins apis God Giana an) Ap ami TEI CE x9 S\u00a9exturm\nCtr Mp | ,| Scsmeam S@cxap e\n[iikiwectataares mnmediatety sallownixy every tact clair @] Croan Chefeina Postar iongt site] ocigED o o SOcmmD\n0 mm Ce Oy EEE) CE) CP an, CEN CD CoD OND eD > S@agp @\nTimi Soup\nfepsodes/capturesy \u00ae LEE,\nDost Hoc Grounding Verifies (Tiare nac/eaoue sn 0) oan\n[oTsentence Boundary Splitting, tvshurtrs wach cham mckopiorthy @com=\n[oJ citation Checking: Vainiates that rach senten e contains 2a) citatian] Seca\n[matching a retrevend contest 109 Sean\nDo} Timestamp Verification: ftr.i t.17 how and 74 howe chock) Oop\nQeumxp\nTaner span ($2 Mil Coursancr vat ITALIC TOL RAE MINIT) \u2018 , Pestainea)\ne&HGe\n[oT Scoting & Pruning: Computes grounding rate \"rier! Fy & em pax (tit) cp eamD GhimmaixmmaaeoS QG-IGs a PAcrot Cantera]\nCIO CHAM oO MINK MANY mop fe Oia om ih MED, Des |S] aio\na ms peas\nplese (ame, Oct YORE) BW] oom\nCEMraS() Ws (tL 13) Cantoreseerraveipturn] [Storeng upturn J] 24600 iptured 1/2 aki pped | (und hanged) O\u00a2zmyirho\neen bit far {6 Rircli cers Giciyy Chamero) apa) CADIS om\not>> ) f] erahe etirar) (cata) OctEins) (ea aa\nfo] Olfiine Grounded Synthesis Fallback: Determineste Tellback wher) er ira [ed cp {nl Bin crD GC) CoINnD cm) Cap) CPEs) Cau\nOm Ciexkeniety. \u2014 DY eae o-a ye toeed] (Ye punks i Trot JY | (6167 ae) DSC hank! rt]\nOSMAN 0 CANAAN TERI oss] Teale Oo Libre cts Gicihip cco ci) CID ap) HIDES) wan\nRenta Dae ee proxi CCRT IONTIN WIN IRIN CSET DY [rt io-oSstored] (Oe nunks foes i Trot) fo Ogi\narray [ow Coton screrveaption [oeemnyt aptunrs P7480 aptucrd Aled tsk i pped | (une hanged) asa\nAOeINAOOERIEIMD aoe | i fe (6 Be eo ODD meric)\nSD recom) (Odin, Oc\n\u00b0 @) esata] Logg fie Li srocetp GDcihfs cma) CL epi) EI\n\u00a2 Gra \u00a9) | FR ee no bedern, oom eet peat\n| | | | Dy Tinting, |\nSS (Gateeoties Cole Cur (eV Gee tie) CO GD eet Cs Glen Gente Glinteme ie",
+          "window_title": "InternProject - Antigravity IDE - Chunk4.md",
+          "process_name": "Antigravity IDE.exe",
+          "similarity": 0.2953447103500366,
+          "rrf_score": 0.01639344262295082,
+          "score": 0.01639344262295082,
+          "keyword_match": false,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 2288,
+          "timestamp": "2026-11-24T03:40:15.913316",
+          "source": "screen",
+          "text_content": "QA OD @@ cits (> \u00a9 ap tut) mp CO0OS16 - \u00a9 &\n\u00a9} @ & enza eo @ (cams! QOOe\u00a2o=)| cp = [9\nA Wreeate \u2014 S wesraligs reaped FE \u00a9 :eenrcject\nQ Oe SR eee EEE Oe &\n\u2018Chunk 3: Grounded Generation\u2019s Refusal Gate Completed (Tag, 4 B\u00a5 | Chunk[47\u2014\" Kodel] benchaark fof fline]proof Jheld-out]run} (tag Be finals) Eeeeny O@aiteammm \u00a9\noun) 6] se czaeatstocm apa oom Gp ODA? a) Tune oa\na9MOG@hmtp timp @menptum Prnarrosend] ci Sq\n[Al recquneements toc Chunk 3 ax outlined su re chuck tons Ton]\nEN CIE IES COP GIT ss) SD S@aD\nDastagert Context ond [have been implemented tested, cvahuated, sn) Vea\nEe omitted undies art ta econo] (coment i a4 8] \u00a9 sO @\n6 0% Giitiogo2 \u00ab3 Tn, Gp da ana) Peess fan ear le) oOaxp\nreutbound fear t fans (CYR pe ort ne tg? Re-noues ef Reni Foe Cea, A eb eo fy CD \u00a9 \u00ae&\nSe emaeye Came aan CENT akits cn aoc cam) (Ee D sas\np| SP ocoaaite Aap wan coterie enix) 8\nTETTS 0 pebemcoqa>ctn wim POERIAP T C a Oumty \u00ae\nDinane castors B Pomel Ea.neeag (Or! ese 77) ED GENID EEDA ED CTD CD OD NT cam peuaten 3\n0 eR GTA OTD @| scape dip Git ohana oat \u00a9 d@cmmp 8\neommaits Taio veamp\nCini Mii | o Som\n[inkne Gtsbons inmedustety jallown every tactuat (faim) Ofhan\nCod Structured tempore! operators (oputduaat long lanes alee int )] Caw\nOct\nDerxsodes/t aptures) Sean\n[Post Hoc Grounding Verifies ( [intel Lizem \u00ab/erour Jing ry12) oC\n[oT sentence Soundary Spitting, tvelucton each clam sek ety Cau\nEel Giston checking, Veinen inet rectscrteneetortiam: yeeros 1 Ogu\nGiitipemtaxianteD kp 63 ctpexD (tam) em em Qaimarmmmara do 9 @ 16) 3 (edict Cetera)\nfod Timestamp, Verification 131/117 ena and 74 ten ce \u00bb Next pecra) Catrite, Oc) () CATED [| Gate\nCres Bi Cayo Raptor scremeeapturr] [orn aptucrs PMO iptucrds Fa Sp cece G) Oany\n[ol Scoring & Pruning: Computes grounding rate \u2014 \"ots! Np aioe Geol aren \u00a9 a eS omni\nDelOW TGRURDING AIH eat bev aTeMpTS a anh (EU ENeT ITOK TeUY, Sf rthe corer) (cern, Oct) i Cah} cr ao CAD aE is OQayimmmn\nat: asta) [18.01 IPO Cree iploen] [Score captures 22468 iptured 1/94 ski pped [Cun hanged) odin\nCORREA CI aa aes | mm i \u201cThea Eddi cise ca Ca CDT) ogni\nCEN SE TOI | Petco ae OG anne\nin essere] [reo ED BD Pipe inetoutn] (55 gain) Paceren. 724/Datoced] (242.0 aptured S177. sk oped]\nOnesinpOummtnavetm eas eran) Oder, \u00a9 Pn icine\nos: 5974s] [Teo ED BD Pipe retort] (sh eein) [eceren 77.1 fstoced] (24/99 aptured 1a tsk oped]\n} \u00b0 DJ Drist(o-okctocrd) (8% none Ops i Lent )] [6-168 emp\nRED SEES ERD Papimanmmyrino \u00a7Cmmepinas Serpin) Hci dat)\ni | Patanetine, i\nBy (receO cr Oa NoKe ca \" (tee Gas GD GD cate Gti Gk caepe catenin (oy",
+          "window_title": "InternProject - Antigravity IDE - Chunk4.md",
+          "process_name": "Antigravity IDE.exe",
+          "similarity": 0.28122198581695557,
+          "rrf_score": 0.016129032258064516,
+          "score": 0.016129032258064516,
+          "keyword_match": false,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 2301,
+          "timestamp": "2026-11-24T03:42:46.117545",
+          "source": "screen",
+          "text_content": "QA Gh OM Sits tt @ tm tute) op InterTPRCgUete tipanaty IOC Pear) COOOLS1@ - \u00a9 &\n@] @ % exten 6 0 @|@a=zmmm foam: 980\u00a20-] cn om (3)\naR ane > 90\" unk 2 pate bene nO POO. Nektar (Oy fa ee 2\nD6) PBs eeciurcments fou chunk 3 ax bullied wieneg: hurt 1ensQee) 9 para | 5\nDQEAgEIAcs Cram Nee Q|| @exhootanemam cingah cia as Cap WIP) Esai SOCD mano\nKeommnittend unde ait tag eonaxiee (coment ot aca) 1) 6) oC Mtartatsocibd as Oetetip Gp Woh? a) Tan SO\nOVMOdimts) imp ientirm eS capa ay ae >| SOamp &\n\u2014_ > CILIDE Harr amma cath 33) fo OD S@aD\na8 V@ecin\nOy @\n1\" Summary of Changes 6] SUC ad Uy Gr Ui CE en OG CITED oaat\nCin Gm Cag REE ELI) Exe Ch Noy cate \u00a9 \u00ae&\n[inne custions & Prompt Engincering (So) tel ligerer/ rent on) en COD Ghia tn apa cam) Rede D CREED\ncE? @ Ci anion) @ GG Wan teiuiry> OcuEEEERED | 4\nCCimiiIiMEpg | 9 o odin)\nAMAIA | |) Scien car cttm turin Goering Ce\u201d eae Oe Ouray re)\n[eepture entre) Cam qpins apis God Giana an) Ap ami TEI CE x9 S\u00a9exturm\nCtr Mp | ,| Scsmeam S@cxap e\n[rakoe arabian unmedistety sallownn) every tacts lair) fie) 2 Oy Cre Geer cin Cin ceitim ie emi \u00b0 cae \u00a9 cuisine bOcumty\n0 mm Ce Oy EEE) CE) CP an, ELEN ED COMET Ot &D > Sege \u00a9\nTimi vamp\nPemsxienrcantorey o S02,\nProse ounce vere tf tet ines /eana or) oan\nCY sentence Boundary SpUtting taste cachncharn swe pe TOCTINY Ociam=p\nCeTCitstian Checking. Veinistes that rechsememecontains >) ] citation] Seca\n[matching a retrevend contest 109 Soaz\nDo} Timestamp Verification: ftr.i t.17 how and 74 howe chock) Oa\nQeumxp\nTaner span ($2 Mil Coursancr vat ITALIC TOL RAE MINIT) ; , Pestainea)\n0 Gai Oimngamagem ar ee [ovipsa] (tam) @p Gm @ptoemmmmar Go 09 @ 19) 3 (edict Cetera)\nCI CTA oO MENT PPOIER | qgmamuare | emocrigs pas ere pate A} Qa\n(heney er ie rcvio cca Ghociip CH COI CE | Oany\nSeries) Oars, Oo e Mae Otaimyro\nos: sara sy [te ED ts pipelinetatatsl (Spain) [ocrren 274 /[atorrd (747M aptucrd G1/)/.ok i pod) o@mn:\not>> fl ozs) Rt ored) (OY hunks fGrs4 Trot) I(teZ16T ue\nfo] Olfiine Grounded Synthesis Fallback: Determineste Tellback wher) er ora] [ied cp bt Are eD GIDC s Co cin) CD apy CD) Capmany\nOlea manne | syst hee amg se sed herrea I jesTanteenen) Dil erie ear) Odie, Ocninip) | Cg) ocniiza\n2 CORED i fT) Cantoreseteraveiptucn] [Storeng aptunns J] 2488 iptured af 18 bok i pped | (und hanged) Penk hank? ext]\nRestate re produ atie (CCAS Claes mnths carats a aaa sy wo a> {6 Piped Unekctart J (Soeatn) opeceren= 27590 et ord [2488 Se aptarnd 16d ek ppd) Oarih=n\nSf riper) Dame, Ooh e Me ane\nOa OUTEMIND SED gC Fer Lage GIDCHe GRAD CMD aI CIDA\nSf acter) Oa, Oo e Me\n) esarray [eo ED 3 riper eters] Sota) Toceren. 7269 stoerd[(24 79 captured 1871] k {ped\n| | | | Dy Tinting, |\nSS [CREPE COMED Creer tee Mess CO GD Cr Us OLED Con Cee",
+          "window_title": "InternProject - Antigravity IDE - Chunk4.md",
+          "process_name": "Antigravity IDE.exe",
+          "similarity": 0.2803117036819458,
+          "rrf_score": 0.015873015873015872,
+          "score": 0.015873015873015872,
+          "keyword_match": false,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 2303,
+          "timestamp": "2026-11-24T03:43:26.177259",
+          "source": "screen",
+          "text_content": "QA Gh OM eit te & Gm tute) mp GOOOL1\u00ae - \u00a9 &\n\u00a9] \u00a9 4 eum 6 0 @|@a=zmmm [oem] QGO\u00a2o>| cn = [6\naR ane >\u00bb 98\" unk 2 pate bene nO PION. Nek ua Uy fea ee 2\nD6) PBs eeciurcments fou chunk 3 ax bullied wieneg: hurt 1ensQee) 9 para | 5\nBQ EAGEIENCS CEMA ENN Q|| @exhootanemam cingah cia as Cap WIP) = SOCD mano\nEe ommrttedd unde (it ta eee] (comment at asa? 6) oC Mtartatsocibd as Oetetip Gp Woh? a) Tan SO\nO9V@IO Gime) dip dentim Ee EID CD EER CD SOamp &\nOT Qeuinem Hamam ope [3] SD Sap\nveakn\n8] \u00a9 soa @\n1 Summary of Changes\u2019 @ 0% Giitiogo2 \u00ab3 Tn, Gp da ana) Peess fan ear le) oOaxp\nreutbound fear t fans (CYR pe ort ne tg? Re-noues ef Reni Foe Cea, A eb eo fy CD -. \u00a9 \u00ae&\n[inne custions & Prompt Engincering (So) tel ligerer/ rent on) Se emaeye Came aan CHEN dhs dm aan cama) Rede D CREED\nct @ Ci ania) @ AED Wan deity OcuEEEERED | 4\nCCIE CD | ov o oguan=)\nDenisa with tire spars and dommant apphtationnesnd] {43} 150g 8 Be RAG y eo ee ree aaa Go Ocamin \u00ae\nquai, Gum, Geis epi\u2019 Goaye Crs cop aa aa) > CAD CRIB CHE \u20ac29 > @entarm\n(oJ croundiedd system and context prompts instruc tne) the model 10 place] Sora CGD 6 oS@\u00a9exep e\nee ry\nPinkie otsbors immedistety Sallownne) every tacts claim \u00a9) SC CEtoarrs come Ub UE MIRED Gib (malin o diam o apo Scmmmny\n0 mm Ce Oy EEE) CRD CP cm exe EAN, CID MIDCu Caan Cais, eB ce OD S@agp @\nGem veep\nPemsxienrcantorey o S02,\nDEAT CUETO oan\nPy sentcnce Boundary Spitting, vslustrac ance RENN Ociam=p\nCeTCitstian Checking. Veinistes that rechsememecontains >) ] citation] Seca\n[matching a retrevend contest 109 Sean\nDo} Timestamp Verification: ftr.i t.17 how and 74 howe chock) Oop\nQeumxp\nume span (+2 Min tolerance vig lC TTATION: TOLERAMCE MINUTES ) \u2018 : Potnjneed\ncape (cu) 2\nEY scoring pruning Compute grounding trates ie Fr xD em exp (im)ean am Giteammre OG -(108] ogo\nCIO CHAM oO MINK MANY cmt te Orin ich MI aIMeEBeape~ (A) Cai\neT Geol art, \u00a9 pa tesco mem BD] Cam\nSf ertcra) Oars, Oo e ee Coca Cam CD ea pa a a\not CRLED ECL) Ber Ls octs GEDciife cma cian) CID apr) EPs)\nfo] Olfiine Grounded Synthesis Fallback: Determineste Tellback wher) fl erthe eran) (Odie, Octeini) |] Eta) OcpimEmms\na ae ne PT SRS EOD Paviocumyertoe | Coane Sap CC Crom entice\nexpt fe e Praitocerh Gicite came IC aL CK ognin\nRextablorre produxable, (tundra, lamseva thy nthe cast DY Jone (o-oo tored] (Ye punks nga i Trot JY | (6 16\" ae OGriis9\nesata] [eg cD {n Breit GIDC): cm CAD apd CO) sateen\nOheingOummtnvestms Df extract (Oientey, Oc ST\nCREED ECL) Bea BY eiperiorgtat [Got atn) Teccwrns 7269 stom] (249) captured 1871] sk oped]\n\u00a9 exxpmetpe Df eta (Odie, Ocha) NED\noars] [Te OM [taptorractrec%captinr] [ormcateapturm | 00M aptunrd 182 1k iperd] (one hanged} poured)\n| | | | Dy Tamadine |\nBy (receO cr Oa NoKe ca (tae Ges GD GD cee ei Gli caepn catenin (o",
+          "window_title": "InternProject - Antigravity IDE - Chunk4.md",
+          "process_name": "Antigravity IDE.exe",
+          "similarity": 0.28002288937568665,
+          "rrf_score": 0.015625,
+          "score": 0.015625,
+          "keyword_match": false,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 2299,
+          "timestamp": "2026-11-24T03:42:31.087908",
+          "source": "screen",
+          "text_content": "QA Gh OM Sits tt @ tm tute) op InterTPRCgUete tipanaty IOC Pear) COOOLS1@ - \u00a9 &\n\u00a9} @ & oma so @(@neem foams] QOO\u00a2d2] azn om (0)\nQ aR ane >\u00bb 98\" unk 2 pate bene nO PION. Nek ua Uy fea OnE 2\nPall eauccments for Chunks 3 ss outlined ster hut wad 0) 9 esa | peaum\nOcmaAgmmacs (roimiym ene) PRIMES # Chunk] 40 Kodal] benchaark fot fline|proof iheld-outloun| (tan iB finals)] eee | oexrxemmom Oo\nCAAA FORE CCIE 3 Saat,\n6) oC Mtartatsocibd as Oetetip Gp Woh? a) Tan Z|\na9MOG@hmtp timp @menptum SD ae S@cup &\n\u2014_ > CILIDE Harr amma cath 33) fo OD S@aD\na8 V@ecin\nS| @\n1\" Summary of Changes OC) STC Asy ad ULL Gy Ui CEI eA OCR) CITC HED oaat\nCin Gm Cag REE ELI) Exe Ch Noy cate \u00a9 \u00ae&\n[inne custions & Prompt Engincering (So) tel ligerer/ rent on) Se emaeye Came aan CHEN dhs dm aan cama) Rede D CREED\ncE? @ Ci anion) @ GG Wan teiuiry> OcuEEEERED | 4\nCCIE CD | ov o ogres\nDenisa with tire spars and dommant apphtationnesnd] {43} 150g 6) SM CMcae ain triage (pepcerind Serre aap ats te Ocamin \u00ae\n[eepture entre) Cam qpins apis God Giana an) Ap ami TEI CE x9 S\u00a9exturm\nCtr Mp | ,| Scsmeam S@cxap e\ntioiiniiin cine @]) cea cmoam: Chm Cea etentton tet oc \u00a9 o@cmmp\n0 mm Ce Oy EEE) CE) CP an, CEN CD CoD OND eD > S@agp @\nTimi vamp\nPemsxienrcantorey o S02,\nProxtnee oeuvres] rl itene/emoatneD) oan\nCY sentence Boundary SpUtting taste cachncharn swe pe TOCTINY Oca\nCeTCitstian Checking. Veinistes that rechsememecontains >) ] citation] Seca\n[matching a retrevend contest 109 Soaz\nDo} Timestamp Verification: ftr.i t.17 how and 74 howe chock) Oa\nQeumxp\nTaner span ($2 Mil Coursancr vat ITALIC TOL RAE MINIT) ; , Pestainea)\n=D [ocorg coreci & G2\n[oT Scoting & Pruning: Computes grounding rate \"rier! Fy & em eayaxd (ta) ep em GhimmaixmmaaeoS QG-IGs a PAcrot Cantera]\nCIO CHAM oO MINK MANY compton fep Oia om ih MED, Des |S] aio\nDara air Oct TERI BD] Cam\nCEMraS() Ws (tL 13) Cantoreseerraveipturn] [Storeng upturn J] 24600 iptured 1/2 aki pped | (und hanged) O\u00a2zmyirho\naes | fo fep {6 Rircli cers Giciyy Chamero) apa) CADIS om\not>> fl erties) Rt orrd | (Oe hunks sp Grs4 Lat ) (ea aa\nfo] Olfiine Grounded Synthesis Fallback: Determineste Tellback wher) er ira [ed cp {nl Are ED GICs CED cin) CIDE CA) Capmany\n\u2018Ollema (Onin ( syne heer pg ar ed Meena I uSsrSMteen Ul entre desis) (Odie, Ocenia ocniiza\n: EH ERNE CRED ECL Fer BY riper ioeget te] (8 ain) Tocerwns 2st Totocrd (24/9 iptured ao sk lope] ogmin\nTextablesreproducble drounorss (aims with inknencitatonsy ) f] erie etirar (dat) OctEins) oe Oarin=9\nAOeINAOOERIEIMD aoe | i fe (6 Be eo ODD meric)\nSf citer Oa, Oo e Me\n\u00a9 cximmmpo CRIED ECD Pen PONSA cons GIDcifs cm) CAD aL) COE)\nDl Panda %otoeed | (a% hanks ve) b> outtine]\n| | Oosktap 1 | inn |\nSS [CREPE COMED Creer tee Mess CO GD Cr Us OLED Con Cee",
+          "window_title": "InternProject - Antigravity IDE - Chunk4.md",
+          "process_name": "Antigravity IDE.exe",
+          "similarity": 0.2797878086566925,
+          "rrf_score": 0.015384615384615385,
+          "score": 0.015384615384615385,
+          "keyword_match": false,
+          "cosine_sim": 0.5
+        }
+      ]
+    },
+    {
+      "id": "HA1",
+      "category": "ambiguous",
+      "query": "What did the other person say during the WhatsApp call at 2:00 AM on November 24?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: No audio recordings captured for call."
+      },
+      "execution": {
+        "search_time_ms": 21.479129791259766,
+        "generate_time_ms": 4.557609558105469,
+        "total_time_ms": 26.526212692260742,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          1492,
+          1402,
+          1324,
+          1273,
+          1393
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 1862,
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`",
+      "sources": [
+        {
+          "id": 1492,
+          "timestamp": "2026-11-24T02:10:06.973876",
+          "source": "screen",
+          "text_content": "[\u00a9 writen ct Coogi nome) WwhateApg call Gacdie Chrome e @ 8\nS) Prcbwhatsapircom) Q\nCall ended",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe",
+          "fts_rank": -5.272339601612758,
+          "rrf_score": 0.03225806451612903,
+          "score": 0.03225806451612903,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1402,
+          "timestamp": "2026-11-24T02:02:21.166144",
+          "source": "screen",
+          "text_content": "[\u00a9 wrscton cat cooge nome) WwhateApg call Gacdie Chrome e @ 8\n@utmmmmpy  \u2014eeeses\u2014\u201c(\u2018\u201c\u2018i we\nxe. \\ ote wd y\nao i : : aan ae\nDe Oo @",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe",
+          "fts_rank": -4.377414664149853,
+          "rrf_score": 0.03149801587301587,
+          "score": 0.03149801587301587,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1324,
+          "timestamp": "2026-11-24T01:55:30.553414",
+          "source": "screen",
+          "text_content": "[\u00a9 wrscton cat cooge nome) WwhateApg call Gacdie Chrome e @ 8\n@utmmmmpy eeesesess\u2014aeses\u2014(i\u2018<iaiaie we emmy a ea eee eee\nERO nee a\n- i cc ary A vem > ati\ntye Oe tp. Wy\nBe Oe 8",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe",
+          "fts_rank": -4.163168978262485,
+          "rrf_score": 0.0288981288981289,
+          "score": 0.0288981288981289,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1273,
+          "timestamp": "2026-11-24T01:51:10.183222",
+          "source": "screen",
+          "text_content": "(ey @am alo (Caams)l \u00a9 \u00a9 8\n\u00a25 @@ @ae=mz QSe) BIGQHBIA SB\n@) \u00a9aeume> Jame Samm Oaum oan Hammam ou Femme Onze ) @\u00a9anm=z>\n8 @) | @ ancan SG&A BZ\n0) we - be Rew WE IRCIY note ny \u00abng gee we unin Las\nQA SJL RRO YE\u201d IOUT AR OB WY S/S BOe YES Yu\nAO =O Pe i ee,\nSo 2 SS \u00a9 2, 0@)\u00b0@* of 0 LOSS) \u00b0 2 eee lf SS = we TASH Y\niccked chats ge: BASS eke BO Say CtoaD B\n@| ecm Oe Mone) 4 eh ome u\u20ac\nDENG oy 7S GS\" \u00a9 Sen \u00a7 CNY SESS rp el\n\u00ae \"\u00a9 eB go Ce ghd \u201c\u20ac oe whales eS\nCN Qa AAS se Ga ke TD ge SA\n(Glos) en Sours.) jan Soho\nome (Coe : 1s: lO) ee ZO 2 Os le\\ emma \u00a9\nOS amma bed, aes bso Gem e, Se\nog cary 5 9 S Bo Gao CO ak + 2 10 eS EG S \u00ab\n@ ci = Sara eer A ORD ens\n> ene LY fas Sa Wares 3 Oe ao Oes \u201cGY aS\nae) F S pio cia koh cal beth Ra Vesa? XC) 5 \u00a9 ae 'S ALA@e= & Ke) $2 er\nFo me \u2014\u2014 encore te Y oGomFofrsrAaye ala GY? AW >\nCrm VAS \u00a2 CS Qo ati oe Bri, Bios\n@ (rar) Naas = a ol See\n@ | Oe O\u00b0 Be(a)}\\0 \u00a9 warm o>\nee en ee RODS a TL a OO ne Lae ae EI ete",
+          "window_title": "WhatsApp - Google Chrome",
+          "process_name": "chrome.exe",
+          "fts_rank": -3.344052201706138,
+          "rrf_score": 0.026515151515151516,
+          "score": 0.026515151515151516,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        },
+        {
+          "id": 1393,
+          "timestamp": "2026-11-24T02:01:36.149718",
+          "source": "screen",
+          "text_content": "Oo os\\e (Gans )) - \u00a9 8\n\u00a25 @6 Oatirmm QSe) BIGQHBIA SB\n8) @\u00a9au;mm Jemtamp Oem Oam an Hamme, Ow Gemma Orummm ) @arma\n@ datets @& @%&Q\u2014~s\ne Smosh Oe Bee a\n& axpay(\u00a9) exten Q be ay nee CHieos, 98 ou,\ng : OlA-lei woe eZ\n& @ AS GES? pe @ |i Zz\n_ \u2018A You pars A \u2018aes a? 6A ay a HE\ni) Reg fees, \u2018Os \u2014 Perk Gi &\nrs \u00a9, \u00a5N [\\S= i ae a SSCA Hy,\nDOYS exon D:\n\u00ae: OAs |O ase \u20ac\nWhatsApp AS? Bye 3 or ean as \u201c\u00a2 Cz C os evs\nMov eh bas Oe eri heya SAG Se\nopie he OR aloe\nI~ ENE Noe OES OS Crs SEO QE &\nGye ee \u00a9} LY\n= - OSG \\! Mme YS \u00a2\nOs De Saaaee Hae",
+          "window_title": "WhatsApp call - Google Chrome",
+          "process_name": "chrome.exe",
+          "fts_rank": -5.8314884331221615,
+          "rrf_score": 0.024085750315258513,
+          "score": 0.024085750315258513,
+          "keyword_match": true,
+          "cosine_sim": 0.5
+        }
+      ]
+    },
+    {
+      "id": "HA2",
+      "category": "ambiguous",
+      "query": "What will I be coding tomorrow morning at 10 AM?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: System cannot predict future activities."
+      },
+      "execution": {
+        "search_time_ms": 0,
+        "generate_time_ms": 0,
+        "total_time_ms": 1.2104511260986328,
+        "retrieved_count": 0,
+        "retrieved_ids": [],
+        "distinct_episodes": 0,
+        "context_chars": 0,
+        "is_refusal": true,
+        "refusal_reason": "future_time"
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 1.0,
+        "grounding_rate": 1.0,
+        "correctly_refused": true,
+        "falsely_refused": null
+      },
+      "answer": "I cannot predict future activities. My context only covers past recorded activities up to 2026-11-24T04:00:47.944581.",
+      "sources": []
+    }
+  ]
+}

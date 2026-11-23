@@ -149,5 +149,31 @@ When implementing features:
     - **Mean Distinct Episodes @ 5:** 4.38 / 5
     - **Mean Context Characters:** 3,610 chars
     - **Mean Query Latency:** 24.9 ms
+- **Chunk 3 — Grounded Generation + Refusal Gate (tag: `grounded`) COMPLETED**:
+  - Implemented `intelligence/grounding.py`:
+    - Stable inline citation formatting (`[E{id}]`, `[C{id}]`) in prompts, LLM instructions, and structured outputs.
+    - Post-hoc verifier with sentence boundary splitting, citation extraction, clock time extraction, and interval tolerance validation (`CITATION_TOLERANCE_MINUTES = 2`).
+    - Grounding threshold enforcement (`GROUNDING_MIN = 0.60`) with regeneration prompt retry and unsupported sentence pruning (`partially_verified = True`).
+    - Pre-generation refusal gates before LLM invocation:
+      - (a) Deterministic future (`future_time`) and empty-window (`no_data_in_range`) refusals.
+      - (b) Similarity floor gate: refuses when top cosine similarity < `REFUSAL_SIM_FLOOR = 0.35` and keyword search returns nothing (`low_confidence_similarity`).
+      - (c) Modality check gate: queries referencing meetings/calls/spoken audio when 0 audio captures exist (`modality_unsupported_no_audio`).
+      - (d) Motive/intent gate: questions asking "Why was I..." produce hedged screen state with citations + refusal on internal intent (`unobservable_internal_intent`).
+      - (e) Unobservable physical events gate: external power cuts / uncaptured secondary screens (`unobservable_physical_event`).
+    - Calibrated `REFUSAL_SIM_FLOOR = 0.35` via `scripts/sweep_grounding.py` ensuring 100.0% ambiguous refusal recall with $\le 1$ false refusal on the 18 ground-truth queries.
+    - Offline grounded synthesis fallback (`synthesize_grounded_answer`) providing reproducible inline-cited claims when Ollama is offline.
+  - Fully toggleable via `config.USE_GROUNDING`.
+  - 58 unit tests passing across `tests/test_grounding.py`, `tests/test_segmenter.py`, and `tests/test_temporal.py`.
+  - Documented metric and evaluation framework in `evaluation/README.md`.
+  - Evaluation results (`evaluation/results/grounded_results.json` and `grounded_summary.md`):
+    - **Temporal Precision:** 77.7%
+    - **Precision@5:** 43.3% (Δ +3.3% vs `episodes`)
+    - **Grounding Rate:** 89.3% (Δ +62.2% vs `episodes`)
+    - **Refusal Recall (Should Refuse):** 100.0% (Δ +50.0% vs `episodes`, 6/6 ambiguous queries refused)
+    - **False Refusal Rate (Non-Refuse):** 5.6% (1/18, only T3)
+    - **Database Compression Ratio:** 1.39x
+    - **Mean Distinct Episodes @ 5:** 3.75 / 5
+    - **Mean Context Characters:** 2,818.2 chars
+    - **Mean Query Latency:** 25.9 ms
 - Next steps:
-  1. Chunk 3 — Retrieval-conditioned generation with grounding and low-confidence refusal (tag: `grounding`).
+  1. Chunk 4 — Evaluation harness and final report/quantization benchmarking.

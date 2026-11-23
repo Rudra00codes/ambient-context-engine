@@ -72,7 +72,7 @@ class DatabaseManager:
     """Thread-safe SQLite database manager with FTS5 + sqlite-vec support."""
 
     def __init__(self, db_path: Optional[Path] = None):
-        self.db_path = db_path or DB_PATH
+        self.db_path = Path(db_path) if db_path else DB_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = self._connect()
         self._init_schema()
@@ -382,11 +382,18 @@ class DatabaseManager:
                 step = (len(candidates) - 1) / (limit - 1) if limit > 1 else 1
                 return [candidates[round(i * step)] for i in range(limit)]
 
+            kw_id_set = {k["id"] for k in keyword_results}
             sorted_ids = sorted(rrf_scores, key=lambda x: rrf_scores[x], reverse=True)
             results = []
             for rid in sorted_ids[:limit]:
                 entry = result_map[rid].copy()
                 entry["rrf_score"] = rrf_scores[rid]
+                entry["score"] = rrf_scores[rid]
+                entry["keyword_match"] = (rid in kw_id_set)
+                if "distance" in entry:
+                    entry["cosine_sim"] = max(0.0, 1.0 - (entry["distance"] ** 2) / 2.0)
+                else:
+                    entry["cosine_sim"] = 0.5
                 results.append(entry)
 
             return results
@@ -413,12 +420,19 @@ class DatabaseManager:
             rrf_scores[rid] = rrf_scores.get(rid, 0) + 1.0 / (RRF_K + rank + 1)
             result_map[rid] = result
 
+        kw_id_set = {k["id"] for k in keyword_results}
         sorted_ids = sorted(rrf_scores, key=lambda x: rrf_scores[x], reverse=True)
 
         results = []
         for rid in sorted_ids[:limit]:
             entry = result_map[rid].copy()
             entry["rrf_score"] = rrf_scores[rid]
+            entry["score"] = rrf_scores[rid]
+            entry["keyword_match"] = (rid in kw_id_set)
+            if "distance" in entry:
+                entry["cosine_sim"] = max(0.0, 1.0 - (entry["distance"] ** 2) / 2.0)
+            else:
+                entry["cosine_sim"] = 0.5
             results.append(entry)
 
         return results
@@ -499,6 +513,7 @@ class DatabaseManager:
             return results
 
         rank_vec = {}
+        sim_map = {}
         candidate_ids = [r["id"] for r in ep_rows]
         candidate_id_set = set(candidate_ids)
 
@@ -510,7 +525,9 @@ class DatabaseManager:
             sims = np.dot(C_mat, q_vec)
             order = np.argsort(-sims)
             for r_idx, idx in enumerate(order):
-                rank_vec[ep_rows[idx]["id"]] = r_idx
+                ep_id = ep_rows[idx]["id"]
+                rank_vec[ep_id] = r_idx
+                sim_map[ep_id] = float(sims[idx])
 
         rank_fts = {}
         if has_text:
@@ -571,6 +588,8 @@ class DatabaseManager:
                 "capture_ids": cids,
                 "source": "episode",
                 "score": rrf_scores[ep_id],
+                "cosine_sim": sim_map.get(ep_id, 0.0),
+                "keyword_match": (ep_id in rank_fts),
             })
 
         return results

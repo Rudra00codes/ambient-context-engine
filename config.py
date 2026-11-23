@@ -60,8 +60,8 @@ OCR_DEDUP_HISTORY = 5             # Number of recent OCR texts to compare agains
 
 # ─── Feature Flags (Ablation Study) ──────────────────────────────────
 USE_TEMPORAL = os.environ.get("USE_TEMPORAL", "true").lower() in ("true", "1", "yes")
-USE_EPISODES = os.environ.get("USE_EPISODES", "false").lower() in ("true", "1", "yes")
-USE_GROUNDING = os.environ.get("USE_GROUNDING", "false").lower() in ("true", "1", "yes")
+USE_EPISODES = os.environ.get("USE_EPISODES", "true").lower() in ("true", "1", "yes")
+USE_GROUNDING = os.environ.get("USE_GROUNDING", "true").lower() in ("true", "1", "yes")
 
 # Temporal Decomposition Settings
 AROUND_WINDOW_MINUTES = int(os.environ.get("AROUND_WINDOW_MINUTES", "15"))
@@ -70,6 +70,11 @@ AROUND_WINDOW_MINUTES = int(os.environ.get("AROUND_WINDOW_MINUTES", "15"))
 EPISODE_MAX_GAP_SECS = int(os.environ.get("EPISODE_MAX_GAP_SECS", "120"))
 EPISODE_SIM_THRESHOLD = float(os.environ.get("EPISODE_SIM_THRESHOLD", "0.85"))
 EPISODE_REPRESENTATIVE_MAX_CHARS = int(os.environ.get("EPISODE_REPRESENTATIVE_MAX_CHARS", "1000"))
+
+# Grounded Generation & Refusal Gate Settings (Chunk 3)
+REFUSAL_SIM_FLOOR = float(os.environ.get("REFUSAL_SIM_FLOOR", "0.35"))
+GROUNDING_MIN = float(os.environ.get("GROUNDING_MIN", "0.60"))
+CITATION_TOLERANCE_MINUTES = int(os.environ.get("CITATION_TOLERANCE_MINUTES", "2"))
 
 # ─── Logging ─────────────────────────────────────────────────────────
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")

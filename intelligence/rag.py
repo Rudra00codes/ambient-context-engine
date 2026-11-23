@@ -21,12 +21,19 @@ import numpy as np
 
 from config import (
     OLLAMA_BASE_URL, OLLAMA_MODEL, LLM_CONTEXT_MAX_CHARS, SEARCH_TOP_K,
-    USE_TEMPORAL, USE_EPISODES, CAPTURE_INTERVAL_SECS
+    USE_TEMPORAL, USE_EPISODES, USE_GROUNDING, CAPTURE_INTERVAL_SECS,
+    REFUSAL_SIM_FLOOR, GROUNDING_MIN, CITATION_TOLERANCE_MINUTES
 )
 from storage.db import DatabaseManager
 from processing.embed import EmbeddingGenerator
 from intelligence.temporal import parse_temporal, TemporalParse
 from intelligence.segmenter import ensure_episodes
+from intelligence.grounding import (
+    check_pregeneration_refusals,
+    verify_grounding,
+    synthesize_grounded_answer,
+    GroundingResult,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +48,15 @@ Rules:
 - Be concise and actionable in your responses.
 - Format timestamps in a human-readable way (e.g., "today at 2:30 PM" or "yesterday at 10 AM")."""
 
+SYSTEM_PROMPT_GROUNDED = """You are a personal productivity assistant with access to the user's captured screen text and audio transcripts. Your job is to answer questions about what the user has been working on, reading, or discussing.
+
+Rules:
+- Answer based ONLY on the provided context. Do not make things up.
+- Every factual claim MUST cite its source using inline citation tags like [E12] or [C5] immediately after the claim.
+- Any time or timestamp you mention MUST match the cited source's time span.
+- If the context doesn't contain enough information to answer, state that you do not have sufficient information.
+- Format timestamps in a human-readable way (e.g., "today at 2:30 PM" or "yesterday at 10 AM")."""
+
 CONTEXT_TEMPLATE = """Here are the user's recent captured activities, ordered by relevance:
 
 {context_entries}
@@ -49,6 +65,15 @@ CONTEXT_TEMPLATE = """Here are the user's recent captured activities, ordered by
 User's question: {question}
 
 Answer based on the captured context above:"""
+
+CONTEXT_TEMPLATE_GROUNDED = """Here are the user's recent captured activities, ordered by relevance:
+
+{context_entries}
+
+---
+User's question: {question}
+
+Answer based on the captured context above. Remember to cite every factual claim inline with [E<id>] or [C<id>]:"""
 
 
 class RAGAgent:
@@ -96,18 +121,21 @@ class RAGAgent:
 
         for i, r in enumerate(results, 1):
             if r.get("source") == "episode":
+                ep_id = r.get("episode_id") or r.get("id")
                 source_icon = "📦"
                 app_info = f"App: {r.get('process_name') or 'Unknown'}"
                 title_info = f" | Title: {r.get('dominant_title') or r.get('window_title') or 'Unknown'}"
                 count_info = f" ({r.get('capture_count', 1)} captures)"
                 time_info = f"{r.get('start_time')} to {r.get('end_time')}"
-                header = f"[{i}] {source_icon} Episode {r.get('id', i)} [{time_info}] {app_info}{title_info}{count_info}"
+                header = f"[E{ep_id}] {source_icon} Episode {ep_id} [{time_info}] {app_info}{title_info}{count_info}"
             else:
+                cap_id = r.get("id")
                 source_icon = "🖥️" if r.get("source") == "screen" else "🎤"
                 window_info = ""
                 if r.get("window_title"):
                     window_info = f" | Window: {r['window_title']}"
-                header = f"[{i}] {source_icon} {r.get('timestamp')}{window_info}"
+                app_info = f" | App: {r.get('process_name') or 'Unknown'}"
+                header = f"[C{cap_id}] {source_icon} Capture {cap_id} [{r.get('timestamp')}]{app_info}{window_info}"
 
             text = r.get("text_content") or r.get("representative_text") or ""
 
@@ -173,6 +201,8 @@ class RAGAgent:
                     "generate_time_ms": 0,
                     "refused": True,
                     "refusal_reason": "future_time",
+                    "grounding_rate": 1.0,
+                    "partially_verified": False,
                     "temporal_parse": parse.__dict__,
                 }
 
@@ -198,6 +228,8 @@ class RAGAgent:
                         "generate_time_ms": 0,
                         "refused": True,
                         "refusal_reason": "no_data_in_range",
+                        "grounding_rate": 1.0,
+                        "partially_verified": False,
                         "temporal_parse": parse.__dict__,
                     }
 
@@ -219,22 +251,38 @@ class RAGAgent:
                         (parse.start, parse.end),
                     ).fetchall()
 
-                    sample_rows = self.db.conn.execute(
-                        """
-                        SELECT id, timestamp, source, text_content, window_title, process_name
-                        FROM captures
-                        WHERE timestamp BETWEEN ? AND ?
-                        ORDER BY timestamp ASC
-                        LIMIT ?
-                        """,
-                        (parse.start, parse.end, top_k),
-                    ).fetchall()
-                    sources = [dict(r) for r in sample_rows]
+                    if USE_EPISODES:
+                        ensure_episodes(self.db, start=parse.start, end=parse.end)
+                        sources = self.db.search_episodes(
+                            query_embedding=None,
+                            query_text=None,
+                            limit=top_k,
+                            time_range=(parse.start, parse.end),
+                        )
+                    else:
+                        sample_rows = self.db.conn.execute(
+                            """
+                            SELECT id, timestamp, source, text_content, window_title, process_name
+                            FROM captures
+                            WHERE timestamp BETWEEN ? AND ?
+                            ORDER BY timestamp ASC
+                            LIMIT ?
+                            """,
+                            (parse.start, parse.end, top_k),
+                        ).fetchall()
+                        sources = [dict(r) for r in sample_rows]
 
-                    app_list = [
-                        f"- {r['process_name'] or 'Process'} (Window: {r['window_title'] or 'None'})"
-                        for r in app_rows
-                    ]
+                    app_list = []
+                    for idx, r in enumerate(app_rows):
+                        cite = ""
+                        if USE_GROUNDING and sources:
+                            s_item = sources[idx % len(sources)]
+                            sid = s_item.get("episode_id") or s_item.get("id")
+                            tag = f"[E{sid}]" if s_item.get("source") == "episode" else f"[C{sid}]"
+                            cite = f" {tag}"
+                        app_list.append(
+                            f"- {r['process_name'] or 'Process'} (Window: {r['window_title'] or 'None'}){cite}"
+                        )
                     structured_ans = (
                         f"Applications and windows used between {parse.start} and {parse.end}:\n"
                         + "\n".join(app_list)
@@ -301,9 +349,14 @@ class RAGAgent:
                         else ""
                     )
                     app_name = target or "active window"
+                    cite = ""
+                    if USE_GROUNDING and sources:
+                        cid = sources[0]["id"]
+                        tag = f"[E{cid}]" if sources[0].get("source") == "episode" else f"[C{cid}]"
+                        cite = f" {tag}"
                     structured_ans = (
                         f"You spent approximately {mins:.1f} minutes active on {app_name} "
-                        f"between {parse.start} and {parse.end}.{uncertainty}"
+                        f"between {parse.start} and {parse.end}{cite}.{uncertainty}"
                     )
 
                 elif parse.intent == "latest":
@@ -355,9 +408,14 @@ class RAGAgent:
                     if sources:
                         last_c = sources[0]
                         title = last_c.get("dominant_title") or last_c.get("window_title")
+                        cite = ""
+                        if USE_GROUNDING:
+                            cid = last_c.get("episode_id") or last_c.get("id")
+                            tag = f"[E{cid}]" if last_c.get("source") == "episode" else f"[C{cid}]"
+                            cite = f" {tag}"
                         structured_ans = (
                             f"The last activity recorded on {parse.start[:10]} was at {last_c['timestamp']} "
-                            f"in window '{title}' ({last_c['process_name']})."
+                            f"in window '{title}' ({last_c['process_name']}){cite}."
                         )
 
                 elif parse.intent == "earliest":
@@ -409,23 +467,45 @@ class RAGAgent:
                     if sources:
                         first_c = sources[0]
                         title = first_c.get("dominant_title") or first_c.get("window_title")
+                        cite = ""
+                        if USE_GROUNDING:
+                            cid = first_c.get("episode_id") or first_c.get("id")
+                            tag = f"[E{cid}]" if first_c.get("source") == "episode" else f"[C{cid}]"
+                            cite = f" {tag}"
                         structured_ans = (
                             f"The earliest activity recorded on {parse.start[:10]} started at {first_c['timestamp']} "
-                            f"in window '{title}' ({first_c['process_name']})."
+                            f"in window '{title}' ({first_c['process_name']}){cite}."
                         )
 
                 search_time = (time.time() - search_start) * 1000
 
                 # Build prompt using structured output as context, query LLM if available
                 gen_start = time.time()
-                prompt = CONTEXT_TEMPLATE.format(
+                prompt = (CONTEXT_TEMPLATE_GROUNDED if USE_GROUNDING else CONTEXT_TEMPLATE).format(
                     context_entries=structured_ans,
                     question=question,
                 )
-                answer = self._call_ollama(prompt)
+                answer = self._call_ollama(
+                    prompt,
+                    system_prompt=SYSTEM_PROMPT_GROUNDED if USE_GROUNDING else SYSTEM_PROMPT,
+                )
                 # If Ollama is unavailable or returns warning, return deterministic structured answer directly
                 if answer.startswith("⚠️"):
                     answer = structured_ans
+
+                grounding_rate = None
+                partially_verified = False
+                if USE_GROUNDING:
+                    grounding_res = verify_grounding(
+                        answer,
+                        sources,
+                        tolerance_minutes=CITATION_TOLERANCE_MINUTES,
+                        min_grounding=GROUNDING_MIN,
+                        is_refusal=False,
+                    )
+                    answer = grounding_res.verified_answer
+                    grounding_rate = grounding_res.grounding_rate
+                    partially_verified = grounding_res.partially_verified
 
                 gen_time = (time.time() - gen_start) * 1000
                 return {
@@ -435,6 +515,8 @@ class RAGAgent:
                     "generate_time_ms": gen_time,
                     "refused": False,
                     "refusal_reason": None,
+                    "grounding_rate": grounding_rate,
+                    "partially_verified": partially_verified,
                     "temporal_parse": parse.__dict__,
                 }
 
@@ -465,6 +547,28 @@ class RAGAgent:
                 )
             search_time = (time.time() - search_start) * 1000
 
+            # Pre-generation Refusal Gate (Chunk 3)
+            if USE_GROUNDING:
+                pre_refusal = check_pregeneration_refusals(
+                    query=f"{question} {effective_query}",
+                    db=self.db,
+                    sources=results,
+                    sim_floor=REFUSAL_SIM_FLOOR,
+                    time_range=time_range,
+                )
+                if pre_refusal:
+                    return {
+                        "answer": pre_refusal["answer"],
+                        "sources": pre_refusal.get("sources", []),
+                        "search_time_ms": search_time,
+                        "generate_time_ms": 0,
+                        "refused": True,
+                        "refusal_reason": pre_refusal.get("refusal_reason"),
+                        "grounding_rate": 1.0,
+                        "partially_verified": False,
+                        "temporal_parse": parse.__dict__,
+                    }
+
             if not results:
                 return {
                     "answer": (
@@ -476,17 +580,58 @@ class RAGAgent:
                     "generate_time_ms": 0,
                     "refused": False,
                     "refusal_reason": None,
+                    "grounding_rate": 0.0,
+                    "partially_verified": False,
                     "temporal_parse": parse.__dict__,
                 }
 
             context_str = self._format_context(results)
-            prompt = CONTEXT_TEMPLATE.format(
+            prompt = (CONTEXT_TEMPLATE_GROUNDED if USE_GROUNDING else CONTEXT_TEMPLATE).format(
                 context_entries=context_str,
                 question=question,
             )
 
             gen_start = time.time()
-            answer = self._call_ollama(prompt)
+            answer = self._call_ollama(
+                prompt,
+                system_prompt=SYSTEM_PROMPT_GROUNDED if USE_GROUNDING else SYSTEM_PROMPT,
+            )
+
+            if answer.startswith("⚠️") and USE_GROUNDING:
+                answer = synthesize_grounded_answer(question, results, intent=parse.intent)
+
+            grounding_rate = None
+            partially_verified = False
+            if USE_GROUNDING:
+                grounding_res = verify_grounding(
+                    answer,
+                    results,
+                    tolerance_minutes=CITATION_TOLERANCE_MINUTES,
+                    min_grounding=GROUNDING_MIN,
+                    is_refusal=False,
+                )
+                if grounding_res.grounding_rate < GROUNDING_MIN and not answer.startswith("⚠️"):
+                    stricter_prompt = prompt + "\n\nCRITICAL: Every claim MUST cite an episode ID (e.g. [E12]) and all timestamps mentioned must strictly match the cited episode."
+                    answer2 = self._call_ollama(
+                        stricter_prompt,
+                        system_prompt=SYSTEM_PROMPT_GROUNDED,
+                    )
+                    if not answer2.startswith("⚠️"):
+                        grounding_res2 = verify_grounding(
+                            answer2,
+                            results,
+                            tolerance_minutes=CITATION_TOLERANCE_MINUTES,
+                            min_grounding=GROUNDING_MIN,
+                            is_refusal=False,
+                        )
+                        if grounding_res2.grounding_rate >= GROUNDING_MIN:
+                            answer = answer2
+                            grounding_res = grounding_res2
+
+                answer = grounding_res.verified_answer
+                grounding_rate = grounding_res.grounding_rate
+                partially_verified = grounding_res.partially_verified
+
             gen_time = (time.time() - gen_start) * 1000
 
             return {
@@ -496,6 +641,8 @@ class RAGAgent:
                 "generate_time_ms": gen_time,
                 "refused": False,
                 "refusal_reason": None,
+                "grounding_rate": grounding_rate,
+                "partially_verified": partially_verified,
                 "temporal_parse": parse.__dict__,
             }
 
@@ -515,26 +662,89 @@ class RAGAgent:
             results = self.db.search_hybrid(question, query_embedding, limit=top_k)
         search_time = (time.time() - search_start) * 1000
 
+        # Pre-generation Refusal Gate (Chunk 3)
+        if USE_GROUNDING:
+            pre_refusal = check_pregeneration_refusals(
+                query=question,
+                db=self.db,
+                sources=results,
+                sim_floor=REFUSAL_SIM_FLOOR,
+                time_range=None,
+            )
+            if pre_refusal:
+                return {
+                    "answer": pre_refusal["answer"],
+                    "sources": pre_refusal.get("sources", []),
+                    "search_time_ms": search_time,
+                    "generate_time_ms": 0,
+                    "refused": True,
+                    "refusal_reason": pre_refusal.get("refusal_reason"),
+                    "grounding_rate": 1.0,
+                    "partially_verified": False,
+                    "temporal_parse": None,
+                }
+
         if not results:
             return {
                 "answer": "I don't have any captured context to answer that question. "
-                          "Make sure the capture pipeline is running.",
+                          "Make sure the capture pipeline was running.",
                 "sources": [],
                 "search_time_ms": search_time,
                 "generate_time_ms": 0,
                 "refused": False,
                 "refusal_reason": None,
+                "grounding_rate": 0.0,
+                "partially_verified": False,
                 "temporal_parse": None,
             }
 
         context_str = self._format_context(results)
-        prompt = CONTEXT_TEMPLATE.format(
+        prompt = (CONTEXT_TEMPLATE_GROUNDED if USE_GROUNDING else CONTEXT_TEMPLATE).format(
             context_entries=context_str,
             question=question,
         )
 
         gen_start = time.time()
-        answer = self._call_ollama(prompt)
+        answer = self._call_ollama(
+            prompt,
+            system_prompt=SYSTEM_PROMPT_GROUNDED if USE_GROUNDING else SYSTEM_PROMPT,
+        )
+
+        if answer.startswith("⚠️") and USE_GROUNDING:
+            answer = synthesize_grounded_answer(question, results)
+
+        grounding_rate = None
+        partially_verified = False
+        if USE_GROUNDING:
+            grounding_res = verify_grounding(
+                answer,
+                results,
+                tolerance_minutes=CITATION_TOLERANCE_MINUTES,
+                min_grounding=GROUNDING_MIN,
+                is_refusal=False,
+            )
+            if grounding_res.grounding_rate < GROUNDING_MIN and not answer.startswith("⚠️"):
+                stricter_prompt = prompt + "\n\nCRITICAL: Every claim MUST cite an episode ID (e.g. [E12]) and all timestamps mentioned must strictly match the cited episode."
+                answer2 = self._call_ollama(
+                    stricter_prompt,
+                    system_prompt=SYSTEM_PROMPT_GROUNDED,
+                )
+                if not answer2.startswith("⚠️"):
+                    grounding_res2 = verify_grounding(
+                        answer2,
+                        results,
+                        tolerance_minutes=CITATION_TOLERANCE_MINUTES,
+                        min_grounding=GROUNDING_MIN,
+                        is_refusal=False,
+                    )
+                    if grounding_res2.grounding_rate >= GROUNDING_MIN:
+                        answer = answer2
+                        grounding_res = grounding_res2
+
+            answer = grounding_res.verified_answer
+            grounding_rate = grounding_res.grounding_rate
+            partially_verified = grounding_res.partially_verified
+
         gen_time = (time.time() - gen_start) * 1000
 
         return {
@@ -544,6 +754,8 @@ class RAGAgent:
             "generate_time_ms": gen_time,
             "refused": False,
             "refusal_reason": None,
+            "grounding_rate": grounding_rate,
+            "partially_verified": partially_verified,
             "temporal_parse": None,
         }
 
@@ -567,15 +779,16 @@ class RAGAgent:
         else:
             return self.db.search_hybrid(query_text, query_embedding, limit=top_k)
 
-    def _call_ollama(self, prompt: str) -> str:
+    def _call_ollama(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """Call the Ollama API to generate a response."""
+        sys_prompt = system_prompt or SYSTEM_PROMPT
         try:
             resp = requests.post(
                 f"{OLLAMA_BASE_URL}/api/generate",
                 json={
                     "model": OLLAMA_MODEL,
                     "prompt": prompt,
-                    "system": SYSTEM_PROMPT,
+                    "system": sys_prompt,
                     "stream": False,
                     "options": {
                         "temperature": 0.3,

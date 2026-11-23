@@ -198,18 +198,23 @@ def compute_grounding_rate(
     sources: List[Dict[str, Any]],
     should_refuse: bool,
     is_refusal: bool,
+    rag_grounding_rate: Optional[float] = None,
 ) -> float:
     """
     Compute grounding rate:
     - If refusal query and system correctly refused: 1.0
+    - If rag_grounding_rate is explicitly returned by RAGAgent verifier: use that rate
     - If Ollama was unavailable or answer is empty: 0.0
-    - Otherwise: fraction of sentences supported by citations, timestamps, window titles, or source text.
+    - Otherwise: fraction of sentences supported by citations ([E12], [C5], [12]), timestamps, window titles, or source text.
     """
-    if is_connection_error(answer):
-        return 0.0
-
     if should_refuse and is_refusal:
         return 1.0
+
+    if rag_grounding_rate is not None:
+        return rag_grounding_rate
+
+    if is_connection_error(answer):
+        return 0.0
 
     if not sources or not answer.strip():
         return 0.0
@@ -248,7 +253,7 @@ def compute_grounding_rate(
         s_lower = sentence.lower()
         is_grounded = False
 
-        if re.search(r"\[\d+\]", sentence):
+        if re.search(r"\[(?:E|C)?\d+\]", sentence):
             is_grounded = True
 
         if not is_grounded:
@@ -415,7 +420,13 @@ def run_evaluation(
         is_refusal = is_refusal_response(answer, sources, rag_refused=rag_refused)
         t_prec = compute_temporal_precision(sources, expected_window, should_refuse)
         p_at_k = compute_precision_at_k(sources, relevant_ids, k, should_refuse)
-        grounding = compute_grounding_rate(answer, sources, should_refuse, is_refusal)
+        grounding = compute_grounding_rate(
+            answer,
+            sources,
+            should_refuse,
+            is_refusal,
+            rag_grounding_rate=rag_output.get("grounding_rate"),
+        )
 
         top_k_srcs = sources[:k]
         d_eps = len(set(s.get("episode_id", s.get("id")) for s in top_k_srcs))
@@ -548,6 +559,8 @@ def run_evaluation(
     baseline_data = None
     if compare_tag:
         target_compare = compare_tag
+    elif tag == "grounded":
+        target_compare = "episodes" if (output_dir / "episodes_results.json").exists() else "temporal"
     elif tag == "episodes":
         target_compare = "temporal" if (output_dir / "temporal_results.json").exists() else "baseline"
     else:

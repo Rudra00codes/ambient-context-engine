@@ -1,0 +1,338 @@
+{
+  "version": "1.0",
+  "description": "Instantiated evaluation queries with ground truth annotations based on captured ambient context database.",
+  "reference_now": "2026-11-23T22:05:00",
+  "categories": [
+    {
+      "id": "temporal",
+      "name": "Pure Temporal",
+      "description": "Queries with time-only constraints, testing temporal filtering without relying on semantic embedding.",
+      "queries": [
+        {
+          "id": "T1",
+          "query": "What was I doing at 9:50 PM on November 23?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [62, 63, 64, 65, 66],
+            "expected_time_window": {
+              "start": "2026-11-23T21:35:00",
+              "end": "2026-11-23T22:05:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Used Snipping Tool overlay, previewed Agent_Context.md in Antigravity IDE, and checked WhatsApp in Chrome."
+          }
+        },
+        {
+          "id": "T2",
+          "query": "What apps did I use between 9:40 PM and 10:00 PM on November 23?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [15, 19, 22, 37, 47, 62, 65, 103, 109],
+            "expected_time_window": {
+              "start": "2026-11-23T21:40:00",
+              "end": "2026-11-23T22:00:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Antigravity IDE, Google Chrome, and Snipping Tool."
+          }
+        },
+        {
+          "id": "T3",
+          "query": "What was I doing between 9:42 PM and 9:46 PM on November 23?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+            "expected_time_window": {
+              "start": "2026-11-23T21:42:00",
+              "end": "2026-11-23T21:46:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Edited requirements.txt in Antigravity IDE, then browsed Claude and Google Search in Chrome."
+          }
+        },
+        {
+          "id": "T4",
+          "query": "How long did I spend on Chrome between 9:40 PM and 9:50 PM on November 23?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
+            "expected_time_window": {
+              "start": "2026-11-23T21:40:00",
+              "end": "2026-11-23T21:50:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Active in Chrome across Claude and Google Search from 21:42 to 21:47 (~5 minutes)."
+          }
+        },
+        {
+          "id": "T5",
+          "query": "What was the last thing I was doing on November 23?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [121, 122, 123, 124, 125, 126, 127, 128, 129, 130],
+            "expected_time_window": {
+              "start": "2026-11-23T00:00:00",
+              "end": "2026-11-23T22:05:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Configuring Antigravity Settings in Antigravity IDE."
+          }
+        },
+        {
+          "id": "T6",
+          "query": "When did I start working on November 23?",
+          "category": "temporal",
+          "ground_truth": {
+            "relevant_capture_ids": [15, 16, 17, 18, 19],
+            "expected_time_window": {
+              "start": "2026-11-23T00:00:00",
+              "end": "2026-11-23T22:05:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "First capture recorded at 9:42 PM in Antigravity IDE on requirements.txt."
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic",
+      "name": "Pure Semantic",
+      "description": "Queries with content-only constraints, testing retrieval precision and keyword/semantic matching.",
+      "queries": [
+        {
+          "id": "S1",
+          "query": "Find captures where requirements.txt was open in the editor",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [15, 16, 17, 18, 36, 43],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "Captures 15-18, 36, 43 viewing requirements.txt in Antigravity IDE."
+          }
+        },
+        {
+          "id": "S2",
+          "query": "Where did I see the word 'WhatsApp'?",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [65, 66, 67, 68, 69, 114],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "In Chrome window titled WhatsApp - Google Chrome."
+          }
+        },
+        {
+          "id": "S3",
+          "query": "What was I reading about major project thesis?",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 76, 85],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "Agent_Context.md describing major major project thesis on ambient context engine."
+          }
+        },
+        {
+          "id": "S4",
+          "query": "Which files was I editing in Antigravity IDE?",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [15, 47, 63, 103, 109],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "README.md, requirements.txt, Agent_Context.md, query_taxonomy.json, and Settings."
+          }
+        },
+        {
+          "id": "S5",
+          "query": "What websites was I visiting on Google Chrome?",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [12, 19, 20, 22, 23, 24, 65, 66, 114],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "Claude AI, Google Search (Annotate), WhatsApp Web, and Ambient Context Engine."
+          }
+        },
+        {
+          "id": "S6",
+          "query": "Find where I was looking at query_taxonomy.json",
+          "category": "semantic",
+          "ground_truth": {
+            "relevant_capture_ids": [103, 104, 105, 106, 107, 108, 110],
+            "expected_time_window": null,
+            "should_refuse": false,
+            "expected_answer": "Captures 103-110 in Antigravity IDE viewing query_taxonomy.json."
+          }
+        }
+      ]
+    },
+    {
+      "id": "hybrid",
+      "name": "Hybrid (Temporal + Semantic)",
+      "description": "Queries combining temporal constraints with semantic content filters — the core thesis query type.",
+      "queries": [
+        {
+          "id": "H1",
+          "query": "What repo documentation was I reading around 9:53 PM on November 23?",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 63, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 84, 85, 99, 100, 101, 102],
+            "expected_time_window": {
+              "start": "2026-11-23T21:38:00",
+              "end": "2026-11-23T22:08:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Agent_Context.md and Preview Agent_Context.md in Antigravity IDE."
+          }
+        },
+        {
+          "id": "H2",
+          "query": "What Claude conversation was I having in Chrome around 9:45 PM on November 23?",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [19, 20, 21, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
+            "expected_time_window": {
+              "start": "2026-11-23T21:42:00",
+              "end": "2026-11-23T21:48:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "OmniContext Claude chat in Google Chrome."
+          }
+        },
+        {
+          "id": "H3",
+          "query": "What search query did I perform in Chrome around 9:43 PM on November 23?",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [22, 23, 24],
+            "expected_time_window": {
+              "start": "2026-11-23T21:42:00",
+              "end": "2026-11-23T21:45:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Annotate Google Search in Chrome."
+          }
+        },
+        {
+          "id": "H4",
+          "query": "What file was open in Antigravity IDE between 9:42 PM and 9:45 PM on November 23?",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [15, 16, 17, 18],
+            "expected_time_window": {
+              "start": "2026-11-23T21:42:00",
+              "end": "2026-11-23T21:45:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "requirements.txt in Antigravity IDE."
+          }
+        },
+        {
+          "id": "H5",
+          "query": "Did I look at WhatsApp around 9:51 PM on November 23?",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [65, 66, 67, 68, 69],
+            "expected_time_window": {
+              "start": "2026-11-23T21:50:00",
+              "end": "2026-11-23T21:53:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Yes, active on WhatsApp in Google Chrome from 21:50:56 to 21:51:26."
+          }
+        },
+        {
+          "id": "H6",
+          "query": "Summarize what I did with Agent_Context.md between 9:50 PM and 9:56 PM on November 23",
+          "category": "hybrid",
+          "ground_truth": {
+            "relevant_capture_ids": [63, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95],
+            "expected_time_window": {
+              "start": "2026-11-23T21:50:00",
+              "end": "2026-11-23T21:56:00"
+            },
+            "should_refuse": false,
+            "expected_answer": "Viewing and editing Agent_Context.md and previewing markdown in Antigravity IDE."
+          }
+        }
+      ]
+    },
+    {
+      "id": "ambiguous",
+      "name": "Ambiguous / Low-Confidence",
+      "description": "Queries where the system should refuse or express uncertainty due to lack of captured evidence.",
+      "queries": [
+        {
+          "id": "A1",
+          "query": "What did my colleague say about the project deadline on the call?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": null,
+            "should_refuse": true,
+            "expected_answer": "Refusal: No audio transcripts captured."
+          }
+        },
+        {
+          "id": "A2",
+          "query": "What was I working on three months ago on August 15th?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": {
+              "start": "2026-08-15T00:00:00",
+              "end": "2026-08-15T23:59:59"
+            },
+            "should_refuse": true,
+            "expected_answer": "Refusal: Data retention / earliest capture is September 5th."
+          }
+        },
+        {
+          "id": "A3",
+          "query": "Why was I reading WhatsApp messages at 9:50 PM?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": null,
+            "should_refuse": true,
+            "expected_answer": "Refusal: Internal intent cannot be inferred from screen captures."
+          }
+        },
+        {
+          "id": "A4",
+          "query": "What will I be coding tomorrow morning at 10 AM?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": null,
+            "should_refuse": true,
+            "expected_answer": "Refusal: System cannot predict future activities."
+          }
+        },
+        {
+          "id": "A5",
+          "query": "Did I finish all tasks planned for next month?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": null,
+            "should_refuse": true,
+            "expected_answer": "Refusal: Task completion status cannot be determined."
+          }
+        },
+        {
+          "id": "A6",
+          "query": "What was displayed on my secondary screen when the power fluctuated?",
+          "category": "ambiguous",
+          "ground_truth": {
+            "relevant_capture_ids": [],
+            "expected_time_window": null,
+            "should_refuse": true,
+            "expected_answer": "Refusal: External physical event unobservable."
+          }
+        }
+      ]
+    }
+  ]
+}

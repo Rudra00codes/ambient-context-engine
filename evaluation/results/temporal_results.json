@@ -1,0 +1,1132 @@
+{
+  "metadata": {
+    "tag": "temporal",
+    "timestamp": "20261124_001708",
+    "db_path": "X:\\InternProject\\ambient-context-engine\\data\\context.db",
+    "queries_path": "X:\\InternProject\\ambient-context-engine\\evaluation\\queries.json",
+    "reference_now": "2026-11-23T22:05:00",
+    "k": 5
+  },
+  "overall": {
+    "total_queries": 24,
+    "temporal_precision": 0.7923,
+    "temporal_precision_count": "13/24",
+    "precision_at_k": 0.4083,
+    "precision_at_k_count": "24/24",
+    "grounding_rate": 0.2708,
+    "grounding_rate_count": "24/24",
+    "refusal_recall": 0.5,
+    "refusal_recall_count": "3/6",
+    "false_refusal_rate": 0.0,
+    "false_refusal_count": "0/18"
+  },
+  "by_category": {
+    "ambiguous": {
+      "query_count": 6,
+      "temporal_precision": 1.0,
+      "temporal_precision_count": "1/6",
+      "precision_at_k": 0.5,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.5,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": 0.5,
+      "refusal_recall_count": "3/6",
+      "false_refusal_rate": null,
+      "false_refusal_count": "N/A"
+    },
+    "hybrid": {
+      "query_count": 6,
+      "temporal_precision": 0.55,
+      "temporal_precision_count": "6/6",
+      "precision_at_k": 0.4,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/6"
+    },
+    "semantic": {
+      "query_count": 6,
+      "temporal_precision": null,
+      "temporal_precision_count": "0/6",
+      "precision_at_k": 0.0,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/6"
+    },
+    "temporal": {
+      "query_count": 6,
+      "temporal_precision": 1.0,
+      "temporal_precision_count": "6/6",
+      "precision_at_k": 0.7333,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.5833,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/6"
+    }
+  },
+  "queries": [
+    {
+      "id": "T1",
+      "category": "temporal",
+      "query": "What was I doing at 9:50 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:35:00",
+          "end": "2026-11-23T22:05:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Used Snipping Tool overlay, previewed Agent_Context.md in Antigravity IDE, and checked WhatsApp in Chrome."
+      },
+      "execution": {
+        "search_time_ms": 47.64842987060547,
+        "generate_time_ms": 4.127979278564453,
+        "total_time_ms": 59.73625183105469,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          72,
+          73,
+          79,
+          59,
+          71
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "T2",
+      "category": "temporal",
+      "query": "What apps did I use between 9:40 PM and 10:00 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          19,
+          22,
+          37,
+          47,
+          62,
+          65,
+          103,
+          109
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:40:00",
+          "end": "2026-11-23T22:00:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Antigravity IDE, Google Chrome, and Snipping Tool."
+      },
+      "execution": {
+        "search_time_ms": 0.3895759582519531,
+        "generate_time_ms": 3.5254955291748047,
+        "total_time_ms": 4.239797592163086,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.4,
+        "grounding_rate": 1.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "Applications and windows used between 2026-11-23T21:40:00 and 2026-11-23T22:00:00:\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - requirements.txt)\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Antigravity Settings)\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE)\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Agent_Context.md)\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Preview Agent_Context.md)\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - query_taxonomy.json)\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Settings)\n- SnippingTool.exe (Window: Snipping Tool Overlay)\n- chrome.exe (Window: OmniContext - Claude - Google Chrome)\n- chrome.exe (Window: Annotate - Google Search - Google Chrome)\n- chrome.exe (Window: WhatsApp - Google Chrome)\n- explorer.exe (Window: Task Switching)"
+    },
+    {
+      "id": "T3",
+      "category": "temporal",
+      "query": "What was I doing between 9:42 PM and 9:46 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:46:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Edited requirements.txt in Antigravity IDE, then browsed Claude and Google Search in Chrome."
+      },
+      "execution": {
+        "search_time_ms": 20.372867584228516,
+        "generate_time_ms": 3.247499465942383,
+        "total_time_ms": 23.940563201904297,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          19,
+          25,
+          21,
+          29,
+          30
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "T4",
+      "category": "temporal",
+      "query": "How long did I spend on Chrome between 9:40 PM and 9:50 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:40:00",
+          "end": "2026-11-23T21:50:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Active in Chrome across Claude and Google Search from 21:42 to 21:47 (~5 minutes)."
+      },
+      "execution": {
+        "search_time_ms": 0.3535747528076172,
+        "generate_time_ms": 27.008533477783203,
+        "total_time_ms": 27.657270431518555,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "grounding_rate": 0.5,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "You spent approximately 0.6 minutes active on Chrome between 2026-11-23T21:40:00 and 2026-11-23T21:50:00. (Notice: 9 inactivity gaps exceeding 10s observed)"
+    },
+    {
+      "id": "T5",
+      "category": "temporal",
+      "query": "What was the last thing I was doing on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T00:00:00",
+          "end": "2026-11-23T22:05:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Configuring Antigravity Settings in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 0.171661376953125,
+        "generate_time_ms": 2.98309326171875,
+        "total_time_ms": 3.6084651947021484,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          130,
+          129,
+          128,
+          127,
+          126
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "grounding_rate": 1.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "The last activity recorded on 2026-11-23 was at 2026-11-23T22:04:38.086594 in window 'InternProject - Antigravity IDE - Antigravity Settings' (Antigravity IDE.exe)."
+    },
+    {
+      "id": "T6",
+      "category": "temporal",
+      "query": "When did I start working on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T00:00:00",
+          "end": "2026-11-23T22:05:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "First capture recorded at 9:42 PM in Antigravity IDE on requirements.txt."
+      },
+      "execution": {
+        "search_time_ms": 0.15234947204589844,
+        "generate_time_ms": 2.5513172149658203,
+        "total_time_ms": 2.8820037841796875,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "grounding_rate": 1.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "The earliest activity recorded on 2026-11-23 started at 2026-11-23T21:42:10.878095 in window 'InternProject - Antigravity IDE - requirements.txt' (Antigravity IDE.exe)."
+    },
+    {
+      "id": "S1",
+      "category": "semantic",
+      "query": "Find captures where requirements.txt was open in the editor",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          16,
+          17,
+          18,
+          36,
+          43
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Captures 15-18, 36, 43 viewing requirements.txt in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 19.792795181274414,
+        "generate_time_ms": 2.9544830322265625,
+        "total_time_ms": 23.072004318237305,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          568,
+          612,
+          604,
+          573,
+          558
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S2",
+      "category": "semantic",
+      "query": "Where did I see the word 'WhatsApp'?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          65,
+          66,
+          67,
+          68,
+          69,
+          114
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "In Chrome window titled WhatsApp - Google Chrome."
+      },
+      "execution": {
+        "search_time_ms": 17.583370208740234,
+        "generate_time_ms": 5.645513534545898,
+        "total_time_ms": 23.42391014099121,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          354,
+          351,
+          355,
+          289,
+          320
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S3",
+      "category": "semantic",
+      "query": "What was I reading about major project thesis?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          76,
+          85
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Agent_Context.md describing major major project thesis on ambient context engine."
+      },
+      "execution": {
+        "search_time_ms": 21.250247955322266,
+        "generate_time_ms": 2.9315948486328125,
+        "total_time_ms": 24.351835250854492,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          278,
+          287,
+          279,
+          609,
+          285
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S4",
+      "category": "semantic",
+      "query": "Which files was I editing in Antigravity IDE?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          47,
+          63,
+          103,
+          109
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "README.md, requirements.txt, Agent_Context.md, query_taxonomy.json, and Settings."
+      },
+      "execution": {
+        "search_time_ms": 28.435468673706055,
+        "generate_time_ms": 2.926349639892578,
+        "total_time_ms": 31.53395652770996,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          397,
+          370,
+          400,
+          624,
+          221
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S5",
+      "category": "semantic",
+      "query": "What websites was I visiting on Google Chrome?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          12,
+          19,
+          20,
+          22,
+          23,
+          24,
+          65,
+          66,
+          114
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Claude AI, Google Search (Annotate), WhatsApp Web, and Ambient Context Engine."
+      },
+      "execution": {
+        "search_time_ms": 15.142679214477539,
+        "generate_time_ms": 3.0510425567626953,
+        "total_time_ms": 18.399953842163086,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          314,
+          400,
+          354,
+          333,
+          396
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S6",
+      "category": "semantic",
+      "query": "Find where I was looking at query_taxonomy.json",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          110
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Captures 103-110 in Antigravity IDE viewing query_taxonomy.json."
+      },
+      "execution": {
+        "search_time_ms": 18.884897232055664,
+        "generate_time_ms": 3.0934810638427734,
+        "total_time_ms": 22.1860408782959,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          113,
+          112,
+          116,
+          134,
+          137
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H1",
+      "category": "hybrid",
+      "query": "What repo documentation was I reading around 9:53 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          63,
+          71,
+          72,
+          73,
+          74,
+          75,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          99,
+          100,
+          101,
+          102
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:38:00",
+          "end": "2026-11-23T22:08:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Agent_Context.md and Preview Agent_Context.md in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 28.523921966552734,
+        "generate_time_ms": 3.0579566955566406,
+        "total_time_ms": 31.924724578857422,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          101,
+          47,
+          69,
+          122,
+          99
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.6,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H2",
+      "category": "hybrid",
+      "query": "What Claude conversation was I having in Chrome around 9:45 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          19,
+          20,
+          21,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:48:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "OmniContext Claude chat in Google Chrome."
+      },
+      "execution": {
+        "search_time_ms": 19.586563110351562,
+        "generate_time_ms": 2.989053726196289,
+        "total_time_ms": 22.961139678955078,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          67,
+          68,
+          43,
+          97,
+          89
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H3",
+      "category": "hybrid",
+      "query": "What search query did I perform in Chrome around 9:43 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          22,
+          23,
+          24
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:45:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Annotate Google Search in Chrome."
+      },
+      "execution": {
+        "search_time_ms": 25.514602661132812,
+        "generate_time_ms": 2.9489994049072266,
+        "total_time_ms": 28.816938400268555,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          87,
+          72,
+          51,
+          73,
+          97
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H4",
+      "category": "hybrid",
+      "query": "What file was open in Antigravity IDE between 9:42 PM and 9:45 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          16,
+          17,
+          18
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:45:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "requirements.txt in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 25.784015655517578,
+        "generate_time_ms": 24.262666702270508,
+        "total_time_ms": 50.45819282531738,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          18,
+          23,
+          25,
+          21,
+          20
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 0.2,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H5",
+      "category": "hybrid",
+      "query": "Did I look at WhatsApp around 9:51 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          65,
+          66,
+          67,
+          68,
+          69
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:50:00",
+          "end": "2026-11-23T21:53:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Yes, active on WhatsApp in Google Chrome from 21:50:56 to 21:51:26."
+      },
+      "execution": {
+        "search_time_ms": 22.542715072631836,
+        "generate_time_ms": 2.8619766235351562,
+        "total_time_ms": 25.75230598449707,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          68,
+          69,
+          102,
+          43,
+          67
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.3,
+        "precision_at_k": 0.6,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H6",
+      "category": "hybrid",
+      "query": "Summarize what I did with Agent_Context.md between 9:50 PM and 9:56 PM on November 23",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          63,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:50:00",
+          "end": "2026-11-23T21:56:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Viewing and editing Agent_Context.md and previewing markdown in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 20.416975021362305,
+        "generate_time_ms": 3.058910369873047,
+        "total_time_ms": 23.82969856262207,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          87,
+          85,
+          83,
+          84,
+          86
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A1",
+      "category": "ambiguous",
+      "query": "What did my colleague say about the project deadline on the call?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: No audio transcripts captured."
+      },
+      "execution": {
+        "search_time_ms": 15.760421752929688,
+        "generate_time_ms": 2.9540061950683594,
+        "total_time_ms": 18.96357536315918,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          448,
+          278,
+          287,
+          283,
+          279
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A2",
+      "category": "ambiguous",
+      "query": "What was I working on three months ago on August 15th?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": {
+          "start": "2026-08-15T00:00:00",
+          "end": "2026-08-15T23:59:59"
+        },
+        "should_refuse": true,
+        "expected_answer": "Refusal: Data retention / earliest capture is September 5th."
+      },
+      "execution": {
+        "search_time_ms": 0,
+        "generate_time_ms": 0,
+        "total_time_ms": 1.1403560638427734,
+        "retrieved_count": 0,
+        "retrieved_ids": [],
+        "is_refusal": true,
+        "refusal_reason": "no_data_in_range"
+      },
+      "metrics": {
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "grounding_rate": 1.0,
+        "correctly_refused": true,
+        "falsely_refused": null
+      },
+      "answer": "I don't have any captured context between 2026-08-15T00:00:00 and 2026-08-15T23:59:59. My recorded activity only covers from 2026-11-23T21:42:10.878095 to 2026-11-24T00:04:09.553869."
+    },
+    {
+      "id": "A3",
+      "category": "ambiguous",
+      "query": "Why was I reading WhatsApp messages at 9:50 PM?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: Internal intent cannot be inferred from screen captures."
+      },
+      "execution": {
+        "search_time_ms": 20.10655403137207,
+        "generate_time_ms": 2.9265880584716797,
+        "total_time_ms": 23.26059341430664,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          69,
+          70,
+          68,
+          102,
+          67
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A4",
+      "category": "ambiguous",
+      "query": "What will I be coding tomorrow morning at 10 AM?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: System cannot predict future activities."
+      },
+      "execution": {
+        "search_time_ms": 0,
+        "generate_time_ms": 0,
+        "total_time_ms": 0.9732246398925781,
+        "retrieved_count": 0,
+        "retrieved_ids": [],
+        "is_refusal": true,
+        "refusal_reason": "future_time"
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 1.0,
+        "grounding_rate": 1.0,
+        "correctly_refused": true,
+        "falsely_refused": null
+      },
+      "answer": "I cannot predict future activities. My context only covers past recorded activities up to 2026-11-24T00:04:09.553869."
+    },
+    {
+      "id": "A5",
+      "category": "ambiguous",
+      "query": "Did I finish all tasks planned for next month?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: Task completion status cannot be determined."
+      },
+      "execution": {
+        "search_time_ms": 0,
+        "generate_time_ms": 0,
+        "total_time_ms": 0.6854534149169922,
+        "retrieved_count": 0,
+        "retrieved_ids": [],
+        "is_refusal": true,
+        "refusal_reason": "future_time"
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 1.0,
+        "grounding_rate": 1.0,
+        "correctly_refused": true,
+        "falsely_refused": null
+      },
+      "answer": "I cannot predict future activities. My context only covers past recorded activities up to 2026-11-24T00:04:09.553869."
+    },
+    {
+      "id": "A6",
+      "category": "ambiguous",
+      "query": "What was displayed on my secondary screen when the power fluctuated?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: External physical event unobservable."
+      },
+      "execution": {
+        "search_time_ms": 19.92964744567871,
+        "generate_time_ms": 3.027200698852539,
+        "total_time_ms": 23.169279098510742,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          217,
+          619,
+          51,
+          621,
+          531
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    }
+  ]
+}

@@ -9,9 +9,10 @@ sqlite-vec (semantic vector search) with hybrid Reciprocal Rank Fusion.
 import sqlite3
 import logging
 import json
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple, List
 
 import numpy as np
 
@@ -21,6 +22,50 @@ from config import (
 )
 
 logger = logging.getLogger(__name__)
+
+ENGLISH_STOPWORDS = {
+    "a", "about", "above", "after", "again", "against", "all", "am", "an", "and",
+    "any", "are", "aren't", "as", "at", "be", "because", "been", "before", "being",
+    "below", "between", "both", "but", "by", "can", "can't", "cannot", "could",
+    "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down",
+    "during", "each", "few", "for", "from", "further", "had", "hadn't", "has",
+    "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her",
+    "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's",
+    "i", "i'd", "i'll", "i'm", "i've", "if", "in", "into", "is", "isn't", "it",
+    "it's", "its", "itself", "let's", "me", "more", "most", "mustn't", "my",
+    "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other",
+    "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "shan't",
+    "she", "she'd", "she'll", "she's", "should", "shouldn't", "so", "some", "such",
+    "than", "that", "that's", "the", "their", "theirs", "them", "themselves",
+    "then", "there", "there's", "these", "they", "they'd", "they'll", "they're",
+    "they've", "this", "those", "through", "to", "too", "under", "until", "up",
+    "very", "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were",
+    "weren't", "what", "what's", "when", "when's", "where", "where's", "which",
+    "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would",
+    "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours",
+    "yourself", "yourselves"
+}
+
+
+def _fts_query(text: str) -> Optional[str]:
+    """
+    Format a natural-language text string into a valid FTS5 query:
+    tokenize to alphanumerics, drop stopwords, quote each term, join with OR.
+    Returns None if no terms remain.
+    """
+    if not text:
+        return None
+    tokens = re.findall(r"\w+", text.lower())
+    content_terms = [t for t in tokens if t not in ENGLISH_STOPWORDS and len(t) > 1]
+    if not content_terms:
+        return None
+    seen = set()
+    unique_terms = []
+    for t in content_terms:
+        if t not in seen:
+            seen.add(t)
+            unique_terms.append(t)
+    return " OR ".join(f'"{t}"' for t in unique_terms)
 
 
 class DatabaseManager:
@@ -180,38 +225,178 @@ class DatabaseManager:
     ) -> list[dict]:
         """
         Full-text keyword search using FTS5.
+        Uses _fts_query to tokenize, drop stopwords, quote terms, and join with OR.
         Returns list of dicts with capture metadata + FTS rank.
         """
-        rows = self.conn.execute(
-            """
-            SELECT
-                c.id, c.timestamp, c.source, c.text_content,
-                c.window_title, c.process_name,
-                captures_fts.rank AS fts_rank
-            FROM captures_fts
-            JOIN captures c ON c.id = captures_fts.rowid
-            WHERE captures_fts MATCH ?
-            ORDER BY captures_fts.rank
-            LIMIT ?
-            """,
-            (query_text, limit),
-        ).fetchall()
+        fts_expr = _fts_query(query_text)
+        if not fts_expr:
+            return []
 
-        return [dict(row) for row in rows]
+        try:
+            rows = self.conn.execute(
+                """
+                SELECT
+                    c.id, c.timestamp, c.source, c.text_content,
+                    c.window_title, c.process_name,
+                    captures_fts.rank AS fts_rank
+                FROM captures_fts
+                JOIN captures c ON c.id = captures_fts.rowid
+                WHERE captures_fts MATCH ?
+                ORDER BY captures_fts.rank
+                LIMIT ?
+                """,
+                (fts_expr, limit),
+            ).fetchall()
+            return [dict(row) for row in rows]
+        except sqlite3.OperationalError as e:
+            logger.warning(f"FTS keyword search error on '{fts_expr}': {e}")
+            return []
 
     def search_hybrid(
         self,
         query_text: str,
-        query_embedding: np.ndarray,
+        query_embedding: Optional[np.ndarray],
         limit: int = SEARCH_TOP_K,
+        time_range: Optional[Tuple[str, str]] = None,
     ) -> list[dict]:
         """
         Hybrid search combining semantic + keyword results using
         Reciprocal Rank Fusion (RRF).
 
-        RRF score = sum(1 / (k + rank_i)) across each ranker.
+        If time_range=(start_time, end_time) is provided:
+        - Fetches candidate captures in range via the timestamp index.
+        - If pure temporal query (no residual query terms), returns captures spread evenly across window.
+        - Computes exact cosine similarity on candidate vectors in numpy.
+        - Restricts FTS keyword search to candidate rowids.
+        - Fuses rankings with RRF.
+
+        If time_range is None:
+        - Runs standard global hybrid search.
         """
-        semantic_results = self.search_semantic(query_embedding, limit=limit * 2)
+        # ─── Time-Filtered Search Path ───────────────────────────────
+        if time_range is not None:
+            start_time, end_time = time_range
+            candidate_rows = self.conn.execute(
+                """
+                SELECT id, timestamp, source, text_content,
+                       window_title, process_name
+                FROM captures
+                WHERE timestamp BETWEEN ? AND ?
+                ORDER BY timestamp ASC
+                """,
+                (start_time, end_time),
+            ).fetchall()
+
+            if not candidate_rows:
+                return []
+
+            candidates = [dict(r) for r in candidate_rows]
+            candidate_ids = [c["id"] for c in candidates]
+
+            # Pure temporal query: empty residual query
+            clean_query = query_text.strip() if query_text else ""
+            fts_expr = _fts_query(clean_query)
+            is_pure_temporal = (not clean_query) or (fts_expr is None and query_embedding is None)
+
+            if is_pure_temporal:
+                if len(candidates) <= limit:
+                    return candidates
+                step = (len(candidates) - 1) / (limit - 1) if limit > 1 else 1
+                indices = [round(i * step) for i in range(limit)]
+                return [candidates[idx] for idx in indices]
+
+            # 1. Exact Cosine Similarity in numpy over candidate rowids
+            semantic_results = []
+            if query_embedding is not None and candidate_ids:
+                placeholders = ",".join("?" * len(candidate_ids))
+                vec_rows = self.conn.execute(
+                    f"SELECT rowid, embedding FROM vec_captures WHERE rowid IN ({placeholders})",
+                    candidate_ids,
+                ).fetchall()
+
+                rowid_to_emb = {
+                    r[0]: np.frombuffer(r[1], dtype=np.float32) for r in vec_rows
+                }
+                q_norm = float(np.linalg.norm(query_embedding))
+
+                scored = []
+                for c in candidates:
+                    emb = rowid_to_emb.get(c["id"])
+                    if emb is not None and q_norm > 0:
+                        e_norm = float(np.linalg.norm(emb))
+                        sim = float(np.dot(emb, query_embedding) / (e_norm * q_norm)) if e_norm > 0 else 0.0
+                    else:
+                        sim = -1.0
+                    entry = c.copy()
+                    entry["similarity"] = sim
+                    scored.append(entry)
+
+                scored.sort(key=lambda x: x["similarity"], reverse=True)
+                semantic_results = scored
+
+            # 2. Restricted FTS keyword search on candidate IDs
+            keyword_results = []
+            if fts_expr and candidate_ids:
+                placeholders = ",".join("?" * len(candidate_ids))
+                try:
+                    fts_rows = self.conn.execute(
+                        f"""
+                        SELECT c.id, captures_fts.rank AS fts_rank
+                        FROM captures_fts
+                        JOIN captures c ON c.id = captures_fts.rowid
+                        WHERE captures_fts MATCH ? AND c.id IN ({placeholders})
+                        ORDER BY captures_fts.rank
+                        LIMIT ?
+                        """,
+                        (fts_expr, *candidate_ids, limit * 2),
+                    ).fetchall()
+
+                    cand_map = {c["id"]: c for c in candidates}
+                    for fr in fts_rows:
+                        cid = fr[0]
+                        if cid in cand_map:
+                            entry = cand_map[cid].copy()
+                            entry["fts_rank"] = fr[1]
+                            keyword_results.append(entry)
+                except sqlite3.OperationalError as e:
+                    logger.warning(f"FTS error in time-filtered search: {e}")
+
+            # 3. Reciprocal Rank Fusion (RRF)
+            rrf_scores: dict[int, float] = {}
+            result_map: dict[int, dict] = {}
+
+            for rank, result in enumerate(semantic_results):
+                rid = result["id"]
+                rrf_scores[rid] = rrf_scores.get(rid, 0) + 1.0 / (RRF_K + rank + 1)
+                result_map[rid] = result
+
+            for rank, result in enumerate(keyword_results):
+                rid = result["id"]
+                rrf_scores[rid] = rrf_scores.get(rid, 0) + 1.0 / (RRF_K + rank + 1)
+                result_map[rid] = result
+
+            if not rrf_scores:
+                # If neither produced rankable hits, evenly sample in-window candidates
+                if len(candidates) <= limit:
+                    return candidates
+                step = (len(candidates) - 1) / (limit - 1) if limit > 1 else 1
+                return [candidates[round(i * step)] for i in range(limit)]
+
+            sorted_ids = sorted(rrf_scores, key=lambda x: rrf_scores[x], reverse=True)
+            results = []
+            for rid in sorted_ids[:limit]:
+                entry = result_map[rid].copy()
+                entry["rrf_score"] = rrf_scores[rid]
+                results.append(entry)
+
+            return results
+
+        # ─── Global (Unfiltered) Search Path ─────────────────────────
+        semantic_results = (
+            self.search_semantic(query_embedding, limit=limit * 2)
+            if query_embedding is not None
+            else []
+        )
         keyword_results = self.search_keyword(query_text, limit=limit * 2)
 
         # Build RRF scores
@@ -228,7 +413,6 @@ class DatabaseManager:
             rrf_scores[rid] = rrf_scores.get(rid, 0) + 1.0 / (RRF_K + rank + 1)
             result_map[rid] = result
 
-        # Sort by RRF score descending
         sorted_ids = sorted(rrf_scores, key=lambda x: rrf_scores[x], reverse=True)
 
         results = []

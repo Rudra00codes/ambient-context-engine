@@ -58,5 +58,13 @@ RETENTION_DAYS = 30                # Auto-delete captures older than this (0 = k
 OCR_DEDUP_SIMILARITY = 0.90       # SequenceMatcher ratio threshold to skip duplicate OCR
 OCR_DEDUP_HISTORY = 5             # Number of recent OCR texts to compare against
 
+# ─── Feature Flags (Ablation Study) ──────────────────────────────────
+USE_TEMPORAL = os.environ.get("USE_TEMPORAL", "true").lower() in ("true", "1", "yes")
+USE_EPISODES = os.environ.get("USE_EPISODES", "false").lower() in ("true", "1", "yes")
+USE_GROUNDING = os.environ.get("USE_GROUNDING", "false").lower() in ("true", "1", "yes")
+
+# Temporal Decomposition Settings
+AROUND_WINDOW_MINUTES = int(os.environ.get("AROUND_WINDOW_MINUTES", "15"))
+
 # ─── Logging ─────────────────────────────────────────────────────────
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")

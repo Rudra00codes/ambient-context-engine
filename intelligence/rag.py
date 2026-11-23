@@ -13,16 +13,19 @@ Zero cloud dependency — everything runs on localhost.
 import json
 import logging
 import time
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Union, Dict, Any, List
 
 import requests
 import numpy as np
 
 from config import (
     OLLAMA_BASE_URL, OLLAMA_MODEL, LLM_CONTEXT_MAX_CHARS, SEARCH_TOP_K,
+    USE_TEMPORAL, CAPTURE_INTERVAL_SECS
 )
 from storage.db import DatabaseManager
 from processing.embed import EmbeddingGenerator
+from intelligence.temporal import parse_temporal, TemporalParse
 
 logger = logging.getLogger(__name__)
 
@@ -114,22 +117,305 @@ class RAGAgent:
 
         return "\n\n".join(entries)
 
-    def query(self, question: str, top_k: int = SEARCH_TOP_K) -> dict:
+    def query(
+        self,
+        question: str,
+        top_k: int = SEARCH_TOP_K,
+        reference_now: Optional[Union[str, datetime]] = None,
+    ) -> dict:
         """
         Answer a question about the user's activity history.
+        When USE_TEMPORAL is enabled, applies temporal query decomposition,
+        deterministic refusals, structured aggregate operators, and time-filtered search.
 
         Returns a dict with:
-            - answer: The LLM-generated answer
+            - answer: The LLM-generated answer or structured summary
             - sources: The retrieved context entries
             - search_time_ms: How long retrieval took
             - generate_time_ms: How long LLM generation took
+            - refused: bool indicating if system deterministically refused
+            - refusal_reason: Optional string explanation
+            - temporal_parse: Optional dict with temporal parse details
         """
         total_start = time.time()
 
-        # Step 1: Embed the question
+        # Resolve reference datetime
+        if reference_now is not None:
+            if isinstance(reference_now, str):
+                now = datetime.fromisoformat(reference_now)
+            else:
+                now = reference_now
+        else:
+            now = datetime.now()
+
+        # ─── Temporal Decomposition Path (if enabled) ────────────────
+        if USE_TEMPORAL:
+            parse = parse_temporal(question, now=now)
+
+            # 1. Deterministic Refusal: Future expression
+            if parse.is_future:
+                stats = self.db.get_stats()
+                latest = stats.get("latest_capture") or "the present"
+                return {
+                    "answer": (
+                        "I cannot predict future activities. My context only covers past "
+                        f"recorded activities up to {latest}."
+                    ),
+                    "sources": [],
+                    "search_time_ms": 0,
+                    "generate_time_ms": 0,
+                    "refused": True,
+                    "refusal_reason": "future_time",
+                    "temporal_parse": parse.__dict__,
+                }
+
+            # 2. Deterministic Refusal: Explicit window with 0 captures
+            if parse.start and parse.end:
+                count_row = self.db.conn.execute(
+                    "SELECT COUNT(*) FROM captures WHERE timestamp BETWEEN ? AND ?",
+                    (parse.start, parse.end),
+                ).fetchone()
+                count = count_row[0] if count_row else 0
+
+                if count == 0:
+                    stats = self.db.get_stats()
+                    earliest = stats.get("earliest_capture") or "unknown"
+                    latest = stats.get("latest_capture") or "unknown"
+                    return {
+                        "answer": (
+                            f"I don't have any captured context between {parse.start} and {parse.end}. "
+                            f"My recorded activity only covers from {earliest} to {latest}."
+                        ),
+                        "sources": [],
+                        "search_time_ms": 0,
+                        "generate_time_ms": 0,
+                        "refused": True,
+                        "refusal_reason": "no_data_in_range",
+                        "temporal_parse": parse.__dict__,
+                    }
+
+            # 3. Structured Temporal Operators for Aggregate Intents
+            if parse.intent != "search" and parse.start and parse.end:
+                search_start = time.time()
+                structured_ans = ""
+                sources = []
+
+                if parse.intent == "apps":
+                    app_rows = self.db.conn.execute(
+                        """
+                        SELECT DISTINCT process_name, window_title
+                        FROM captures
+                        WHERE timestamp BETWEEN ? AND ?
+                          AND (process_name IS NOT NULL OR window_title IS NOT NULL)
+                        ORDER BY process_name
+                        """,
+                        (parse.start, parse.end),
+                    ).fetchall()
+
+                    sample_rows = self.db.conn.execute(
+                        """
+                        SELECT id, timestamp, source, text_content, window_title, process_name
+                        FROM captures
+                        WHERE timestamp BETWEEN ? AND ?
+                        ORDER BY timestamp ASC
+                        LIMIT ?
+                        """,
+                        (parse.start, parse.end, top_k),
+                    ).fetchall()
+                    sources = [dict(r) for r in sample_rows]
+
+                    app_list = [
+                        f"- {r['process_name'] or 'Process'} (Window: {r['window_title'] or 'None'})"
+                        for r in app_rows
+                    ]
+                    structured_ans = (
+                        f"Applications and windows used between {parse.start} and {parse.end}:\n"
+                        + "\n".join(app_list)
+                    )
+
+                elif parse.intent == "duration":
+                    # Check for target process name in residual query (e.g. Chrome, VS Code)
+                    target = parse.residual_query.strip()
+                    if target:
+                        pat = f"%{target.lower()}%"
+                        dur_rows = self.db.conn.execute(
+                            """
+                            SELECT timestamp FROM captures
+                            WHERE timestamp BETWEEN ? AND ?
+                              AND (LOWER(process_name) LIKE ? OR LOWER(window_title) LIKE ?)
+                            ORDER BY timestamp ASC
+                            """,
+                            (parse.start, parse.end, pat, pat),
+                        ).fetchall()
+                        sample_rows = self.db.conn.execute(
+                            """
+                            SELECT id, timestamp, source, text_content, window_title, process_name
+                            FROM captures
+                            WHERE timestamp BETWEEN ? AND ?
+                              AND (LOWER(process_name) LIKE ? OR LOWER(window_title) LIKE ?)
+                            ORDER BY timestamp ASC
+                            LIMIT ?
+                            """,
+                            (parse.start, parse.end, pat, pat, top_k),
+                        ).fetchall()
+                    else:
+                        dur_rows = self.db.conn.execute(
+                            "SELECT timestamp FROM captures WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp ASC",
+                            (parse.start, parse.end),
+                        ).fetchall()
+                        sample_rows = self.db.conn.execute(
+                            """
+                            SELECT id, timestamp, source, text_content, window_title, process_name
+                            FROM captures WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp ASC LIMIT ?
+                            """,
+                            (parse.start, parse.end, top_k),
+                        ).fetchall()
+
+                    sources = [dict(r) for r in sample_rows]
+                    ts_list = [datetime.fromisoformat(r[0]) for r in dur_rows]
+                    max_gap = 2 * CAPTURE_INTERVAL_SECS
+                    total_active_secs = 0.0
+                    gaps_count = 0
+
+                    for idx in range(len(ts_list) - 1):
+                        gap = (ts_list[idx + 1] - ts_list[idx]).total_seconds()
+                        if gap <= max_gap:
+                            total_active_secs += gap
+                        else:
+                            gaps_count += 1
+
+                    if ts_list and total_active_secs == 0:
+                        total_active_secs = len(ts_list) * CAPTURE_INTERVAL_SECS
+
+                    mins = total_active_secs / 60.0
+                    uncertainty = (
+                        f" (Notice: {gaps_count} inactivity gaps exceeding {max_gap}s observed)"
+                        if gaps_count > 0
+                        else ""
+                    )
+                    app_name = target or "active window"
+                    structured_ans = (
+                        f"You spent approximately {mins:.1f} minutes active on {app_name} "
+                        f"between {parse.start} and {parse.end}.{uncertainty}"
+                    )
+
+                elif parse.intent == "latest":
+                    lat_rows = self.db.conn.execute(
+                        """
+                        SELECT id, timestamp, source, text_content, window_title, process_name
+                        FROM captures
+                        WHERE timestamp BETWEEN ? AND ?
+                        ORDER BY timestamp DESC
+                        LIMIT ?
+                        """,
+                        (parse.start, parse.end, top_k),
+                    ).fetchall()
+                    sources = [dict(r) for r in lat_rows]
+                    if sources:
+                        last_c = sources[0]
+                        structured_ans = (
+                            f"The last activity recorded on {parse.start[:10]} was at {last_c['timestamp']} "
+                            f"in window '{last_c['window_title']}' ({last_c['process_name']})."
+                        )
+
+                elif parse.intent == "earliest":
+                    ear_rows = self.db.conn.execute(
+                        """
+                        SELECT id, timestamp, source, text_content, window_title, process_name
+                        FROM captures
+                        WHERE timestamp BETWEEN ? AND ?
+                        ORDER BY timestamp ASC
+                        LIMIT ?
+                        """,
+                        (parse.start, parse.end, top_k),
+                    ).fetchall()
+                    sources = [dict(r) for r in ear_rows]
+                    if sources:
+                        first_c = sources[0]
+                        structured_ans = (
+                            f"The earliest activity recorded on {parse.start[:10]} started at {first_c['timestamp']} "
+                            f"in window '{first_c['window_title']}' ({first_c['process_name']})."
+                        )
+
+                search_time = (time.time() - search_start) * 1000
+
+                # Build prompt using structured output as context, query LLM if available
+                gen_start = time.time()
+                prompt = CONTEXT_TEMPLATE.format(
+                    context_entries=structured_ans,
+                    question=question,
+                )
+                answer = self._call_ollama(prompt)
+                # If Ollama is unavailable or returns warning, return deterministic structured answer directly
+                if answer.startswith("⚠️"):
+                    answer = structured_ans
+
+                gen_time = (time.time() - gen_start) * 1000
+                return {
+                    "answer": answer,
+                    "sources": sources,
+                    "search_time_ms": search_time,
+                    "generate_time_ms": gen_time,
+                    "refused": False,
+                    "refusal_reason": None,
+                    "temporal_parse": parse.__dict__,
+                }
+
+            # 4. Standard Search with Time Filter & Residual Query
+            search_start = time.time()
+            time_range = (parse.start, parse.end) if (parse.start and parse.end) else None
+            effective_query = parse.residual_query if parse.residual_query else question
+
+            if effective_query.strip():
+                query_embedding = self.embedder.generate(effective_query)
+            else:
+                query_embedding = None
+
+            results = self.db.search_hybrid(
+                effective_query,
+                query_embedding,
+                limit=top_k,
+                time_range=time_range,
+            )
+            search_time = (time.time() - search_start) * 1000
+
+            if not results:
+                return {
+                    "answer": (
+                        "I don't have any captured context matching that query in the specified time range. "
+                        "Make sure the capture pipeline was running."
+                    ),
+                    "sources": [],
+                    "search_time_ms": search_time,
+                    "generate_time_ms": 0,
+                    "refused": False,
+                    "refusal_reason": None,
+                    "temporal_parse": parse.__dict__,
+                }
+
+            context_str = self._format_context(results)
+            prompt = CONTEXT_TEMPLATE.format(
+                context_entries=context_str,
+                question=question,
+            )
+
+            gen_start = time.time()
+            answer = self._call_ollama(prompt)
+            gen_time = (time.time() - gen_start) * 1000
+
+            return {
+                "answer": answer,
+                "sources": results,
+                "search_time_ms": search_time,
+                "generate_time_ms": gen_time,
+                "refused": False,
+                "refusal_reason": None,
+                "temporal_parse": parse.__dict__,
+            }
+
+        # ─── Baseline Path (USE_TEMPORAL is False) ───────────────────
         query_embedding = self.embedder.generate(question)
 
-        # Step 2: Hybrid search
         search_start = time.time()
         results = self.db.search_hybrid(question, query_embedding, limit=top_k)
         search_time = (time.time() - search_start) * 1000
@@ -141,31 +427,29 @@ class RAGAgent:
                 "sources": [],
                 "search_time_ms": search_time,
                 "generate_time_ms": 0,
+                "refused": False,
+                "refusal_reason": None,
+                "temporal_parse": None,
             }
 
-        # Step 3: Build the prompt
         context_str = self._format_context(results)
         prompt = CONTEXT_TEMPLATE.format(
             context_entries=context_str,
             question=question,
         )
 
-        # Step 4: Generate answer via Ollama
         gen_start = time.time()
         answer = self._call_ollama(prompt)
         gen_time = (time.time() - gen_start) * 1000
-
-        total_time = (time.time() - total_start) * 1000
-        logger.info(
-            f"RAG query completed in {total_time:.0f}ms "
-            f"(search={search_time:.0f}ms, generate={gen_time:.0f}ms)"
-        )
 
         return {
             "answer": answer,
             "sources": results,
             "search_time_ms": search_time,
             "generate_time_ms": gen_time,
+            "refused": False,
+            "refusal_reason": None,
+            "temporal_parse": None,
         }
 
     def search_only(

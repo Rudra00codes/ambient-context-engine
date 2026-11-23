@@ -1,0 +1,1114 @@
+{
+  "metadata": {
+    "tag": "baseline",
+    "timestamp": "20261124_000440",
+    "db_path": "X:\\InternProject\\ambient-context-engine\\data\\context.db",
+    "queries_path": "X:\\InternProject\\ambient-context-engine\\evaluation\\queries.json",
+    "reference_now": "2026-11-23T22:05:00",
+    "k": 5
+  },
+  "overall": {
+    "total_queries": 24,
+    "temporal_precision": 0.0,
+    "temporal_precision_count": "13/24",
+    "precision_at_k": 0.0,
+    "precision_at_k_count": "24/24",
+    "grounding_rate": 0.0,
+    "grounding_rate_count": "24/24",
+    "refusal_recall": 0.0,
+    "refusal_recall_count": "0/6",
+    "false_refusal_rate": 0.0,
+    "false_refusal_count": "0/18"
+  },
+  "by_category": {
+    "ambiguous": {
+      "query_count": 6,
+      "temporal_precision": 0.0,
+      "temporal_precision_count": "1/6",
+      "precision_at_k": 0.0,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": 0.0,
+      "refusal_recall_count": "0/6",
+      "false_refusal_rate": null,
+      "false_refusal_count": "N/A"
+    },
+    "hybrid": {
+      "query_count": 6,
+      "temporal_precision": 0.0,
+      "temporal_precision_count": "6/6",
+      "precision_at_k": 0.0,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/6"
+    },
+    "semantic": {
+      "query_count": 6,
+      "temporal_precision": null,
+      "temporal_precision_count": "0/6",
+      "precision_at_k": 0.0,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/6"
+    },
+    "temporal": {
+      "query_count": 6,
+      "temporal_precision": 0.0,
+      "temporal_precision_count": "6/6",
+      "precision_at_k": 0.0,
+      "precision_at_k_count": "6/6",
+      "grounding_rate": 0.0,
+      "grounding_rate_count": "6/6",
+      "refusal_recall": null,
+      "refusal_recall_count": "N/A",
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/6"
+    }
+  },
+  "queries": [
+    {
+      "id": "T1",
+      "category": "temporal",
+      "query": "What was I doing at 9:50 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:49:00",
+          "end": "2026-11-23T21:52:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Used Snipping Tool overlay, previewed Agent_Context.md in Antigravity IDE, and checked WhatsApp in Chrome."
+      },
+      "execution": {
+        "search_time_ms": 4.295110702514648,
+        "generate_time_ms": 3.1974315643310547,
+        "total_time_ms": 44.167280197143555,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          19,
+          447,
+          617,
+          252,
+          306
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "T2",
+      "category": "temporal",
+      "query": "What apps did I use between 9:40 PM and 10:00 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          19,
+          22,
+          37,
+          47,
+          62,
+          65,
+          103,
+          109
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:40:00",
+          "end": "2026-11-23T22:00:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Antigravity IDE, Google Chrome, and Snipping Tool."
+      },
+      "execution": {
+        "search_time_ms": 4.033565521240234,
+        "generate_time_ms": 3.1125545501708984,
+        "total_time_ms": 30.890941619873047,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          325,
+          320,
+          447,
+          335,
+          252
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "T3",
+      "category": "temporal",
+      "query": "What was I doing between 4:13 PM and 4:18 PM on September 5th?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "expected_time_window": {
+          "start": "2026-09-05T16:13:00",
+          "end": "2026-09-05T16:18:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Reviewing Preview README.md in Antigravity IDE and Ambient Context Engine in Chrome."
+      },
+      "execution": {
+        "search_time_ms": 3.730297088623047,
+        "generate_time_ms": 2.9647350311279297,
+        "total_time_ms": 25.418758392333984,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          201,
+          451,
+          200,
+          616,
+          204
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "T4",
+      "category": "temporal",
+      "query": "How long did I spend on Chrome between 9:40 PM and 9:50 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:48:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Active in Chrome across Claude and Google Search from 21:42 to 21:47 (~5 minutes)."
+      },
+      "execution": {
+        "search_time_ms": 3.443479537963867,
+        "generate_time_ms": 24.599313735961914,
+        "total_time_ms": 49.17740821838379,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          200,
+          335,
+          252,
+          358,
+          450
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "T5",
+      "category": "temporal",
+      "query": "What was the last thing I was doing on September 5th?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          13,
+          14
+        ],
+        "expected_time_window": {
+          "start": "2026-09-05T16:15:00",
+          "end": "2026-09-05T16:20:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Preview README.md in Antigravity IDE at 4:17:54 PM."
+      },
+      "execution": {
+        "search_time_ms": 3.4818649291992188,
+        "generate_time_ms": 3.0601024627685547,
+        "total_time_ms": 25.854825973510742,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          451,
+          200,
+          407,
+          615,
+          412
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "T6",
+      "category": "temporal",
+      "query": "When did I start working on September 5th?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          1,
+          2
+        ],
+        "expected_time_window": {
+          "start": "2026-09-05T16:10:00",
+          "end": "2026-09-05T16:15:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "First capture recorded at 4:13:03 PM viewing Preview README.md."
+      },
+      "execution": {
+        "search_time_ms": 3.3769607543945312,
+        "generate_time_ms": 16.793012619018555,
+        "total_time_ms": 37.26601600646973,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          616,
+          201,
+          601,
+          204,
+          615
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S1",
+      "category": "semantic",
+      "query": "Find captures where requirements.txt was open in the editor",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          16,
+          17,
+          18,
+          36,
+          43
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Captures 15-18, 36, 43 viewing requirements.txt in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 3.870248794555664,
+        "generate_time_ms": 2.947092056274414,
+        "total_time_ms": 26.376724243164062,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          553,
+          109,
+          288,
+          199,
+          450
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S2",
+      "category": "semantic",
+      "query": "Where did I see the word 'WhatsApp'?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          65,
+          66,
+          67,
+          68,
+          69,
+          114
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "In Chrome window titled WhatsApp - Google Chrome."
+      },
+      "execution": {
+        "search_time_ms": 3.47900390625,
+        "generate_time_ms": 3.1652450561523438,
+        "total_time_ms": 23.86331558227539,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          589,
+          587,
+          581,
+          354,
+          351
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S3",
+      "category": "semantic",
+      "query": "What was I reading about major project thesis?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          76,
+          85
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Agent_Context.md describing major major project thesis on ambient context engine."
+      },
+      "execution": {
+        "search_time_ms": 3.5314559936523438,
+        "generate_time_ms": 22.349119186401367,
+        "total_time_ms": 44.84248161315918,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          278,
+          287,
+          282,
+          283,
+          279
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S4",
+      "category": "semantic",
+      "query": "Which files was I editing in Antigravity IDE?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          47,
+          63,
+          103,
+          109
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "README.md, requirements.txt, Agent_Context.md, query_taxonomy.json, and Settings."
+      },
+      "execution": {
+        "search_time_ms": 3.2415390014648438,
+        "generate_time_ms": 3.0143260955810547,
+        "total_time_ms": 24.586915969848633,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          400,
+          397,
+          624,
+          370,
+          221
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S5",
+      "category": "semantic",
+      "query": "What websites was I visiting on Google Chrome?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          12,
+          19,
+          20,
+          22,
+          23,
+          24,
+          65,
+          66,
+          114
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Claude AI, Google Search (Annotate), WhatsApp Web, and Ambient Context Engine."
+      },
+      "execution": {
+        "search_time_ms": 3.3147335052490234,
+        "generate_time_ms": 3.029346466064453,
+        "total_time_ms": 26.259660720825195,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          314,
+          313,
+          333,
+          354,
+          325
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "S6",
+      "category": "semantic",
+      "query": "Find where I was looking at query_taxonomy.json",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          110
+        ],
+        "expected_time_window": null,
+        "should_refuse": false,
+        "expected_answer": "Captures 103-110 in Antigravity IDE viewing query_taxonomy.json."
+      },
+      "execution": {
+        "search_time_ms": 3.3407211303710938,
+        "generate_time_ms": 3.014802932739258,
+        "total_time_ms": 24.544239044189453,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          134,
+          113,
+          112,
+          137,
+          235
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H1",
+      "category": "hybrid",
+      "query": "What repo documentation was I reading around 4:15 PM on September 5th?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          13,
+          14
+        ],
+        "expected_time_window": {
+          "start": "2026-09-05T16:13:00",
+          "end": "2026-09-05T16:18:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Preview README.md in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 3.738880157470703,
+        "generate_time_ms": 2.985239028930664,
+        "total_time_ms": 25.92325210571289,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          313,
+          620,
+          200,
+          551,
+          204
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H2",
+      "category": "hybrid",
+      "query": "What Claude conversation was I having in Chrome around 9:45 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          19,
+          20,
+          21,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:48:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "OmniContext Claude chat in Google Chrome."
+      },
+      "execution": {
+        "search_time_ms": 3.6814212799072266,
+        "generate_time_ms": 18.1732177734375,
+        "total_time_ms": 41.82624816894531,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          200,
+          314,
+          306,
+          315,
+          252
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H3",
+      "category": "hybrid",
+      "query": "What search query did I perform in Chrome around 9:43 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          22,
+          23,
+          24
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:45:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Annotate Google Search in Chrome."
+      },
+      "execution": {
+        "search_time_ms": 4.014253616333008,
+        "generate_time_ms": 2.9785633087158203,
+        "total_time_ms": 30.983448028564453,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          200,
+          309,
+          524,
+          447,
+          523
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H4",
+      "category": "hybrid",
+      "query": "What file was open in Antigravity IDE between 9:42 PM and 9:45 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          15,
+          16,
+          17,
+          18
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:42:00",
+          "end": "2026-11-23T21:45:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "requirements.txt in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 3.72314453125,
+        "generate_time_ms": 2.913951873779297,
+        "total_time_ms": 28.735876083374023,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          624,
+          400,
+          397,
+          370,
+          545
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H5",
+      "category": "hybrid",
+      "query": "Did I look at WhatsApp around 9:51 PM on November 23?",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          65,
+          66,
+          67,
+          68,
+          69
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:50:00",
+          "end": "2026-11-23T21:53:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Yes, active on WhatsApp in Google Chrome from 21:50:56 to 21:51:26."
+      },
+      "execution": {
+        "search_time_ms": 3.0639171600341797,
+        "generate_time_ms": 3.077983856201172,
+        "total_time_ms": 22.35865592956543,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          428,
+          354,
+          447,
+          351,
+          355
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "H6",
+      "category": "hybrid",
+      "query": "Summarize what I did with Agent_Context.md between 9:50 PM and 9:56 PM on November 23",
+      "ground_truth": {
+        "relevant_capture_ids": [
+          63,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95
+        ],
+        "expected_time_window": {
+          "start": "2026-11-23T21:50:00",
+          "end": "2026-11-23T21:56:00"
+        },
+        "should_refuse": false,
+        "expected_answer": "Viewing and editing Agent_Context.md and previewing markdown in Antigravity IDE."
+      },
+      "execution": {
+        "search_time_ms": 3.7279129028320312,
+        "generate_time_ms": 2.9366016387939453,
+        "total_time_ms": 27.007579803466797,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          446,
+          445,
+          450,
+          449,
+          447
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": null,
+        "falsely_refused": false
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A1",
+      "category": "ambiguous",
+      "query": "What did my colleague say about the project deadline on the call?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: No audio transcripts captured."
+      },
+      "execution": {
+        "search_time_ms": 3.337383270263672,
+        "generate_time_ms": 2.9935836791992188,
+        "total_time_ms": 29.500246047973633,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          278,
+          448,
+          279,
+          287,
+          283
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A2",
+      "category": "ambiguous",
+      "query": "What was I working on three months ago on August 15th?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": {
+          "start": "2026-08-15T00:00:00",
+          "end": "2026-08-15T23:59:59"
+        },
+        "should_refuse": true,
+        "expected_answer": "Refusal: Data retention / earliest capture is September 5th."
+      },
+      "execution": {
+        "search_time_ms": 3.1616687774658203,
+        "generate_time_ms": 2.954721450805664,
+        "total_time_ms": 28.535842895507812,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          335,
+          449,
+          601,
+          406,
+          598
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": 0.0,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A3",
+      "category": "ambiguous",
+      "query": "Why was I reading WhatsApp messages at 9:50 PM?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: Internal intent cannot be inferred from screen captures."
+      },
+      "execution": {
+        "search_time_ms": 3.5834312438964844,
+        "generate_time_ms": 3.0312538146972656,
+        "total_time_ms": 26.49974822998047,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          289,
+          428,
+          70,
+          524,
+          210
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A4",
+      "category": "ambiguous",
+      "query": "What will I be coding tomorrow morning at 10 AM?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: System cannot predict future activities."
+      },
+      "execution": {
+        "search_time_ms": 3.6821365356445312,
+        "generate_time_ms": 3.6711692810058594,
+        "total_time_ms": 27.2519588470459,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          102,
+          448,
+          87,
+          335,
+          77
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A5",
+      "category": "ambiguous",
+      "query": "Did I finish all tasks planned for next month?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: Task completion status cannot be determined."
+      },
+      "execution": {
+        "search_time_ms": 3.4525394439697266,
+        "generate_time_ms": 2.9990673065185547,
+        "total_time_ms": 22.989511489868164,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          598,
+          279,
+          274,
+          335,
+          336
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    },
+    {
+      "id": "A6",
+      "category": "ambiguous",
+      "query": "What was displayed on my secondary screen when the power fluctuated?",
+      "ground_truth": {
+        "relevant_capture_ids": [],
+        "expected_time_window": null,
+        "should_refuse": true,
+        "expected_answer": "Refusal: External physical event unobservable."
+      },
+      "execution": {
+        "search_time_ms": 3.1707286834716797,
+        "generate_time_ms": 2.90679931640625,
+        "total_time_ms": 26.450634002685547,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          217,
+          615,
+          51,
+          621,
+          531
+        ],
+        "is_refusal": false,
+        "refusal_reason": null
+      },
+      "metrics": {
+        "temporal_precision": null,
+        "precision_at_k": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
+        "falsely_refused": null
+      },
+      "answer": "\u26a0\ufe0f  Cannot connect to Ollama. Make sure it's running: `ollama serve`"
+    }
+  ]
+}

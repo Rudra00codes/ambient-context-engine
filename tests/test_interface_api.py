@@ -109,13 +109,21 @@ class TestInterfaceAPI(unittest.TestCase):
         self.assertTrue(res_post.get_json()["use_temporal"])
 
     def test_api_chat(self):
-        res = self.client.post("/api/chat", json={"question": "What was I coding in Antigravity IDE?"})
+        res = self.client.post("/api/chat", json={"question": "What was I coding in Antigravity IDE?", "top_k": 5})
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertIn("answer", data)
         self.assertIn("sources", data)
         self.assertIn("grounding_rate", data)
         self.assertFalse(data.get("refused"))
+
+    def test_api_capture_now(self):
+        res = self.client.post("/api/capture_now")
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertEqual(data.get("status"), "success")
+        self.assertIn("id", data)
+        self.assertIn("timestamp", data)
 
 
 if __name__ == "__main__":

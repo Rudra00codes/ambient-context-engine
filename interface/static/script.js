@@ -1,7 +1,8 @@
 /**
  * Ambient Context Engine — Frontend Controller
  * Complete interactive manager for Chat, Grounded Citations, Timeline,
- * Activity Analytics, Library Search, Inspector Drawer, and Day Recap.
+ * Activity Analytics, Library Search, Command Palette, Custom Pills,
+ * Mode/Depth Selectors, and Manual Capture Shutter.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalTimelineEpisodes = 0;
     let currentInspectorEpId = null;
     let searchDebounceTimer = null;
+    let paletteSearchTimer = null;
+
+    // Active query options
+    let currentMode = 'hybrid'; // 'hybrid' | 'semantic' | 'keyword'
+    let currentDepth = 10;      // 3 | 10 | 25
+    let captureRunning = true;
 
     // ─── DOM Element References ──────────────────────────────────────
     const navItems = document.querySelectorAll('.nav-item');
@@ -40,12 +47,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatHistory = document.getElementById('chat-history');
     const chatInput = document.getElementById('chat-input');
     const chatSubmit = document.getElementById('chat-submit');
-    const btnNewChat = document.getElementById('btn-new-chat');
     const btnDayRecap = document.getElementById('btn-day-recap');
     const btnInsights = document.getElementById('btn-insights');
     const nudgeText = document.getElementById('nudge-text');
-    const actionPills = document.querySelectorAll('.action-pills .pill');
+    const actionPillsContainer = document.getElementById('action-pills-container');
+    const btnCustomPrompt = document.getElementById('btn-custom-prompt');
     const bottomInputContainer = document.getElementById('bottom-input-container');
+
+    // Popover Elements & Triggers
+    const btnAttachMenu = document.getElementById('btn-attach-menu');
+    const popoverAttach = document.getElementById('popover-attach');
+    const btnModeToggle = document.getElementById('btn-mode-toggle');
+    const popoverMode = document.getElementById('popover-mode');
+    const labelModeBtn = document.getElementById('label-mode-btn');
+    const btnDepthToggle = document.getElementById('btn-depth-toggle');
+    const popoverDepth = document.getElementById('popover-depth');
+    const labelDepthBtn = document.getElementById('label-depth-btn');
+    const allPopovers = [popoverAttach, popoverMode, popoverDepth];
+
+    // Popover Actions
+    const popoverActionSnapshot = document.getElementById('popover-action-snapshot');
+    const popoverActionClear = document.getElementById('popover-action-clear');
+    const popoverActionRecap = document.getElementById('popover-action-recap');
+    const popoverActionCustom = document.getElementById('popover-action-custom');
+
+    // Shutter & Flash Elements
+    const btnCaptureShutter = document.getElementById('btn-capture-shutter');
+    const screenFlash = document.getElementById('screen-flash');
+    const toastContainer = document.getElementById('toast-container');
+
+    // Command Palette Elements
+    const btnQuickSearch = document.getElementById('btn-quick-search');
+    const btnPaletteTriggerBar = document.getElementById('btn-palette-trigger-bar');
+    const modalCommandPalette = document.getElementById('modal-command-palette');
+    const paletteSearchInput = document.getElementById('palette-search-input');
+    const paletteResultsList = document.getElementById('palette-results-list');
+
+    // Custom Pill Modal Elements
+    const modalCustomPill = document.getElementById('modal-custom-pill');
+    const btnCloseCustomModal = document.getElementById('btn-close-custom-modal');
+    const btnCancelCustomPill = document.getElementById('btn-cancel-custom-pill');
+    const btnSaveCustomPill = document.getElementById('btn-save-custom-pill');
+    const customPillLabel = document.getElementById('custom-pill-label');
+    const customPillQuery = document.getElementById('custom-pill-query');
+
+    // Help Modal Elements
+    const btnHelp = document.getElementById('btn-help');
+    const modalHelp = document.getElementById('modal-help');
+    const btnCloseHelpModal = document.getElementById('btn-close-help-modal');
+    const btnCloseHelpModal2 = document.getElementById('btn-close-help-modal-2');
 
     // Timeline Elements
     const timelineContainer = document.getElementById('timeline-container');
@@ -94,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const drawerCapturesContainer = document.getElementById('drawer-captures-container');
     const btnAskAboutEpisode = document.getElementById('btn-ask-about-episode');
 
-    // Modal Elements
+    // Day Recap Modal Elements
     const modalRecapOverlay = document.getElementById('modal-recap-overlay');
     const btnCloseRecapModal = document.getElementById('btn-close-recap-modal');
     const btnCloseRecapModal2 = document.getElementById('btn-close-recap-modal-2');
@@ -105,9 +155,530 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalRecapHighlights = document.getElementById('modal-recap-highlights');
     const btnChatDeeperRecap = document.getElementById('btn-chat-deeper-recap');
 
+    // Power Toggle
+    const btnPowerToggle = document.getElementById('btn-power-toggle');
+    const schedStatusLabel = document.getElementById('sched-status-label');
+    const schedLiveDot = document.getElementById('sched-live-dot');
+
+    // ─── Toast Notification Helper ───────────────────────────────────
+    function showToast(message, type = 'success') {
+        if (!toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let iconName = 'check-circle';
+        if (type === 'warn') iconName = 'alert-triangle';
+        if (type === 'info') iconName = 'info';
+
+        toast.innerHTML = `
+            <i data-lucide="${iconName}" class="icon-xs text-lime"></i>
+            <span>${escapeHtml(message)}</span>
+        `;
+        toastContainer.appendChild(toast);
+        lucide.createIcons({ root: toast });
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            toast.style.transition = 'all 0.25s ease';
+            setTimeout(() => toast.remove(), 250);
+        }, 3200);
+    }
+
+    // ─── Popovers Manager ────────────────────────────────────────────
+    function closeAllPopovers() {
+        allPopovers.forEach(p => {
+            if (p) p.classList.add('hidden');
+        });
+    }
+
+    function togglePopover(popoverEl) {
+        if (!popoverEl) return;
+        const isHidden = popoverEl.classList.contains('hidden');
+        closeAllPopovers();
+        if (isHidden) {
+            popoverEl.classList.remove('hidden');
+        }
+    }
+
+    if (btnAttachMenu) {
+        btnAttachMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePopover(popoverAttach);
+        });
+    }
+
+    if (btnModeToggle) {
+        btnModeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePopover(popoverMode);
+        });
+    }
+
+    if (btnDepthToggle) {
+        btnDepthToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePopover(popoverDepth);
+        });
+    }
+
+    // Close popovers when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.input-box') && !e.target.closest('.floating-popover')) {
+            closeAllPopovers();
+        }
+    });
+
+    // Popover Mode items
+    if (popoverMode) {
+        popoverMode.querySelectorAll('.popover-item').forEach(item => {
+            item.addEventListener('click', () => {
+                popoverMode.querySelectorAll('.popover-item').forEach(i => {
+                    i.classList.remove('active');
+                    const check = i.querySelector('.check-icon');
+                    if (check) check.classList.add('hidden');
+                });
+                item.classList.add('active');
+                const check = item.querySelector('.check-icon');
+                if (check) check.classList.remove('hidden');
+
+                currentMode = item.getAttribute('data-mode') || 'hybrid';
+                if (labelModeBtn) {
+                    labelModeBtn.innerText = currentMode.toUpperCase();
+                }
+                closeAllPopovers();
+                showToast(`Search mode set to ${currentMode.toUpperCase()}`, 'info');
+            });
+        });
+    }
+
+    // Popover Depth items
+    if (popoverDepth) {
+        popoverDepth.querySelectorAll('.popover-item').forEach(item => {
+            item.addEventListener('click', () => {
+                popoverDepth.querySelectorAll('.popover-item').forEach(i => {
+                    i.classList.remove('active');
+                    const check = i.querySelector('.check-icon');
+                    if (check) check.classList.add('hidden');
+                });
+                item.classList.add('active');
+                const check = item.querySelector('.check-icon');
+                if (check) check.classList.remove('hidden');
+
+                const depthVal = parseInt(item.getAttribute('data-depth'), 10) || 10;
+                const depthLabel = item.getAttribute('data-label') || 'MEDIUM';
+                currentDepth = depthVal;
+                if (labelDepthBtn) {
+                    labelDepthBtn.innerText = depthLabel;
+                }
+                closeAllPopovers();
+                showToast(`Reasoning depth set to ${depthLabel} (${depthVal} episodes)`, 'info');
+            });
+        });
+    }
+
+    // Popover Attach actions
+    if (popoverActionSnapshot) {
+        popoverActionSnapshot.addEventListener('click', () => {
+            closeAllPopovers();
+            handleManualCapture();
+        });
+    }
+
+    if (popoverActionClear) {
+        popoverActionClear.addEventListener('click', () => {
+            closeAllPopovers();
+            clearChatSession();
+        });
+    }
+
+    if (popoverActionRecap) {
+        popoverActionRecap.addEventListener('click', () => {
+            closeAllPopovers();
+            openDayRecapModal();
+        });
+    }
+
+    if (popoverActionCustom) {
+        popoverActionCustom.addEventListener('click', () => {
+            closeAllPopovers();
+            openCustomPillModal();
+        });
+    }
+
+    // ─── Manual Screen Capture Shutter ───────────────────────────────
+    async function handleManualCapture() {
+        // Visual shutter flash
+        if (screenFlash) {
+            screenFlash.classList.add('active');
+            setTimeout(() => screenFlash.classList.remove('active'), 180);
+        }
+
+        try {
+            const res = await fetch('/api/capture_now', { method: 'POST' });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                showToast(`📸 Captured frame #${data.id} (${data.process_name || 'Active Screen'})`, 'success');
+                fetchSystemStatus();
+                fetchRecents();
+                if (currentTab === 'timeline') loadEpisodes(true);
+            } else {
+                showToast('Capture error: ' + (data.error || 'Failed'), 'warn');
+            }
+        } catch (e) {
+            showToast('Failed to trigger capture.', 'warn');
+        }
+    }
+
+    if (btnCaptureShutter) {
+        btnCaptureShutter.addEventListener('click', handleManualCapture);
+    }
+
+    function clearChatSession() {
+        chatHistory.innerHTML = '';
+        hasChatted = false;
+        welcomeState.classList.remove('hidden');
+        chatHistory.classList.add('hidden');
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+        chatInput.focus();
+        showToast('Chat conversation cleared', 'info');
+    }
+
+    // ─── Command Palette (Ctrl+K) ────────────────────────────────────
+    const defaultCommands = [
+        { id: 'nav-chat', icon: 'message-square', category: 'Navigation', title: 'Go to Chat', desc: 'Personal Grounded Assistant', action: () => switchTab('chat') },
+        { id: 'nav-timeline', icon: 'calendar', category: 'Navigation', title: 'Go to Timeline', desc: 'Chronological activity episodes', action: () => switchTab('timeline') },
+        { id: 'nav-activity', icon: 'activity', category: 'Navigation', title: 'Go to Activity Analytics', desc: 'Screen time and app distribution', action: () => switchTab('activity') },
+        { id: 'nav-library', icon: 'library', category: 'Navigation', title: 'Go to Context Library', desc: 'Full-text search across OCR captures', action: () => switchTab('library') },
+        { id: 'nav-settings', icon: 'settings', category: 'Navigation', title: 'Go to Settings', desc: 'Model flags and privacy verification', action: () => switchTab('settings') },
+        { id: 'act-snapshot', icon: 'camera', category: 'Actions', title: 'Snapshot Screen Now', desc: 'Instantly grab active screen frame and index', action: () => handleManualCapture() },
+        { id: 'act-recap', icon: 'calendar-days', category: 'Actions', title: 'Day Recap Summary', desc: 'Review focus hours and completed tasks', action: () => openDayRecapModal() },
+        { id: 'act-clear', icon: 'trash-2', category: 'Actions', title: 'Clear Chat Conversation', desc: 'Reset conversation history', action: () => clearChatSession() },
+        { id: 'act-custom', icon: 'plus-circle', category: 'Actions', title: 'Create Custom Action Pill', desc: 'Add personal prompt template shortcut', action: () => openCustomPillModal() },
+    ];
+
+    let paletteSelectedIndex = 0;
+    let paletteCurrentItems = [];
+
+    function openCommandPalette() {
+        if (!modalCommandPalette) return;
+        modalCommandPalette.classList.remove('hidden');
+        paletteSearchInput.value = '';
+        paletteSelectedIndex = 0;
+        renderPaletteItems(defaultCommands);
+        paletteSearchInput.focus();
+    }
+
+    function closeCommandPalette() {
+        if (modalCommandPalette) modalCommandPalette.classList.add('hidden');
+    }
+
+    function renderPaletteItems(items) {
+        paletteCurrentItems = items;
+        paletteResultsList.innerHTML = '';
+
+        if (!items || items.length === 0) {
+            paletteResultsList.innerHTML = '<div style="color:var(--text-muted); padding:1.5rem 0; text-align:center; font-size:0.85rem;">No matching commands or episodes found.</div>';
+            return;
+        }
+
+        let currentCat = '';
+        items.forEach((item, idx) => {
+            if (item.category && item.category !== currentCat) {
+                currentCat = item.category;
+                const catEl = document.createElement('div');
+                catEl.className = 'palette-category-title';
+                catEl.innerText = currentCat;
+                paletteResultsList.appendChild(catEl);
+            }
+
+            const el = document.createElement('button');
+            el.className = `palette-item ${idx === paletteSelectedIndex ? 'selected' : ''}`;
+            el.setAttribute('data-idx', idx);
+            el.innerHTML = `
+                <i data-lucide="${item.icon || 'arrow-right'}" class="icon-xs" style="color:var(--accent-neon)"></i>
+                <div class="palette-item-text">
+                    <strong>${escapeHtml(item.title)}</strong>
+                    <small>${escapeHtml(item.desc || '')}</small>
+                </div>
+            `;
+
+            el.addEventListener('click', () => {
+                executePaletteItem(item);
+            });
+
+            paletteResultsList.appendChild(el);
+        });
+
+        lucide.createIcons({ root: paletteResultsList });
+    }
+
+    function executePaletteItem(item) {
+        closeCommandPalette();
+        if (item.action) {
+            item.action();
+        } else if (item.episodeId) {
+            openInspectorDrawer(item.episodeId);
+        }
+    }
+
+    if (btnQuickSearch) btnQuickSearch.addEventListener('click', openCommandPalette);
+    if (btnPaletteTriggerBar) btnPaletteTriggerBar.addEventListener('click', openCommandPalette);
+
+    if (paletteSearchInput) {
+        paletteSearchInput.addEventListener('input', () => {
+            clearTimeout(paletteSearchTimer);
+            const q = paletteSearchInput.value.trim().toLowerCase();
+            if (!q) {
+                paletteSelectedIndex = 0;
+                renderPaletteItems(defaultCommands);
+                return;
+            }
+
+            // Local filter on commands
+            const matchedCommands = defaultCommands.filter(c => 
+                c.title.toLowerCase().includes(q) || (c.desc && c.desc.toLowerCase().includes(q))
+            );
+
+            // Fetch live episodes matching query
+            paletteSearchTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+                    const data = await res.json();
+                    const epMatches = (data.episodes || []).slice(0, 5).map(ep => ({
+                        id: `ep-${ep.id}`,
+                        icon: 'layers',
+                        category: 'Matching Episodes',
+                        title: `[E${ep.id}] ${ep.dominant_title || ep.process_name}`,
+                        desc: ep.representative_text ? ep.representative_text.slice(0, 80) + '...' : ep.duration_formatted,
+                        episodeId: ep.id
+                    }));
+
+                    paletteSelectedIndex = 0;
+                    renderPaletteItems([...matchedCommands, ...epMatches]);
+                } catch (e) {
+                    paletteSelectedIndex = 0;
+                    renderPaletteItems(matchedCommands);
+                }
+            }, 180);
+        });
+
+        paletteSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (paletteCurrentItems.length > 0) {
+                    paletteSelectedIndex = (paletteSelectedIndex + 1) % paletteCurrentItems.length;
+                    updatePaletteSelection();
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (paletteCurrentItems.length > 0) {
+                    paletteSelectedIndex = (paletteSelectedIndex - 1 + paletteCurrentItems.length) % paletteCurrentItems.length;
+                    updatePaletteSelection();
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (paletteCurrentItems[paletteSelectedIndex]) {
+                    executePaletteItem(paletteCurrentItems[paletteSelectedIndex]);
+                }
+            } else if (e.key === 'Escape') {
+                closeCommandPalette();
+            }
+        });
+    }
+
+    function updatePaletteSelection() {
+        const items = paletteResultsList.querySelectorAll('.palette-item');
+        items.forEach((item, idx) => {
+            if (idx === paletteSelectedIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    if (modalCommandPalette) {
+        modalCommandPalette.addEventListener('click', (e) => {
+            if (e.target === modalCommandPalette) closeCommandPalette();
+        });
+    }
+
+    // Global Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Ctrl+K / Cmd+K -> Command Palette
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+            e.preventDefault();
+            openCommandPalette();
+        }
+        // Alt+S -> Screen Snapshot
+        if (e.altKey && (e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            handleManualCapture();
+        }
+        // Alt+C -> Clear Chat
+        if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+            e.preventDefault();
+            clearChatSession();
+        }
+        // Alt+A -> Attach Menu
+        if (e.altKey && (e.key === 'a' || e.key === 'A')) {
+            e.preventDefault();
+            togglePopover(popoverAttach);
+        }
+        // Esc -> Dismiss Modals & Drawers
+        if (e.key === 'Escape') {
+            closeAllPopovers();
+            closeCommandPalette();
+            closeCustomPillModal();
+            closeHelpModal();
+            closeInspectorDrawer();
+            closeDayRecapModal();
+        }
+    });
+
+    // ─── Custom Action Pills Manager ─────────────────────────────────
+    function loadCustomActionPills() {
+        if (!actionPillsContainer || !btnCustomPrompt) return;
+        
+        // Remove existing custom pill wraps
+        actionPillsContainer.querySelectorAll('.custom-pill-wrap').forEach(el => el.remove());
+
+        let savedPills = [];
+        try {
+            savedPills = JSON.parse(localStorage.getItem('ambient_custom_pills') || '[]');
+        } catch (e) {
+            savedPills = [];
+        }
+
+        savedPills.forEach(p => {
+            const wrap = document.createElement('div');
+            wrap.className = 'pill-wrap custom-pill-wrap';
+
+            const pill = document.createElement('button');
+            pill.className = 'pill';
+            pill.innerText = p.label;
+            pill.setAttribute('data-query', p.query);
+            pill.addEventListener('click', () => {
+                chatInput.value = p.query;
+                handleChatSubmit(p.query);
+            });
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'pill-delete-btn';
+            delBtn.innerHTML = '&times;';
+            delBtn.title = 'Delete shortcut';
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteCustomActionPill(p.label);
+            });
+
+            wrap.appendChild(pill);
+            wrap.appendChild(delBtn);
+            actionPillsContainer.insertBefore(wrap, btnCustomPrompt);
+        });
+    }
+
+    function openCustomPillModal() {
+        if (!modalCustomPill) return;
+        customPillLabel.value = '';
+        customPillQuery.value = '';
+        modalCustomPill.classList.remove('hidden');
+        customPillLabel.focus();
+    }
+
+    function closeCustomPillModal() {
+        if (modalCustomPill) modalCustomPill.classList.add('hidden');
+    }
+
+    function saveCustomActionPill() {
+        const label = customPillLabel.value.trim();
+        const query = customPillQuery.value.trim();
+        if (!label || !query) {
+            alert('Please provide both a label and a prompt query template.');
+            return;
+        }
+
+        let saved = [];
+        try {
+            saved = JSON.parse(localStorage.getItem('ambient_custom_pills') || '[]');
+        } catch (e) {
+            saved = [];
+        }
+
+        saved = saved.filter(p => p.label !== label);
+        saved.push({ label, query });
+        localStorage.setItem('ambient_custom_pills', JSON.stringify(saved));
+
+        closeCustomPillModal();
+        loadCustomActionPills();
+        showToast(`Saved custom action pill "${label}"`, 'success');
+    }
+
+    function deleteCustomActionPill(label) {
+        let saved = [];
+        try {
+            saved = JSON.parse(localStorage.getItem('ambient_custom_pills') || '[]');
+        } catch (e) {
+            saved = [];
+        }
+        saved = saved.filter(p => p.label !== label);
+        localStorage.setItem('ambient_custom_pills', JSON.stringify(saved));
+        loadCustomActionPills();
+        showToast(`Removed custom action pill "${label}"`, 'info');
+    }
+
+    if (btnCustomPrompt) btnCustomPrompt.addEventListener('click', openCustomPillModal);
+    if (btnCloseCustomModal) btnCloseCustomModal.addEventListener('click', closeCustomPillModal);
+    if (btnCancelCustomPill) btnCancelCustomPill.addEventListener('click', closeCustomPillModal);
+    if (btnSaveCustomPill) btnSaveCustomPill.addEventListener('click', saveCustomActionPill);
+    if (modalCustomPill) {
+        modalCustomPill.addEventListener('click', (e) => {
+            if (e.target === modalCustomPill) closeCustomPillModal();
+        });
+    }
+
+    // ─── Help & Architecture Modal ───────────────────────────────────
+    function openHelpModal() {
+        if (modalHelp) modalHelp.classList.remove('hidden');
+    }
+    function closeHelpModal() {
+        if (modalHelp) modalHelp.classList.add('hidden');
+    }
+    if (btnHelp) btnHelp.addEventListener('click', openHelpModal);
+    if (btnCloseHelpModal) btnCloseHelpModal.addEventListener('click', closeHelpModal);
+    if (btnCloseHelpModal2) btnCloseHelpModal2.addEventListener('click', closeHelpModal);
+    if (modalHelp) {
+        modalHelp.addEventListener('click', (e) => {
+            if (e.target === modalHelp) closeHelpModal();
+        });
+    }
+
+    // ─── Power Button Toggle in Sidebar ──────────────────────────────
+    if (btnPowerToggle) {
+        btnPowerToggle.addEventListener('click', () => {
+            captureRunning = !captureRunning;
+            if (captureRunning) {
+                schedStatusLabel.innerText = 'Continuous Capture (5s)';
+                schedLiveDot.style.backgroundColor = 'var(--accent-green)';
+                btnPowerToggle.style.color = 'var(--accent-neon)';
+                showToast('Continuous capture loop: Active (5s)', 'success');
+            } else {
+                schedStatusLabel.innerText = 'Continuous Capture (Paused)';
+                schedLiveDot.style.backgroundColor = 'var(--text-muted)';
+                btnPowerToggle.style.color = 'var(--text-muted)';
+                showToast('Continuous capture loop: Standby', 'warn');
+            }
+        });
+    }
+
     // ─── Tab Navigation Manager ──────────────────────────────────────
     function switchTab(tabId) {
         currentTab = tabId;
+        closeAllPopovers();
         
         // Update nav items
         navItems.forEach(item => {
@@ -264,7 +835,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ─── Chat Implementation ─────────────────────────────────────────
-    // Auto-resize textarea
     chatInput.addEventListener('input', () => {
         chatInput.style.height = 'auto';
         chatInput.style.height = Math.min(chatInput.scrollHeight, 180) + 'px';
@@ -277,24 +847,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    chatSubmit.addEventListener('click', handleChatSubmit);
-
-    // New Chat button resets the chat view
-    if (btnNewChat) {
-        btnNewChat.addEventListener('click', () => {
-            chatHistory.innerHTML = '';
-            hasChatted = false;
-            welcomeState.classList.remove('hidden');
-            chatHistory.classList.add('hidden');
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
-            chatInput.focus();
-        });
-    }
+    chatSubmit.addEventListener('click', () => handleChatSubmit());
 
     async function handleChatSubmit(overrideText = null) {
         const question = (overrideText || chatInput.value).trim();
         if (!question) return;
+
+        closeAllPopovers();
 
         // Transition from welcome state to conversation history
         if (!hasChatted) {
@@ -326,7 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="msg-content" style="color: var(--text-muted); display:flex; align-items:center; gap:8px;">
                 <span class="pulse-dot"></span>
-                <span>Searching local vector memory and verifying grounding...</span>
+                <span>Searching local vector memory (${currentMode}, top ${currentDepth}) and verifying grounding...</span>
             </div>
         `;
         chatHistory.appendChild(loadingEl);
@@ -337,7 +896,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question })
+                body: JSON.stringify({
+                    question,
+                    top_k: currentDepth,
+                    mode: currentMode
+                })
             });
             const data = await res.json();
             
@@ -490,12 +1053,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<button class="citation-pill" data-cap-id="${p1}" title="Capture [C${p1}]"><i data-lucide="image" class="icon-xs"></i> [C${p1}]</button>`;
         });
 
-        // Code blocks: ```lang ... ```
+        // Code blocks
         processed = processed.replace(/```([\w-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
             return `<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
         });
 
-        // Inline code: `code`
+        // Inline code
         processed = processed.replace(/`([^`]+)`/g, '<code>$1</code>');
 
         // Headers
@@ -514,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
         processed = processed.replace(/^\s*-\s+(.*$)/gim, '<li>$1</li>');
         processed = processed.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
 
-        // Paragraph linebreaks
+        // Paragraphs
         const lines = processed.split('\n\n');
         processed = lines.map(p => {
             p = p.trim();
@@ -528,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ─── Action Pills & Quick Prompts ────────────────────────────────
-    actionPills.forEach(pill => {
+    actionPillsContainer.querySelectorAll('.pill:not(.custom-pill)').forEach(pill => {
         pill.addEventListener('click', () => {
             const query = pill.getAttribute('data-query');
             if (query) {
@@ -537,14 +1100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-    const btnCustomPrompt = document.getElementById('btn-custom-prompt');
-    if (btnCustomPrompt) {
-        btnCustomPrompt.addEventListener('click', () => {
-            chatInput.focus();
-            chatInput.placeholder = "Describe what you'd like to analyze...";
-        });
-    }
 
     if (btnDayRecap) {
         btnDayRecap.addEventListener('click', () => {
@@ -892,6 +1447,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(payload)
             });
             fetchSystemStatus();
+            showToast('Settings updated', 'info');
         } catch (e) {
             console.error('Failed to save settings:', e);
         }
@@ -985,6 +1541,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 navigator.clipboard.writeText(drawerRepText.innerText);
                 btnCopyDrawerText.innerHTML = '<i data-lucide="check" class="icon-xs text-lime"></i>';
                 lucide.createIcons({ root: btnCopyDrawerText });
+                showToast('Representative text copied to clipboard', 'info');
                 setTimeout(() => {
                     btnCopyDrawerText.innerHTML = '<i data-lucide="copy" class="icon-xs"></i>';
                     lucide.createIcons({ root: btnCopyDrawerText });
@@ -1098,5 +1655,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSystemStatus();
     fetchNudgeInsight();
     fetchRecents();
+    loadCustomActionPills();
     setInterval(fetchSystemStatus, 15000); // Live heartbeat
 });

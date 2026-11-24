@@ -13,11 +13,14 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <div class="screen-flash" id="screen-flash"></div>
+    <div class="toast-container" id="toast-container"></div>
+
     <div class="app-layout">
         <!-- ─── Left Sidebar Navigation ─────────────────────────────────── -->
         <aside class="left-nav">
             <div class="nav-header">
-                <button class="icon-action-btn" id="btn-quick-search" title="Quick Search (Ctrl+K)">
+                <button class="icon-action-btn" id="btn-quick-search" title="Quick Search & Commands (Ctrl+K)">
                     <i data-lucide="search" class="icon-sm"></i>
                 </button>
                 <div class="status-indicator-badge" title="Capture Engine: 100% Local & Active">
@@ -58,19 +61,21 @@
                 <h4>RECENTS</h4>
             </div>
             <div class="recents-list" id="recents-list">
-                <!-- Dynamically populated -->
+                <!-- Dynamically populated from SQLite -->
                 <div class="recent-item skeleton"></div>
                 <div class="recent-item skeleton"></div>
             </div>
             
             <div class="nav-section">
                 <h4>SCHEDULED</h4>
-                <i data-lucide="power" class="icon-sm right-icon" id="btn-power-toggle" title="Continuous Capture Active"></i>
+                <button class="icon-action-btn right-icon" id="btn-power-toggle" title="Continuous Capture Active (Click to toggle)">
+                    <i data-lucide="power" class="icon-sm"></i>
+                </button>
             </div>
             <div class="scheduled-status">
-                <div class="sched-pill">
-                    <span class="live-dot"></span>
-                    <span>Screen Capture (5s)</span>
+                <div class="sched-pill" id="sched-status-pill">
+                    <span class="live-dot" id="sched-live-dot"></span>
+                    <span id="sched-status-label">Continuous Capture (5s)</span>
                 </div>
             </div>
 
@@ -79,7 +84,7 @@
                     <i data-lucide="settings" class="icon-sm"></i>
                     <span>Settings</span>
                 </a>
-                <button class="icon-action-btn footer-right" id="btn-help" title="Engine Architecture & Zero-Cloud Proof">
+                <button class="icon-action-btn footer-right" id="btn-help" title="Engine Architecture & Keyboard Shortcuts">
                     <i data-lucide="help-circle" class="icon-sm"></i>
                 </button>
             </div>
@@ -94,6 +99,11 @@
                     <span class="view-sub" id="view-sub">Personal Grounded Assistant</span>
                 </div>
                 <div class="header-right">
+                    <button class="btn-palette-trigger" id="btn-palette-trigger-bar" title="Open Command Palette (Ctrl+K)">
+                        <i data-lucide="search" class="icon-xs"></i>
+                        <span>Search or jump to...</span>
+                        <kbd class="header-kbd">Ctrl K</kbd>
+                    </button>
                     <div class="header-stat-pill">
                         <i data-lucide="database" class="icon-xs"></i>
                         <span>DB: <strong id="stat-db-header">--</strong> MB</span>
@@ -113,7 +123,7 @@
                 
                 <!-- ─── TAB 1: Chat View ─────────────────────────────────── -->
                 <div class="view-pane active" id="pane-chat">
-                    <!-- Welcome / Empty State (Identical to user's reference) -->
+                    <!-- Welcome / Empty State (Identical to reference layout) -->
                     <div class="welcome-state" id="welcome-state">
                         <div class="welcome-icon">
                             <i data-lucide="monitor-smartphone" class="icon-lg"></i>
@@ -140,11 +150,12 @@
                             </button>
                         </div>
 
-                        <div class="action-pills">
+                        <div class="action-pills" id="action-pills-container">
                             <button class="pill" data-query="Summarize my time breakdown and primary applications worked on today.">Time Breakdown</button>
                             <button class="pill" data-query="What repetitive workflows or tasks could be automated from my recent activity?">Automate My Work</button>
                             <button class="pill" data-query="What was I working on before my last meeting or discussion?">Meeting Prep</button>
                             <button class="pill" data-query="Identify any errors, debug messages, or blockers I encountered today.">Blockers</button>
+                            <!-- Custom pills injected here -->
                             <button class="pill custom-pill" id="btn-custom-prompt">+ custom</button>
                         </div>
                     </div>
@@ -460,19 +471,106 @@
             <!-- ─── Persistent Bottom Input Bar ─────────────────────────── -->
             <div class="input-container" id="bottom-input-container">
                 <div class="input-box" id="input-box">
+                    
+                    <!-- Floating Popover: Attach / Actions Menu -->
+                    <div class="floating-popover hidden" id="popover-attach">
+                        <div class="popover-header">Quick Actions</div>
+                        <button class="popover-item" id="popover-action-snapshot">
+                            <i data-lucide="camera" class="icon-xs"></i>
+                            <span>Snapshot Screen Now</span>
+                            <kbd class="popover-kbd">Alt S</kbd>
+                        </button>
+                        <button class="popover-item" id="popover-action-clear">
+                            <i data-lucide="trash-2" class="icon-xs"></i>
+                            <span>Clear Conversation</span>
+                            <kbd class="popover-kbd">Alt C</kbd>
+                        </button>
+                        <button class="popover-item" id="popover-action-recap">
+                            <i data-lucide="calendar-days" class="icon-xs"></i>
+                            <span>Open Day Recap</span>
+                        </button>
+                        <div class="popover-divider"></div>
+                        <button class="popover-item" id="popover-action-custom">
+                            <i data-lucide="plus-circle" class="icon-xs"></i>
+                            <span>New Custom Action Pill...</span>
+                        </button>
+                    </div>
+
+                    <!-- Floating Popover: Retrieval Mode -->
+                    <div class="floating-popover hidden" id="popover-mode">
+                        <div class="popover-header">Retrieval Mode</div>
+                        <button class="popover-item active" data-mode="hybrid">
+                            <i data-lucide="sparkles" class="icon-xs"></i>
+                            <div class="popover-item-text">
+                                <strong>Auto (Hybrid RRF)</strong>
+                                <small>Semantic vectors + BM25 keywords</small>
+                            </div>
+                            <i data-lucide="check" class="icon-xs check-icon"></i>
+                        </button>
+                        <button class="popover-item" data-mode="semantic">
+                            <i data-lucide="cpu" class="icon-xs"></i>
+                            <div class="popover-item-text">
+                                <strong>Semantic Only</strong>
+                                <small>Dense vector search (sqlite-vec)</small>
+                            </div>
+                            <i data-lucide="check" class="icon-xs check-icon hidden"></i>
+                        </button>
+                        <button class="popover-item" data-mode="keyword">
+                            <i data-lucide="file-text" class="icon-xs"></i>
+                            <div class="popover-item-text">
+                                <strong>Keyword Only</strong>
+                                <small>Exact matching (SQLite FTS5)</small>
+                            </div>
+                            <i data-lucide="check" class="icon-xs check-icon hidden"></i>
+                        </button>
+                    </div>
+
+                    <!-- Floating Popover: Reasoning Depth -->
+                    <div class="floating-popover hidden" id="popover-depth">
+                        <div class="popover-header">Reasoning Depth</div>
+                        <button class="popover-item" data-depth="3" data-label="LIGHT">
+                            <i data-lucide="zap" class="icon-xs"></i>
+                            <div class="popover-item-text">
+                                <strong>Light (Fast)</strong>
+                                <small>Top 3 episodes (~20ms latency)</small>
+                            </div>
+                            <i data-lucide="check" class="icon-xs check-icon hidden"></i>
+                        </button>
+                        <button class="popover-item active" data-depth="10" data-label="MEDIUM">
+                            <i data-lucide="sliders" class="icon-xs"></i>
+                            <div class="popover-item-text">
+                                <strong>Medium (Balanced)</strong>
+                                <small>Top 10 episodes (Recommended)</small>
+                            </div>
+                            <i data-lucide="check" class="icon-xs check-icon"></i>
+                        </button>
+                        <button class="popover-item" data-depth="25" data-label="DEEP">
+                            <i data-lucide="brain" class="icon-xs"></i>
+                            <div class="popover-item-text">
+                                <strong>Deep (Thorough)</strong>
+                                <small>Top 25 episodes with full timeline</small>
+                            </div>
+                            <i data-lucide="check" class="icon-xs check-icon hidden"></i>
+                        </button>
+                    </div>
+
+                    <!-- Textarea input field (styled seamlessly with no white flash) -->
                     <textarea id="chat-input" rows="1" placeholder="Ask about your screen... (/ for commands, @ chats, $ skills)" autocomplete="off"></textarea>
+                    
                     <div class="input-tools">
-                        <button class="tool-btn" id="btn-new-chat" title="New Chat / Reset View">
+                        <button class="tool-btn" id="btn-attach-menu" title="Actions & Shortcuts (Alt+A)">
                             <i data-lucide="plus"></i>
                         </button>
                         <div class="tool-group right">
-                            <button class="tool-btn text-btn" id="btn-mode-auto" title="Auto Mode">
-                                <i data-lucide="edit-3" class="icon-xs"></i> AUTO
+                            <button class="tool-btn text-btn" id="btn-mode-toggle" title="Switch Retrieval Mode">
+                                <i data-lucide="edit-3" class="icon-xs"></i> <span id="label-mode-btn">AUTO</span>
                             </button>
-                            <button class="tool-btn text-btn" id="btn-depth-toggle" title="Reasoning Depth">
-                                <i data-lucide="chevron-up" class="icon-xs"></i> MEDIUM
+                            <button class="tool-btn text-btn" id="btn-depth-toggle" title="Adjust Reasoning Depth">
+                                <i data-lucide="chevron-up" class="icon-xs"></i> <span id="label-depth-btn">MEDIUM</span>
                             </button>
-                            <span class="tool-status-dot" title="Ready"></span>
+                            <button class="tool-btn shutter-btn" id="btn-capture-shutter" title="Capture Screen Now (Alt+S)">
+                                <i data-lucide="aperture" class="icon-xs"></i>
+                            </button>
                             <button class="tool-btn submit-btn" id="chat-submit" title="Send (Enter)">
                                 <i data-lucide="send"></i>
                             </button>
@@ -482,6 +580,85 @@
             </div>
 
         </main>
+    </div>
+
+    <!-- ─── Spotlight Command Palette Modal (Ctrl+K) ───────────────────── -->
+    <div class="modal-overlay hidden" id="modal-command-palette">
+        <div class="command-palette-card">
+            <div class="palette-input-wrapper">
+                <i data-lucide="search" class="icon-sm palette-search-icon"></i>
+                <input type="text" id="palette-search-input" placeholder="Type a command or search sessions... (Esc to close)" autocomplete="off">
+                <kbd class="kbd-badge">ESC</kbd>
+            </div>
+            <div class="palette-results-list" id="palette-results-list">
+                <!-- Dynamically generated commands & search results -->
+            </div>
+            <div class="palette-footer">
+                <span><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span><kbd>↵</kbd> to select</span>
+                <span><kbd>ESC</kbd> to dismiss</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Custom Action Pill Builder Modal ────────────────────────────── -->
+    <div class="modal-overlay hidden" id="modal-custom-pill">
+        <div class="modal-card small">
+            <div class="modal-header">
+                <div class="modal-header-text">
+                    <div class="recap-badge"><i data-lucide="plus-circle" class="icon-xs"></i> SHORTCUT</div>
+                    <h2>Create Custom Action Pill</h2>
+                </div>
+                <button class="drawer-close-btn" id="btn-close-custom-modal"><i data-lucide="x" class="icon-sm"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="custom-pill-label">Pill Label</label>
+                    <input type="text" id="custom-pill-label" class="styled-input" placeholder="e.g. Daily Standup, Bug Triage">
+                </div>
+                <div class="form-group">
+                    <label for="custom-pill-query">Prompt Template</label>
+                    <textarea id="custom-pill-query" class="styled-textarea" rows="3" placeholder="e.g. Summarize what I worked on for the past 2 hours and what files were touched."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel-custom-pill">Cancel</button>
+                <button class="btn-primary" id="btn-save-custom-pill">Save Action Pill</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Keyboard Shortcuts & Architecture Guide Modal ───────────────── -->
+    <div class="modal-overlay hidden" id="modal-help">
+        <div class="modal-card small">
+            <div class="modal-header">
+                <div class="modal-header-text">
+                    <div class="recap-badge"><i data-lucide="help-circle" class="icon-xs"></i> SHORTCUTS & GUIDE</div>
+                    <h2>Keyboard Shortcuts & Controls</h2>
+                </div>
+                <button class="drawer-close-btn" id="btn-close-help-modal"><i data-lucide="x" class="icon-sm"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcuts-table">
+                    <div class="shortcut-row"><span>Send Message</span><kbd>Enter</kbd></div>
+                    <div class="shortcut-row"><span>Newline in Prompt</span><kbd>Shift + Enter</kbd></div>
+                    <div class="shortcut-row"><span>Command Palette</span><kbd>Ctrl + K</kbd></div>
+                    <div class="shortcut-row"><span>Instant Screen Snapshot</span><kbd>Alt + S</kbd></div>
+                    <div class="shortcut-row"><span>Clear Conversation</span><kbd>Alt + C</kbd></div>
+                    <div class="shortcut-row"><span>Close Any Drawer / Modal</span><kbd>Esc</kbd></div>
+                </div>
+                <div class="airgap-box mt-3">
+                    <div class="airgap-header">
+                        <i data-lucide="shield-check" class="icon-sm text-lime"></i>
+                        <h4>100% Air-Gapped Local Cognitive Memory</h4>
+                    </div>
+                    <p style="font-size:0.75rem; color:var(--text-secondary); margin:0;">All vectors, captures, OCR text, and reasoning stay on 127.0.0.1 with zero external network calls or telemetry.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary full-width" id="btn-close-help-modal-2">Got it</button>
+            </div>
+        </div>
     </div>
 
     <!-- ─── Slide-over Episode Inspector Drawer ─────────────────────────── -->

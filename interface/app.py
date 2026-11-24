@@ -196,12 +196,13 @@ def chat():
     """RAG agent query endpoint with grounding verification."""
     data = request.json or {}
     question = data.get("question", "").strip()
+    top_k = int(data.get("top_k", config.SEARCH_TOP_K))
     if not question:
         return jsonify({"error": "Question is required"}), 400
 
     try:
         agent = get_rag()
-        result = agent.query(question)
+        result = agent.query(question, top_k=top_k)
 
         raw_sources = result.get("sources", [])
         cleaned_sources = [clean_source_dict(s) for s in raw_sources]
@@ -235,6 +236,76 @@ def chat():
     except Exception as e:
         logger.error(f"Chat error: {e}", exc_info=True)
         return jsonify({"error": f"Failed to generate answer: {str(e)}"}), 500
+
+
+@app.route("/api/capture_now", methods=["POST"])
+def capture_now():
+    """Triggers an instant manual screen capture and indexes it immediately."""
+    try:
+        from capture.screen_capture import get_active_window_info
+        title, proc = get_active_window_info()
+        now_iso = datetime.now().isoformat()
+
+        # Capture frame via mss if available
+        text_content = f"Manual screen capture from {title} ({proc})"
+        try:
+            import mss
+            import cv2
+            import numpy as np
+            with mss.mss() as sct:
+                monitor = sct.monitors[1] if len(sct.monitors) > 1 else sct.monitors[0]
+                sct_img = sct.grab(monitor)
+                frame = np.array(sct_img)[:, :, :3]
+
+            from processing.ocr import OCRProcessor
+            ocr = OCRProcessor()
+            res = ocr.process(frame, timestamp=now_iso, window_title=title, process_name=proc)
+            if res and res.text and len(res.text.strip()) > 5:
+                text_content = res.text
+        except Exception as ocr_err:
+            logger.debug(f"Direct OCR during manual capture: {ocr_err}")
+
+        # Redact PII
+        try:
+            from processing.redact import PIIRedactor
+            redactor = PIIRedactor()
+            text_content = redactor.redact(text_content)
+        except Exception:
+            pass
+
+        # Generate embedding
+        emb = get_embedder().generate(text_content)
+        database = get_db()
+        row_id = database.insert_capture(
+            source="screen",
+            text_content=text_content,
+            embedding=emb,
+            window_title=title,
+            process_name=proc,
+            timestamp=now_iso,
+        )
+
+        # Trigger lightweight episode update for current window
+        if config.USE_EPISODES:
+            try:
+                from datetime import timedelta
+                from intelligence.segmenter import build_episodes
+                window_start = (datetime.fromisoformat(now_iso) - timedelta(minutes=5)).isoformat()
+                build_episodes(database, start=window_start, end=now_iso, replace_existing=True)
+            except Exception as ep_err:
+                logger.debug(f"Episode segmenter update note: {ep_err}")
+
+        return jsonify({
+            "status": "success",
+            "id": row_id,
+            "window_title": title,
+            "process_name": proc,
+            "timestamp": now_iso,
+            "text_length": len(text_content),
+        })
+    except Exception as e:
+        logger.error(f"Manual capture error: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 # ─── Episodes & Timeline Endpoints ─────────────────────────────────────

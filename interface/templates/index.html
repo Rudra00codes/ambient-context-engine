@@ -3,44 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ambient Context Engine</title>
-    <!-- Use Inter font for a cleaner, modern look -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Ambient Context Engine — Local Cognitive Memory</title>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-    <!-- Lucide icons for clean, thin SVG icons matching the reference -->
+    <!-- Lucide icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="app-layout">
-        <!-- Sidebar Navigation -->
+        <!-- ─── Left Sidebar Navigation ─────────────────────────────────── -->
         <aside class="left-nav">
             <div class="nav-header">
-                <i data-lucide="search" class="icon-sm"></i>
-                <i data-lucide="github" class="icon-sm"></i>
+                <button class="icon-action-btn" id="btn-quick-search" title="Quick Search (Ctrl+K)">
+                    <i data-lucide="search" class="icon-sm"></i>
+                </button>
+                <div class="status-indicator-badge" title="Capture Engine: 100% Local & Active">
+                    <span class="pulse-dot"></span>
+                    <span class="badge-text">LOCAL</span>
+                </div>
             </div>
             
             <nav class="nav-menu">
-                <a href="#" class="nav-item active">
+                <a href="#chat" class="nav-item active" data-tab="chat">
                     <i data-lucide="message-square" class="icon-sm"></i>
                     <span>Chat</span>
                 </a>
-                <a href="#" class="nav-item" id="nav-timeline">
+                <a href="#timeline" class="nav-item" data-tab="timeline">
                     <i data-lucide="calendar" class="icon-sm"></i>
                     <span>Timeline</span>
+                    <span class="counter-badge" id="sidebar-ep-count">--</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#activity" class="nav-item" data-tab="activity">
                     <i data-lucide="activity" class="icon-sm"></i>
                     <span>Activity</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#library" class="nav-item" data-tab="library">
                     <i data-lucide="library" class="icon-sm"></i>
                     <span>Library</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#scheduled" class="nav-item" data-tab="scheduled">
                     <i data-lucide="clock" class="icon-sm"></i>
                     <span>Scheduled</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#connections" class="nav-item" data-tab="connections">
                     <i data-lucide="network" class="icon-sm"></i>
                     <span>Connections</span>
                 </a>
@@ -49,100 +57,536 @@
             <div class="nav-section">
                 <h4>RECENTS</h4>
             </div>
+            <div class="recents-list" id="recents-list">
+                <!-- Dynamically populated -->
+                <div class="recent-item skeleton"></div>
+                <div class="recent-item skeleton"></div>
+            </div>
             
             <div class="nav-section">
                 <h4>SCHEDULED</h4>
-                <i data-lucide="power" class="icon-sm right-icon"></i>
+                <i data-lucide="power" class="icon-sm right-icon" id="btn-power-toggle" title="Continuous Capture Active"></i>
+            </div>
+            <div class="scheduled-status">
+                <div class="sched-pill">
+                    <span class="live-dot"></span>
+                    <span>Screen Capture (5s)</span>
+                </div>
             </div>
 
             <div class="nav-footer">
-                <a href="#" class="nav-item">
+                <a href="#settings" class="nav-item" data-tab="settings">
                     <i data-lucide="settings" class="icon-sm"></i>
                     <span>Settings</span>
                 </a>
-                <i data-lucide="help-circle" class="icon-sm footer-right"></i>
+                <button class="icon-action-btn footer-right" id="btn-help" title="Engine Architecture & Zero-Cloud Proof">
+                    <i data-lucide="help-circle" class="icon-sm"></i>
+                </button>
             </div>
         </aside>
 
-        <!-- Main Workspace -->
+        <!-- ─── Main Workspace ─────────────────────────────────────────── -->
         <main class="main-workspace">
-            
-            <!-- Chat Interface Container -->
-            <div class="workspace-inner">
-                
-                <!-- Welcome / Empty State (centered) -->
-                <div class="welcome-state" id="welcome-state">
-                    <div class="welcome-icon">
-                        <i data-lucide="monitor-smartphone" class="icon-lg"></i>
+            <!-- Top Bar / Workspace Header -->
+            <header class="workspace-header">
+                <div class="header-left">
+                    <h1 class="view-title" id="view-title">Chat</h1>
+                    <span class="view-sub" id="view-sub">Personal Grounded Assistant</span>
+                </div>
+                <div class="header-right">
+                    <div class="header-stat-pill">
+                        <i data-lucide="database" class="icon-xs"></i>
+                        <span>DB: <strong id="stat-db-header">--</strong> MB</span>
                     </div>
-                    <h2>How can I help today?</h2>
-                    <p class="subtitle">From everything you've seen, said, or heard</p>
-                    
-                    <div class="quick-actions">
-                        <button class="action-card highlight" id="btn-day-recap">
-                            <div class="card-icon"><i data-lucide="calendar-days"></i></div>
-                            <div class="card-text">
-                                <h3>Day Recap</h3>
-                                <p>Today's accomplishments, key moments, and unfinished work</p>
-                            </div>
-                            <i data-lucide="arrow-right" class="arrow"></i>
-                        </button>
+                    <div class="header-stat-pill">
+                        <i data-lucide="layers" class="icon-xs"></i>
+                        <span>Captures: <strong id="stat-caps-header">--</strong></span>
+                    </div>
+                    <div class="model-badge" id="header-model-badge" title="Active Model">
+                        <span class="dot-online" id="ollama-status-dot"></span>
+                        <span id="header-model-name">llama3.2:3b</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="workspace-inner" id="workspace-scroll-area">
+                
+                <!-- ─── TAB 1: Chat View ─────────────────────────────────── -->
+                <div class="view-pane active" id="pane-chat">
+                    <!-- Welcome / Empty State (Identical to user's reference) -->
+                    <div class="welcome-state" id="welcome-state">
+                        <div class="welcome-icon">
+                            <i data-lucide="monitor-smartphone" class="icon-lg"></i>
+                        </div>
+                        <h2>How can I help today?</h2>
+                        <p class="subtitle">From everything you've seen, said, or heard</p>
                         
-                        <button class="action-card" id="btn-insights">
-                            <div class="card-icon"><i data-lucide="list-todo"></i></div>
-                            <div class="card-text">
-                                <h3>Insights</h3>
-                                <p id="nudge-text">Checking for patterns...</p>
-                            </div>
-                        </button>
-                    </div>
+                        <div class="quick-actions">
+                            <button class="action-card highlight" id="btn-day-recap">
+                                <div class="card-icon"><i data-lucide="calendar-days"></i></div>
+                                <div class="card-text">
+                                    <h3>Day Recap</h3>
+                                    <p>Today's accomplishments, key moments, and unfinished work</p>
+                                </div>
+                                <i data-lucide="arrow-right" class="arrow"></i>
+                            </button>
+                            
+                            <button class="action-card" id="btn-insights">
+                                <div class="card-icon"><i data-lucide="list-todo"></i></div>
+                                <div class="card-text">
+                                    <h3>Insights</h3>
+                                    <p id="nudge-text">Checking for patterns...</p>
+                                </div>
+                            </button>
+                        </div>
 
-                    <div class="action-pills">
-                        <span class="pill">Time Breakdown</span>
-                        <span class="pill">Automate My Work</span>
-                        <span class="pill">Meeting Prep</span>
-                        <span class="pill">Blockers</span>
-                        <span class="pill">+ custom</span>
-                    </div>
-                </div>
-
-                <!-- Chat History (Hidden initially) -->
-                <div class="chat-history hidden" id="chat-history">
-                    <!-- Messages will be injected here -->
-                </div>
-                
-                <!-- Timeline View (Hidden initially) -->
-                <div class="timeline-view hidden" id="timeline-view">
-                    <div class="timeline-header">
-                        <h2>Timeline</h2>
-                        <div class="stats">
-                            DB: <span id="stat-db">--</span> MB | Captures: <span id="stat-caps">--</span>
+                        <div class="action-pills">
+                            <button class="pill" data-query="Summarize my time breakdown and primary applications worked on today.">Time Breakdown</button>
+                            <button class="pill" data-query="What repetitive workflows or tasks could be automated from my recent activity?">Automate My Work</button>
+                            <button class="pill" data-query="What was I working on before my last meeting or discussion?">Meeting Prep</button>
+                            <button class="pill" data-query="Identify any errors, debug messages, or blockers I encountered today.">Blockers</button>
+                            <button class="pill custom-pill" id="btn-custom-prompt">+ custom</button>
                         </div>
                     </div>
-                    <div class="timeline-content" id="timeline-container">
-                        <!-- Sessions go here -->
+
+                    <!-- Chat History Messages Stream -->
+                    <div class="chat-history hidden" id="chat-history">
+                        <!-- Messages dynamically rendered here -->
+                    </div>
+                </div>
+
+                <!-- ─── TAB 2: Timeline View ─────────────────────────────── -->
+                <div class="view-pane hidden" id="pane-timeline">
+                    <div class="tab-content-container">
+                        <div class="filter-bar">
+                            <div class="search-input-wrapper">
+                                <i data-lucide="search" class="icon-sm search-icon"></i>
+                                <input type="text" id="timeline-search-input" placeholder="Filter episodes by window title or keyword...">
+                            </div>
+                            <div class="filter-controls">
+                                <select id="timeline-process-filter" class="styled-select">
+                                    <option value="all">All Applications</option>
+                                </select>
+                                <select id="timeline-date-filter" class="styled-select">
+                                    <option value="">All Dates</option>
+                                </select>
+                                <button class="btn-secondary" id="btn-refresh-timeline" title="Refresh">
+                                    <i data-lucide="rotate-cw" class="icon-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="timeline-meta-bar">
+                            <span id="timeline-count-display">Showing 0 episodes</span>
+                            <span class="timeline-hint">Click any episode to inspect raw OCR frames</span>
+                        </div>
+
+                        <div class="timeline-feed" id="timeline-container">
+                            <!-- Episodes dynamically loaded here -->
+                        </div>
+
+                        <div class="pagination-footer hidden" id="timeline-pagination">
+                            <button class="btn-outline" id="btn-load-more-episodes">Load More Episodes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── TAB 3: Activity Analytics View ───────────────────── -->
+                <div class="view-pane hidden" id="pane-activity">
+                    <div class="tab-content-container">
+                        <div class="activity-header-bar">
+                            <div class="activity-title-group">
+                                <h2>Screen Time & Productivity Analytics</h2>
+                                <p class="text-muted">Grounded activity distribution computed directly from SQLite centroid episodes.</p>
+                            </div>
+                            <select id="activity-date-selector" class="styled-select">
+                                <!-- Dates dynamically populated -->
+                            </select>
+                        </div>
+
+                        <!-- KPI Cards Grid -->
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrap lime"><i data-lucide="clock"></i></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">Active Focus Time</span>
+                                    <span class="kpi-value" id="kpi-total-time">--</span>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrap blue"><i data-lucide="layers"></i></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">Episodes Indexed</span>
+                                    <span class="kpi-value" id="kpi-total-episodes">--</span>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrap purple"><i data-lucide="image"></i></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">Captures Processed</span>
+                                    <span class="kpi-value" id="kpi-total-captures">--</span>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrap amber"><i data-lucide="laptop"></i></div>
+                                <div class="kpi-info">
+                                    <span class="kpi-label">Primary Application</span>
+                                    <span class="kpi-value text-truncate" id="kpi-top-app">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Two Column Dashboard Layout -->
+                        <div class="dashboard-grid">
+                            <!-- App Breakdown Bar List -->
+                            <div class="dashboard-card">
+                                <div class="card-header-clean">
+                                    <h3>Application Time Breakdown</h3>
+                                    <span class="badge-subtle">By Process</span>
+                                </div>
+                                <div class="app-breakdown-list" id="app-breakdown-container">
+                                    <!-- App bars populated here -->
+                                </div>
+                            </div>
+
+                            <!-- Hourly Heatmap / Activity Bars -->
+                            <div class="dashboard-card">
+                                <div class="card-header-clean">
+                                    <h3>Hourly Activity Density (24h)</h3>
+                                    <span class="badge-subtle">Captures / Hour</span>
+                                </div>
+                                <div class="hourly-bars-container" id="hourly-bars-container">
+                                    <!-- 24 hourly bars -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top Window Tasks -->
+                        <div class="dashboard-card full-width">
+                            <div class="card-header-clean">
+                                <h3>Most Active Window Tasks</h3>
+                                <span class="badge-subtle">Dominant Titles</span>
+                            </div>
+                            <div class="top-windows-list" id="top-windows-container">
+                                <!-- Top windows -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── TAB 4: Library View ──────────────────────────────── -->
+                <div class="view-pane hidden" id="pane-library">
+                    <div class="tab-content-container">
+                        <div class="filter-bar">
+                            <div class="search-input-wrapper large">
+                                <i data-lucide="search" class="icon-sm search-icon"></i>
+                                <input type="text" id="library-search-input" placeholder="Full-Text Search across all OCR captures, window titles, and transcripts...">
+                            </div>
+                            <button class="btn-primary" id="btn-library-search">Search</button>
+                        </div>
+
+                        <div class="library-results-meta" id="library-results-meta">
+                            <span>Type a query to search local FTS5 index.</span>
+                        </div>
+
+                        <div class="library-results-grid" id="library-results-container">
+                            <!-- Matched captures -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── TAB 5: Scheduled View ────────────────────────────── -->
+                <div class="view-pane hidden" id="pane-scheduled">
+                    <div class="tab-content-container narrow">
+                        <h2>Automations & Background Tasks</h2>
+                        <p class="text-muted mb-4">Continuous capture, clustering, and proactive reflection pipelines.</p>
+
+                        <div class="task-card">
+                            <div class="task-info">
+                                <div class="task-title-row">
+                                    <span class="status-dot green"></span>
+                                    <h3>Screen Capture Daemon</h3>
+                                    <span class="tag">Active</span>
+                                </div>
+                                <p class="task-desc">Captures active screen frames every 5 seconds, computes perceptual frame diff, runs OCR via Tesseract, and writes vectors to SQLite.</p>
+                            </div>
+                            <div class="task-meta">Interval: 5s</div>
+                        </div>
+
+                        <div class="task-card">
+                            <div class="task-info">
+                                <div class="task-title-row">
+                                    <span class="status-dot green"></span>
+                                    <h3>Centroid Episode Segmenter</h3>
+                                    <span class="tag">Chunk 2</span>
+                                </div>
+                                <p class="task-desc">Single-pass clustering collapses redundant captures (sim threshold 0.85, max idle gap 120s) into coherent activity episodes.</p>
+                            </div>
+                            <div class="task-meta">Auto-triggered</div>
+                        </div>
+
+                        <div class="task-card">
+                            <div class="task-info">
+                                <div class="task-title-row">
+                                    <span class="status-dot green"></span>
+                                    <h3>Proactive Reflection Agent</h3>
+                                    <span class="tag">Nudge</span>
+                                </div>
+                                <p class="task-desc">Analyzes activity patterns and generates lightweight non-distracting insights and context recovery reminders.</p>
+                            </div>
+                            <div class="task-meta">Interval: 60m</div>
+                        </div>
+
+                        <div class="task-card">
+                            <div class="task-info">
+                                <div class="task-title-row">
+                                    <span class="status-dot green"></span>
+                                    <h3>Data Retention Pruning</h3>
+                                    <span class="tag">Privacy</span>
+                                </div>
+                                <p class="task-desc">Automated rolling cleanup ensures captures older than retention period (30 days) are pruned from vectors and FTS tables.</p>
+                            </div>
+                            <div class="task-meta">Retention: 30 days</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── TAB 6: Connections View ──────────────────────────── -->
+                <div class="view-pane hidden" id="pane-connections">
+                    <div class="tab-content-container narrow">
+                        <h2>Hardware & Integration Connections</h2>
+                        <p class="text-muted mb-4">Hardware capture sources and local engine connectors.</p>
+
+                        <div class="connection-item">
+                            <div class="conn-icon"><i data-lucide="monitor"></i></div>
+                            <div class="conn-details">
+                                <h3>Screen Capture Source</h3>
+                                <p>Desktop Display 1 (DXGI Screen Grabber + Tesseract 5.x OCR Engine)</p>
+                            </div>
+                            <span class="conn-status connected"><i data-lucide="check" class="icon-xs"></i> Connected</span>
+                        </div>
+
+                        <div class="connection-item">
+                            <div class="conn-icon"><i data-lucide="mic"></i></div>
+                            <div class="conn-details">
+                                <h3>Audio Input Stream</h3>
+                                <p>System Microphone (16kHz Whisper Transcription Engine)</p>
+                            </div>
+                            <span class="conn-status standby">Ready</span>
+                        </div>
+
+                        <div class="connection-item">
+                            <div class="conn-icon"><i data-lucide="database"></i></div>
+                            <div class="conn-details">
+                                <h3>Local SQLite Engine</h3>
+                                <p>WAL Mode · FTS5 Keyword Sync · sqlite-vec (384-dimensional vector store)</p>
+                            </div>
+                            <span class="conn-status connected"><i data-lucide="check" class="icon-xs"></i> Active</span>
+                        </div>
+
+                        <div class="connection-item">
+                            <div class="conn-icon"><i data-lucide="cpu"></i></div>
+                            <div class="conn-details">
+                                <h3>Local LLM Runtime</h3>
+                                <p>Ollama localhost:11434 with Grounded Fallback Synthesizer</p>
+                            </div>
+                            <span class="conn-status connected" id="conn-ollama-status"><i data-lucide="check" class="icon-xs"></i> Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── TAB 7: Settings View ─────────────────────────────── -->
+                <div class="view-pane hidden" id="pane-settings">
+                    <div class="tab-content-container narrow">
+                        <h2>Settings & Configuration</h2>
+                        <p class="text-muted mb-4">Tuning parameters, local model selection, and privacy proof.</p>
+
+                        <div class="settings-group">
+                            <h3 class="settings-group-title">Cognitive Engine Flags (Chunk 1–4)</h3>
+                            
+                            <div class="setting-toggle-row">
+                                <div class="setting-text">
+                                    <label>Temporal Decomposition (Chunk 1)</label>
+                                    <p>Rule-based temporal extraction and in-window candidate filtering</p>
+                                </div>
+                                <input type="checkbox" id="setting-use-temporal" class="toggle-checkbox" checked>
+                            </div>
+
+                            <div class="setting-toggle-row">
+                                <div class="setting-text">
+                                    <label>Episode Retrieval (Chunk 2)</label>
+                                    <p>Centroid vector clustering and episode-level Reciprocal Rank Fusion</p>
+                                </div>
+                                <input type="checkbox" id="setting-use-episodes" class="toggle-checkbox" checked>
+                            </div>
+
+                            <div class="setting-toggle-row">
+                                <div class="setting-text">
+                                    <label>Grounded Generation & Refusal Gate (Chunk 3)</label>
+                                    <p>Strict inline citations [E{id}] with post-hoc temporal verification</p>
+                                </div>
+                                <input type="checkbox" id="setting-use-grounding" class="toggle-checkbox" checked>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h3 class="settings-group-title">Model Configuration</h3>
+                            
+                            <div class="setting-row">
+                                <label for="setting-model-select">Active Local Model</label>
+                                <select id="setting-model-select" class="styled-select">
+                                    <option value="llama3.2:3b">llama3.2:3b (Recommended)</option>
+                                    <option value="qwen2.5:3b">qwen2.5:3b</option>
+                                    <option value="qwen2.5:1.5b">qwen2.5:1.5b (Fastest)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h3 class="settings-group-title">Privacy & Air-Gap Verification</h3>
+                            <div class="airgap-box">
+                                <div class="airgap-header">
+                                    <i data-lucide="shield-check" class="icon-md text-lime"></i>
+                                    <h4>100% Zero-Cloud Guarantee</h4>
+                                </div>
+                                <p>All screen captures, OCR processing, embedding generation, SQLite vector operations, and answer synthesis run strictly on your local device. No external network connections, analytics, or telemetry are ever initiated.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Persistent Bottom Input Bar -->
-            <div class="input-container">
+            <!-- ─── Persistent Bottom Input Bar ─────────────────────────── -->
+            <div class="input-container" id="bottom-input-container">
                 <div class="input-box" id="input-box">
-                    <input type="text" id="chat-input" placeholder="Ask about your screen... (/ for commands, @ chats, $ skills)" autocomplete="off">
+                    <textarea id="chat-input" rows="1" placeholder="Ask about your screen... (/ for commands, @ chats, $ skills)" autocomplete="off"></textarea>
                     <div class="input-tools">
-                        <button class="tool-btn"><i data-lucide="plus"></i></button>
+                        <button class="tool-btn" id="btn-new-chat" title="New Chat / Reset View">
+                            <i data-lucide="plus"></i>
+                        </button>
                         <div class="tool-group right">
-                            <button class="tool-btn text-btn"><i data-lucide="edit-3" class="icon-xs"></i> AUTO</button>
-                            <button class="tool-btn text-btn"><i data-lucide="chevron-up" class="icon-xs"></i> MEDIUM</button>
-                            <button class="tool-btn"><i data-lucide="circle" class="icon-xs outline"></i></button>
-                            <button class="tool-btn submit-btn" id="chat-submit"><i data-lucide="send"></i></button>
+                            <button class="tool-btn text-btn" id="btn-mode-auto" title="Auto Mode">
+                                <i data-lucide="edit-3" class="icon-xs"></i> AUTO
+                            </button>
+                            <button class="tool-btn text-btn" id="btn-depth-toggle" title="Reasoning Depth">
+                                <i data-lucide="chevron-up" class="icon-xs"></i> MEDIUM
+                            </button>
+                            <span class="tool-status-dot" title="Ready"></span>
+                            <button class="tool-btn submit-btn" id="chat-submit" title="Send (Enter)">
+                                <i data-lucide="send"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
         </main>
+    </div>
+
+    <!-- ─── Slide-over Episode Inspector Drawer ─────────────────────────── -->
+    <div class="drawer-overlay hidden" id="drawer-overlay"></div>
+    <aside class="inspector-drawer hidden" id="inspector-drawer">
+        <div class="drawer-header">
+            <div class="drawer-header-title">
+                <span class="drawer-badge" id="drawer-ep-id">Episode #--</span>
+                <h3 id="drawer-title">Episode Inspection</h3>
+            </div>
+            <button class="drawer-close-btn" id="btn-close-drawer">
+                <i data-lucide="x" class="icon-sm"></i>
+            </button>
+        </div>
+
+        <div class="drawer-body">
+            <div class="drawer-section">
+                <label>Metadata</label>
+                <div class="drawer-meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-label">Application</span>
+                        <span class="meta-val" id="drawer-proc">--</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-val" id="drawer-dur">--</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Time Window</span>
+                        <span class="meta-val" id="drawer-time">--</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Captures</span>
+                        <span class="meta-val" id="drawer-caps-count">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="section-title-row">
+                    <label>Representative Text (Centroid)</label>
+                    <button class="btn-copy-small" id="btn-copy-drawer-text" title="Copy Text">
+                        <i data-lucide="copy" class="icon-xs"></i>
+                    </button>
+                </div>
+                <div class="drawer-text-box" id="drawer-rep-text">--</div>
+            </div>
+
+            <div class="drawer-section">
+                <label>Associated Screen Captures</label>
+                <div class="drawer-captures-list" id="drawer-captures-container">
+                    <!-- Child captures rendered here -->
+                </div>
+            </div>
+
+            <div class="drawer-footer">
+                <button class="btn-primary full-width" id="btn-ask-about-episode">
+                    <i data-lucide="message-square" class="icon-xs"></i> Ask AI About This Episode
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ─── Day Recap Modal ─────────────────────────────────────────────── -->
+    <div class="modal-overlay hidden" id="modal-recap-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-header-text">
+                    <div class="recap-badge"><i data-lucide="sparkles" class="icon-xs"></i> DAY RECAP</div>
+                    <h2 id="modal-recap-date">Today's Summary</h2>
+                </div>
+                <button class="drawer-close-btn" id="btn-close-recap-modal">
+                    <i data-lucide="x" class="icon-sm"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="recap-summary-quote" id="modal-recap-summary">
+                    Synthesizing day recap from indexed episodes...
+                </div>
+
+                <div class="recap-stats-row">
+                    <div class="recap-mini-stat">
+                        <span class="lbl">Focus Time</span>
+                        <span class="val" id="modal-recap-time">--</span>
+                    </div>
+                    <div class="recap-mini-stat">
+                        <span class="lbl">Episodes</span>
+                        <span class="val" id="modal-recap-episodes">--</span>
+                    </div>
+                </div>
+
+                <div class="recap-highlights-section">
+                    <h4>Key Accomplishments & Tasks</h4>
+                    <div class="recap-highlights-list" id="modal-recap-highlights">
+                        <!-- Highlights -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-close-recap-modal-2">Close</button>
+                <button class="btn-primary" id="btn-chat-deeper-recap">Ask AI for Detailed Breakdown</button>
+            </div>
+        </div>
     </div>
 
     <!-- Initialize Lucide Icons -->

@@ -6,9 +6,14 @@ model from sentence-transformers. Used for semantic search in the
 storage layer (sqlite-vec).
 """
 
+import os
 import logging
 import time
 from typing import Union
+
+# Force offline mode for air-gapped zero-telemetry local execution
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
 import numpy as np
 

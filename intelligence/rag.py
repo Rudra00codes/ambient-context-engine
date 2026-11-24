@@ -88,7 +88,7 @@ class RAGAgent:
     def _verify_ollama(self):
         """Check that Ollama is running and the model is available."""
         try:
-            resp = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=5)
+            resp = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=(1.0, 2.0))
             resp.raise_for_status()
             models = resp.json().get("models", [])
             model_names = [m["name"] for m in models]
@@ -796,7 +796,7 @@ class RAGAgent:
                         "num_predict": 512,
                     },
                 },
-                timeout=120,
+                timeout=(2.0, 60.0),
             )
             resp.raise_for_status()
 

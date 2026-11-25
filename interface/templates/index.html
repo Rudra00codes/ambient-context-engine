@@ -1,13 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-palette="crimson" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#faf8f5" />
+    <script>
+      (function () {
+        var root = document.documentElement;
+        try {
+          var stored = localStorage.getItem('omnicontext-theme-choice');
+          var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored === 'light' || stored === 'dark' ? stored : osDark ? 'dark' : 'light';
+
+          var palette = localStorage.getItem('omnicontext-palette');
+          if (!/^(crimson|cobalt|lime|orange)$/.test(palette || '')) palette = 'crimson';
+
+          root.setAttribute('data-theme', theme);
+          root.setAttribute('data-palette', palette);
+
+          // Browser UI colour (mobile address bar) matches the page background
+          var bgs = {
+            'crimson-light': '#faf8f5', 'crimson-dark': '#0b0a0a',
+            'cobalt-light': '#f7f8fa', 'cobalt-dark': '#070a14',
+            'lime-light': '#f4f4ef', 'lime-dark': '#0b0b0a',
+            'orange-light': '#fbf7f2', 'orange-dark': '#0d0a08'
+          };
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', bgs[palette + '-' + theme]);
+        } catch (e) {
+          root.setAttribute('data-theme', 'light');
+          root.setAttribute('data-palette', 'crimson');
+        }
+      })();
+    </script>
     <title>Ambient Context Engine — Local Cognitive Memory</title>
-    <!-- Inter Font -->
+    <!-- Geist & Geist Mono Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/theme.css">
     <link rel="stylesheet" href="/static/style.css">
     <!-- Lucide icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -116,6 +147,7 @@
                         <span class="dot-online" id="ollama-status-dot"></span>
                         <span id="header-model-name">llama3.2:3b</span>
                     </div>
+                    <div id="theme-controls-mount" class="theme-controls-mount"></div>
                 </div>
             </header>
 
@@ -123,16 +155,17 @@
                 
                 <!-- ─── TAB 1: Chat View ─────────────────────────────────── -->
                 <div class="view-pane active" id="pane-chat">
-                    <!-- Welcome / Empty State (Identical to reference layout) -->
+                    <!-- Welcome / Empty State -->
                     <div class="welcome-state" id="welcome-state">
                         <div class="welcome-icon">
                             <i data-lucide="monitor-smartphone" class="icon-lg"></i>
                         </div>
-                        <h2>How can I help today?</h2>
+                        <span class="eyebrow">Local Cognitive Memory</span>
+                        <h2>How can I <span class="mark">help today?</span></h2>
                         <p class="subtitle">From everything you've seen, said, or heard</p>
                         
                         <div class="quick-actions">
-                            <button class="action-card highlight" id="btn-day-recap">
+                            <button class="action-card" id="btn-day-recap">
                                 <div class="card-icon"><i data-lucide="calendar-days"></i></div>
                                 <div class="card-text">
                                     <h3>Day Recap</h3>
@@ -218,28 +251,28 @@
                         <!-- KPI Cards Grid -->
                         <div class="kpi-grid">
                             <div class="kpi-card">
-                                <div class="kpi-icon-wrap lime"><i data-lucide="clock"></i></div>
+                                <div class="kpi-icon-wrap"><i data-lucide="clock"></i></div>
                                 <div class="kpi-info">
                                     <span class="kpi-label">Active Focus Time</span>
                                     <span class="kpi-value" id="kpi-total-time">--</span>
                                 </div>
                             </div>
                             <div class="kpi-card">
-                                <div class="kpi-icon-wrap blue"><i data-lucide="layers"></i></div>
+                                <div class="kpi-icon-wrap"><i data-lucide="layers"></i></div>
                                 <div class="kpi-info">
                                     <span class="kpi-label">Episodes Indexed</span>
                                     <span class="kpi-value" id="kpi-total-episodes">--</span>
                                 </div>
                             </div>
                             <div class="kpi-card">
-                                <div class="kpi-icon-wrap purple"><i data-lucide="image"></i></div>
+                                <div class="kpi-icon-wrap"><i data-lucide="image"></i></div>
                                 <div class="kpi-info">
                                     <span class="kpi-label">Captures Processed</span>
                                     <span class="kpi-value" id="kpi-total-captures">--</span>
                                 </div>
                             </div>
                             <div class="kpi-card">
-                                <div class="kpi-icon-wrap amber"><i data-lucide="laptop"></i></div>
+                                <div class="kpi-icon-wrap"><i data-lucide="laptop"></i></div>
                                 <div class="kpi-info">
                                     <span class="kpi-label">Primary Application</span>
                                     <span class="kpi-value text-truncate" id="kpi-top-app">--</span>
@@ -457,7 +490,7 @@
                             <h3 class="settings-group-title">Privacy & Air-Gap Verification</h3>
                             <div class="airgap-box">
                                 <div class="airgap-header">
-                                    <i data-lucide="shield-check" class="icon-md text-lime"></i>
+                                    <i data-lucide="shield-check" class="icon-md text-accent"></i>
                                     <h4>100% Zero-Cloud Guarantee</h4>
                                 </div>
                                 <p>All screen captures, OCR processing, embedding generation, SQLite vector operations, and answer synthesis run strictly on your local device. No external network connections, analytics, or telemetry are ever initiated.</p>
@@ -649,10 +682,10 @@
                 </div>
                 <div class="airgap-box mt-3">
                     <div class="airgap-header">
-                        <i data-lucide="shield-check" class="icon-sm text-lime"></i>
+                        <i data-lucide="shield-check" class="icon-sm text-accent"></i>
                         <h4>100% Air-Gapped Local Cognitive Memory</h4>
                     </div>
-                    <p style="font-size:0.75rem; color:var(--text-secondary); margin:0;">All vectors, captures, OCR text, and reasoning stay on 127.0.0.1 with zero external network calls or telemetry.</p>
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">All vectors, captures, OCR text, and reasoning stay on 127.0.0.1 with zero external network calls or telemetry.</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -770,6 +803,7 @@
     <script>
       lucide.createIcons();
     </script>
+    <script src="/static/theme.js"></script>
     <script src="/static/script.js"></script>
 </body>
 </html>

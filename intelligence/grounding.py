@@ -63,16 +63,35 @@ UNOBSERVABLE_EVENT_PATTERNS = [
 ]
 
 
+GENERIC_QUERY_WORDS = {
+    "what", "was", "i", "doing", "working", "on", "active", "my", "activity",
+    "activities", "worked", "did", "viewing", "looking", "at", "happening",
+    "screen", "tasks", "task", "history", "context", "up", "to", "the", "a", "an",
+    "in", "of", "for", "and", "or", "me", "show", "tell", "summarize", "list"
+}
+
+
+def is_generic_or_empty_query(query: Optional[str]) -> bool:
+    """Return True if the query is empty, whitespace, or contains only generic stop words."""
+    if not query or not query.strip():
+        return True
+    words = re.findall(r"\b\w+\b", query.lower())
+    substantive = [w for w in words if w not in GENERIC_QUERY_WORDS]
+    return len(substantive) == 0
+
+
 def check_pregeneration_refusals(
     query: str,
     db: DatabaseManager,
     sources: List[Dict[str, Any]],
     sim_floor: float = REFUSAL_SIM_FLOOR,
     time_range: Optional[Tuple[str, str]] = None,
+    residual_query: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     """
     Check pre-generation refusal gates before calling the LLM:
     (b) Similarity floor — top episode cosine to residual query < REFUSAL_SIM_FLOOR and no keyword hits
+        (skipped if residual query is empty or generic, e.g. "what was I doing")
     (c) Modality check — query refers to a call/meeting/speech and 0 audio captures exist
     (d) Motive/intent questions — return hedged answer stating on-screen facts but refusing internal motive
     (e) Unobservable physical events (secondary screen, power fluctuation).
@@ -147,7 +166,10 @@ def check_pregeneration_refusals(
             }
 
     # Gate (b): Similarity floor check
-    if sources:
+    # Skip similarity floor when residual query is empty or generic
+    if residual_query is not None and is_generic_or_empty_query(residual_query):
+        pass  # Skip floor check: temporal constraints define relevance
+    elif sources:
         top_s = sources[0]
         top_cos = top_s.get("cosine_sim", 0.0)
         has_any_kw = any(s.get("keyword_match", False) for s in sources)

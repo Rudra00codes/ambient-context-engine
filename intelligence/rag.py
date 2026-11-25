@@ -12,6 +12,7 @@ Zero cloud dependency — everything runs on localhost.
 
 import json
 import logging
+import os
 import time
 from datetime import datetime
 from typing import Optional, Union, Dict, Any, List
@@ -19,11 +20,21 @@ from typing import Optional, Union, Dict, Any, List
 import requests
 import numpy as np
 
+import config
 from config import (
     OLLAMA_BASE_URL, OLLAMA_MODEL, LLM_CONTEXT_MAX_CHARS, SEARCH_TOP_K,
     USE_TEMPORAL, USE_EPISODES, USE_GROUNDING, CAPTURE_INTERVAL_SECS,
-    REFUSAL_SIM_FLOOR, GROUNDING_MIN, CITATION_TOLERANCE_MINUTES
+    REFUSAL_SIM_FLOOR, GROUNDING_MIN, CITATION_TOLERANCE_MINUTES,
+    ALLOW_TEMPLATE_FALLBACK
 )
+
+
+def is_template_fallback_allowed() -> bool:
+    """Check whether template fallback is permitted or if eval must strictly abort."""
+    env_val = os.environ.get("ALLOW_TEMPLATE_FALLBACK")
+    if env_val is not None:
+        return env_val.lower() in ("true", "1", "yes")
+    return getattr(config, "ALLOW_TEMPLATE_FALLBACK", True)
 from storage.db import DatabaseManager
 from processing.embed import EmbeddingGenerator
 from intelligence.temporal import parse_temporal, TemporalParse
@@ -83,6 +94,7 @@ class RAGAgent:
     def __init__(self, db: DatabaseManager, embedder: EmbeddingGenerator):
         self.db = db
         self.embedder = embedder
+        self.last_ollama_stats: Dict[str, Any] = {}
         self._verify_ollama()
 
     def _verify_ollama(self):
@@ -204,6 +216,8 @@ class RAGAgent:
                     "grounding_rate": 1.0,
                     "partially_verified": False,
                     "temporal_parse": parse.__dict__,
+                    "answer_source": "refusal_gate",
+                    "ollama_stats": getattr(self, "last_ollama_stats", {}),
                 }
 
             # 2. Deterministic Refusal: Explicit window with 0 captures
@@ -231,6 +245,8 @@ class RAGAgent:
                         "grounding_rate": 1.0,
                         "partially_verified": False,
                         "temporal_parse": parse.__dict__,
+                        "answer_source": "refusal_gate",
+                        "ollama_stats": getattr(self, "last_ollama_stats", {}),
                     }
 
             # 3. Structured Temporal Operators for Aggregate Intents
@@ -518,6 +534,8 @@ class RAGAgent:
                     "grounding_rate": grounding_rate,
                     "partially_verified": partially_verified,
                     "temporal_parse": parse.__dict__,
+                    "answer_source": "aggregate_operator",
+                    "ollama_stats": getattr(self, "last_ollama_stats", {}),
                 }
 
             # 4. Standard Search with Time Filter & Residual Query
@@ -555,6 +573,7 @@ class RAGAgent:
                     sources=results,
                     sim_floor=REFUSAL_SIM_FLOOR,
                     time_range=time_range,
+                    residual_query=parse.residual_query if parse else None,
                 )
                 if pre_refusal:
                     return {
@@ -567,6 +586,8 @@ class RAGAgent:
                         "grounding_rate": 1.0,
                         "partially_verified": False,
                         "temporal_parse": parse.__dict__,
+                        "answer_source": "refusal_gate",
+                        "ollama_stats": getattr(self, "last_ollama_stats", {}),
                     }
 
             if not results:
@@ -583,6 +604,8 @@ class RAGAgent:
                     "grounding_rate": 0.0,
                     "partially_verified": False,
                     "temporal_parse": parse.__dict__,
+                    "answer_source": "refusal_gate",
+                    "ollama_stats": getattr(self, "last_ollama_stats", {}),
                 }
 
             context_str = self._format_context(results)
@@ -598,7 +621,16 @@ class RAGAgent:
             )
 
             if answer.startswith("⚠️") and USE_GROUNDING:
+                if not is_template_fallback_allowed():
+                    raise RuntimeError(f"Ollama returned error: {answer} and ALLOW_TEMPLATE_FALLBACK is False.")
                 answer = synthesize_grounded_answer(question, results, intent=parse.intent)
+                answer_source = "template_fallback"
+            elif answer.startswith("⚠️"):
+                if not is_template_fallback_allowed():
+                    raise RuntimeError(f"Ollama returned error: {answer} and ALLOW_TEMPLATE_FALLBACK is False.")
+                answer_source = "template_fallback"
+            else:
+                answer_source = "llm"
 
             grounding_rate = None
             partially_verified = False
@@ -644,6 +676,8 @@ class RAGAgent:
                 "grounding_rate": grounding_rate,
                 "partially_verified": partially_verified,
                 "temporal_parse": parse.__dict__,
+                "answer_source": answer_source,
+                "ollama_stats": getattr(self, "last_ollama_stats", {}),
             }
 
         # ─── Baseline Path (USE_TEMPORAL is False) ───────────────────
@@ -670,6 +704,7 @@ class RAGAgent:
                 sources=results,
                 sim_floor=REFUSAL_SIM_FLOOR,
                 time_range=None,
+                residual_query=None,
             )
             if pre_refusal:
                 return {
@@ -682,6 +717,8 @@ class RAGAgent:
                     "grounding_rate": 1.0,
                     "partially_verified": False,
                     "temporal_parse": None,
+                    "answer_source": "refusal_gate",
+                    "ollama_stats": getattr(self, "last_ollama_stats", {}),
                 }
 
         if not results:
@@ -696,6 +733,8 @@ class RAGAgent:
                 "grounding_rate": 0.0,
                 "partially_verified": False,
                 "temporal_parse": None,
+                "answer_source": "refusal_gate",
+                "ollama_stats": getattr(self, "last_ollama_stats", {}),
             }
 
         context_str = self._format_context(results)
@@ -711,7 +750,16 @@ class RAGAgent:
         )
 
         if answer.startswith("⚠️") and USE_GROUNDING:
+            if not is_template_fallback_allowed():
+                raise RuntimeError(f"Ollama returned error: {answer} and ALLOW_TEMPLATE_FALLBACK is False.")
             answer = synthesize_grounded_answer(question, results)
+            answer_source = "template_fallback"
+        elif answer.startswith("⚠️"):
+            if not is_template_fallback_allowed():
+                raise RuntimeError(f"Ollama returned error: {answer} and ALLOW_TEMPLATE_FALLBACK is False.")
+            answer_source = "template_fallback"
+        else:
+            answer_source = "llm"
 
         grounding_rate = None
         partially_verified = False
@@ -757,6 +805,8 @@ class RAGAgent:
             "grounding_rate": grounding_rate,
             "partially_verified": partially_verified,
             "temporal_parse": None,
+            "answer_source": answer_source,
+            "ollama_stats": getattr(self, "last_ollama_stats", {}),
         }
 
     def search_only(
@@ -782,6 +832,7 @@ class RAGAgent:
     def _call_ollama(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """Call the Ollama API to generate a response."""
         sys_prompt = system_prompt or SYSTEM_PROMPT
+        self.last_ollama_stats = {}
         try:
             resp = requests.post(
                 f"{OLLAMA_BASE_URL}/api/generate",
@@ -801,16 +852,36 @@ class RAGAgent:
             resp.raise_for_status()
 
             data = resp.json()
+            self.last_ollama_stats = {
+                "eval_count": data.get("eval_count", 0),
+                "eval_duration": data.get("eval_duration", 0),
+                "prompt_eval_duration": data.get("prompt_eval_duration", 0),
+                "prompt_eval_count": data.get("prompt_eval_count", 0),
+                "total_duration": data.get("total_duration", 0),
+                "load_duration": data.get("load_duration", 0),
+                "model": data.get("model", OLLAMA_MODEL),
+            }
             return data.get("response", "").strip()
 
         except requests.ConnectionError:
+            self.last_ollama_stats = {}
+            if not is_template_fallback_allowed():
+                raise RuntimeError(
+                    f"Cannot connect to Ollama at {OLLAMA_BASE_URL} and ALLOW_TEMPLATE_FALLBACK is False. Aborting evaluation."
+                )
             return (
                 "⚠️  Cannot connect to Ollama. Make sure it's running: "
                 "`ollama serve`"
             )
         except requests.Timeout:
+            self.last_ollama_stats = {}
+            if not is_template_fallback_allowed():
+                raise RuntimeError("Ollama request timed out and ALLOW_TEMPLATE_FALLBACK is False. Aborting evaluation.")
             return "⚠️  Ollama request timed out. The model may be loading."
         except Exception as e:
+            self.last_ollama_stats = {}
+            if not is_template_fallback_allowed():
+                raise RuntimeError(f"Ollama API error ({e}) and ALLOW_TEMPLATE_FALLBACK is False. Aborting evaluation.")
             logger.error(f"Ollama API error: {e}")
             return f"⚠️  Error generating answer: {e}"
 

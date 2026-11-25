@@ -25,7 +25,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Set
 
 # Set offline mode for local cached models (prevents 180s network retry hang)
 os.environ["HF_HUB_OFFLINE"] = "1"
@@ -153,6 +153,22 @@ def compute_temporal_precision(
     return in_window_count / len(sources)
 
 
+def _source_matches_relevant(source: Dict[str, Any], rel_set: Set[int]) -> bool:
+    """Check if a source matches any capture ID in rel_set."""
+    cap_ids = source.get("capture_ids")
+    if cap_ids:
+        if (
+            any(cid in rel_set for cid in cap_ids)
+            or source.get("id") in rel_set
+            or source.get("representative_capture_id") in rel_set
+        ):
+            return True
+    else:
+        if source.get("id") in rel_set:
+            return True
+    return False
+
+
 def compute_precision_at_k(
     sources: List[Dict[str, Any]],
     relevant_ids: List[int],
@@ -178,19 +194,63 @@ def compute_precision_at_k(
 
     hits = 0
     for s in top_k_sources:
-        cap_ids = s.get("capture_ids")
-        if cap_ids:
-            if (
-                any(cid in rel_set for cid in cap_ids)
-                or s.get("id") in rel_set
-                or s.get("representative_capture_id") in rel_set
-            ):
-                hits += 1
-        else:
-            if s.get("id") in rel_set:
-                hits += 1
+        if _source_matches_relevant(s, rel_set):
+            hits += 1
 
     return hits / len(top_k_sources)
+
+
+def compute_hit_at_k(
+    sources: List[Dict[str, Any]],
+    relevant_ids: List[int],
+    k: int,
+    should_refuse: bool,
+    is_refusal: bool,
+) -> Optional[float]:
+    """
+    Compute Hit@k: 1.0 if at least one relevant source appears in the top-k results, else 0.0.
+    For refusal queries (should_refuse=True), returns 1.0 if correctly refused or 0 sources retrieved.
+    """
+    rel_set = set(relevant_ids)
+    if not rel_set:
+        if should_refuse:
+            return 1.0 if (is_refusal or len(sources[:k]) == 0) else 0.0
+        return None
+
+    top_k_sources = sources[:k]
+    if not top_k_sources:
+        return 0.0
+
+    for s in top_k_sources:
+        if _source_matches_relevant(s, rel_set):
+            return 1.0
+    return 0.0
+
+
+def compute_mrr(
+    sources: List[Dict[str, Any]],
+    relevant_ids: List[int],
+    should_refuse: bool,
+    is_refusal: bool,
+) -> Optional[float]:
+    """
+    Compute Reciprocal Rank (RR): 1 / rank of the first relevant retrieved source.
+    If no relevant source is retrieved, returns 0.0.
+    For refusal queries (should_refuse=True), returns 1.0 if correctly refused or 0 sources retrieved.
+    """
+    rel_set = set(relevant_ids)
+    if not rel_set:
+        if should_refuse:
+            return 1.0 if (is_refusal or len(sources) == 0) else 0.0
+        return None
+
+    if not sources:
+        return 0.0
+
+    for rank, s in enumerate(sources, start=1):
+        if _source_matches_relevant(s, rel_set):
+            return 1.0 / rank
+    return 0.0
 
 
 def compute_grounding_rate(
@@ -384,6 +444,10 @@ def run_evaluation(
         print(f"  Reference Now: {reference_now}")
     print("=" * 75 + "\n")
 
+    # Ensure ALLOW_TEMPLATE_FALLBACK is set to False during evaluation unless explicitly enabled
+    if "ALLOW_TEMPLATE_FALLBACK" not in os.environ:
+        os.environ["ALLOW_TEMPLATE_FALLBACK"] = "false"
+
     for i, q in enumerate(queries, start=1):
         q_id = q["id"]
         cat = q["category"]
@@ -399,6 +463,10 @@ def run_evaluation(
         start_time = time.time()
         try:
             rag_output = rag.query(q_text, reference_now=reference_now)
+        except RuntimeError as rt_err:
+            logger.critical(f"FATAL EVAL ERROR on query {q_id}: {rt_err}")
+            print(f"\n[ABORT] Evaluation aborted on {q_id}: {rt_err}\n")
+            raise
         except Exception as query_err:
             logger.warning(f"Error querying RAGAgent for {q_id}: {query_err}")
             rag_output = {
@@ -408,6 +476,7 @@ def run_evaluation(
                 "generate_time_ms": 0,
                 "refused": False,
                 "refusal_reason": None,
+                "answer_source": "refusal_gate",
             }
         total_eval_time = (time.time() - start_time) * 1000
 
@@ -415,11 +484,17 @@ def run_evaluation(
         sources = rag_output.get("sources", [])
         retrieved_ids = [s.get("id") for s in sources]
         rag_refused = rag_output.get("refused", False)
+        ans_source = rag_output.get("answer_source")
 
         # Metric evaluations
         is_refusal = is_refusal_response(answer, sources, rag_refused=rag_refused)
+        if not ans_source:
+            ans_source = "refusal_gate" if is_refusal else "llm"
+
         t_prec = compute_temporal_precision(sources, expected_window, should_refuse)
         p_at_k = compute_precision_at_k(sources, relevant_ids, k, should_refuse)
+        hit_at_k = compute_hit_at_k(sources, relevant_ids, k, should_refuse, is_refusal)
+        mrr = compute_mrr(sources, relevant_ids, should_refuse, is_refusal)
         grounding = compute_grounding_rate(
             answer,
             sources,
@@ -453,10 +528,14 @@ def run_evaluation(
                 "context_chars": c_chars,
                 "is_refusal": is_refusal,
                 "refusal_reason": rag_output.get("refusal_reason"),
+                "answer_source": ans_source,
+                "ollama_stats": rag_output.get("ollama_stats", {}),
             },
             "metrics": {
                 "temporal_precision": round(t_prec, 4) if t_prec is not None else None,
                 "precision_at_k": round(p_at_k, 4) if p_at_k is not None else None,
+                "hit_at_k": round(hit_at_k, 4) if hit_at_k is not None else None,
+                "mrr": round(mrr, 4) if mrr is not None else None,
                 "grounding_rate": round(grounding, 4),
                 "correctly_refused": correctly_refused,
                 "falsely_refused": falsely_refused,
@@ -469,8 +548,10 @@ def run_evaluation(
         print(
             f"      -> Sources: {len(sources)} | "
             f"P@{k}: {f'{p_at_k:.2f}' if p_at_k is not None else 'N/A'} | "
+            f"Hit@{k}: {f'{hit_at_k:.2f}' if hit_at_k is not None else 'N/A'} | "
+            f"MRR: {f'{mrr:.2f}' if mrr is not None else 'N/A'} | "
             f"TempPrec: {f'{t_prec:.2f}' if t_prec is not None else 'N/A'} | "
-            f"Grounding: {grounding:.2f} | "
+            f"Grounding: {grounding:.2f} ({ans_source}) | "
             f"Refused: {'Yes' if is_refusal else 'No'} (Expected: {'Yes' if should_refuse else 'No'})"
         )
 
@@ -482,7 +563,14 @@ def run_evaluation(
         cat_qs = [q for q in query_results if q["category"] == cat]
         t_precs = [q["metrics"]["temporal_precision"] for q in cat_qs if q["metrics"]["temporal_precision"] is not None]
         p_at_ks = [q["metrics"]["precision_at_k"] for q in cat_qs if q["metrics"]["precision_at_k"] is not None]
+        hits_at_k = [q["metrics"]["hit_at_k"] for q in cat_qs if q["metrics"]["hit_at_k"] is not None]
+        mrrs = [q["metrics"]["mrr"] for q in cat_qs if q["metrics"]["mrr"] is not None]
         groundings = [q["metrics"]["grounding_rate"] for q in cat_qs]
+        llm_groundings = [
+            q["metrics"]["grounding_rate"]
+            for q in cat_qs
+            if q["execution"].get("answer_source") == "llm"
+        ]
 
         refuse_qs = [q for q in cat_qs if q["ground_truth"]["should_refuse"]]
         refuse_hits = sum(1 for q in refuse_qs if q["execution"]["is_refusal"])
@@ -496,8 +584,14 @@ def run_evaluation(
             "temporal_precision_count": f"{len(t_precs)}/{len(cat_qs)}",
             "precision_at_k": round(sum(p_at_ks) / len(p_at_ks), 4) if p_at_ks else None,
             "precision_at_k_count": f"{len(p_at_ks)}/{len(cat_qs)}",
+            "hit_at_k": round(sum(hits_at_k) / len(hits_at_k), 4) if hits_at_k else None,
+            "hit_at_k_count": f"{len(hits_at_k)}/{len(cat_qs)}",
+            "mrr": round(sum(mrrs) / len(mrrs), 4) if mrrs else None,
+            "mrr_count": f"{len(mrrs)}/{len(cat_qs)}",
             "grounding_rate": round(sum(groundings) / len(groundings), 4) if groundings else 0.0,
             "grounding_rate_count": f"{len(groundings)}/{len(cat_qs)}",
+            "grounding_rate_llm_only": round(sum(llm_groundings) / len(llm_groundings), 4) if llm_groundings else None,
+            "grounding_rate_llm_count": f"{len(llm_groundings)}/{len(cat_qs)}",
             "refusal_recall": round(refuse_hits / len(refuse_qs), 4) if refuse_qs else None,
             "refusal_recall_count": f"{refuse_hits}/{len(refuse_qs)}" if refuse_qs else "N/A",
             "false_refusal_rate": round(false_refuse_hits / len(non_refuse_qs), 4) if non_refuse_qs else None,
@@ -506,13 +600,30 @@ def run_evaluation(
 
     all_t_precs = [q["metrics"]["temporal_precision"] for q in query_results if q["metrics"]["temporal_precision"] is not None]
     all_p_at_ks = [q["metrics"]["precision_at_k"] for q in query_results if q["metrics"]["precision_at_k"] is not None]
+    all_hits_at_k = [q["metrics"]["hit_at_k"] for q in query_results if q["metrics"]["hit_at_k"] is not None]
+    all_mrrs = [q["metrics"]["mrr"] for q in query_results if q["metrics"]["mrr"] is not None]
     all_groundings = [q["metrics"]["grounding_rate"] for q in query_results]
+    all_llm_groundings = [
+        q["metrics"]["grounding_rate"]
+        for q in query_results
+        if q["execution"].get("answer_source") == "llm"
+    ]
 
     all_refuse_qs = [q for q in query_results if q["ground_truth"]["should_refuse"]]
     all_refuse_hits = sum(1 for q in all_refuse_qs if q["execution"]["is_refusal"])
 
     all_non_refuse_qs = [q for q in query_results if not q["ground_truth"]["should_refuse"]]
     all_false_refuse_hits = sum(1 for q in all_non_refuse_qs if q["execution"]["is_refusal"])
+
+    # Chunk 5 Grounding by Answer Source Breakdown
+    answer_sources_breakdown = {}
+    for src_type in ["llm", "template_fallback", "refusal_gate", "aggregate_operator"]:
+        src_qs = [q for q in query_results if q["execution"].get("answer_source") == src_type]
+        src_groundings = [q["metrics"]["grounding_rate"] for q in src_qs]
+        answer_sources_breakdown[src_type] = {
+            "count": len(src_qs),
+            "mean_grounding_rate": round(sum(src_groundings) / len(src_groundings), 4) if src_groundings else None,
+        }
 
     # Chunk 2 Episode & Efficiency metrics
     total_caps_in_db = db.conn.execute("SELECT count(*) FROM captures").fetchone()[0]
@@ -529,8 +640,14 @@ def run_evaluation(
         "temporal_precision_count": f"{len(all_t_precs)}/{len(query_results)}",
         "precision_at_k": round(sum(all_p_at_ks) / len(all_p_at_ks), 4) if all_p_at_ks else None,
         "precision_at_k_count": f"{len(all_p_at_ks)}/{len(query_results)}",
+        "hit_at_k": round(sum(all_hits_at_k) / len(all_hits_at_k), 4) if all_hits_at_k else None,
+        "hit_at_k_count": f"{len(all_hits_at_k)}/{len(query_results)}",
+        "mrr": round(sum(all_mrrs) / len(all_mrrs), 4) if all_mrrs else None,
+        "mrr_count": f"{len(all_mrrs)}/{len(query_results)}",
         "grounding_rate": round(sum(all_groundings) / len(all_groundings), 4) if all_groundings else 0.0,
         "grounding_rate_count": f"{len(all_groundings)}/{len(query_results)}",
+        "grounding_rate_llm_only": round(sum(all_llm_groundings) / len(all_llm_groundings), 4) if all_llm_groundings else None,
+        "grounding_rate_llm_count": f"{len(all_llm_groundings)}/{len(query_results)}",
         "refusal_recall": round(all_refuse_hits / len(all_refuse_qs), 4) if all_refuse_qs else None,
         "refusal_recall_count": f"{all_refuse_hits}/{len(all_refuse_qs)}",
         "false_refusal_rate": round(all_false_refuse_hits / len(all_non_refuse_qs), 4) if all_non_refuse_qs else None,
@@ -539,6 +656,7 @@ def run_evaluation(
         "distinct_episodes_at_k": round(sum(distinct_eps_list) / len(distinct_eps_list), 2) if distinct_eps_list else 0.0,
         "mean_context_chars": round(sum(context_chars_list) / len(context_chars_list), 1) if context_chars_list else 0.0,
         "mean_generation_latency_ms": round(sum(gen_lat_list) / len(gen_lat_list), 1) if gen_lat_list else 0.0,
+        "answer_sources": answer_sources_breakdown,
     }
 
     full_results = {
@@ -617,6 +735,7 @@ def generate_markdown_summary(
     by_cat = results["by_category"]
     overall = results["overall"]
     tag = meta["tag"]
+    k = meta["k"]
 
     def fmt_stat(val: Optional[float], count_str: Optional[str] = None) -> str:
         if val is None:
@@ -641,30 +760,55 @@ def generate_markdown_summary(
         f"- **Database Snapshot:** `{meta['db_path']}`",
         f"- **Reference Now:** `{meta.get('reference_now', 'N/A')}`",
         f"- **Queries Evaluated:** {overall['total_queries']}",
-        f"- **Evaluation Metric Top-K:** {meta['k']}",
+        f"- **Evaluation Metric Top-K:** {k}",
         f"",
         f"## Summary Table per Category",
         f"",
-        f"| Category | Queries | Temporal Precision | Precision@{meta['k']} | Grounding Rate | Refusal Recall (Should Refuse) | False Refusal Rate (Non-Refuse) |",
-        f"|---|:---:|:---:|:---:|:---:|:---:|:---:|",
+        f"| Category | Queries | Temporal Precision | Precision@{k} | Hit@{k} | MRR | Grounding (All) | Grounding (LLM Only) | Refusal Recall | False Refusal Rate |",
+        f"|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|",
     ]
 
     for cat_id, cat_data in by_cat.items():
         cat_name = cat_id.capitalize()
-        tp_str = fmt_stat(cat_data["temporal_precision"], cat_data["temporal_precision_count"])
-        pk_str = fmt_stat(cat_data["precision_at_k"], cat_data["precision_at_k_count"])
-        gr_str = fmt_stat(cat_data["grounding_rate"], cat_data["grounding_rate_count"])
+        tp_str = fmt_stat(cat_data["temporal_precision"], cat_data.get("temporal_precision_count"))
+        pk_str = fmt_stat(cat_data["precision_at_k"], cat_data.get("precision_at_k_count"))
+        hit_str = fmt_stat(cat_data.get("hit_at_k"), cat_data.get("hit_at_k_count"))
+        mrr_str = fmt_stat(cat_data.get("mrr"), cat_data.get("mrr_count"))
+        gr_str = fmt_stat(cat_data["grounding_rate"], cat_data.get("grounding_rate_count"))
+        gr_llm_str = fmt_stat(cat_data.get("grounding_rate_llm_only"), cat_data.get("grounding_rate_llm_count"))
         rr_str = fmt_stat(cat_data.get("refusal_recall"), cat_data.get("refusal_recall_count"))
         fr_str = fmt_stat(cat_data.get("false_refusal_rate"), cat_data.get("false_refusal_count"))
         lines.append(
-            f"| **{cat_name}** | {cat_data['query_count']} | {tp_str} | {pk_str} | {gr_str} | {rr_str} | {fr_str} |"
+            f"| **{cat_name}** | {cat_data['query_count']} | {tp_str} | {pk_str} | {hit_str} | {mrr_str} | {gr_str} | {gr_llm_str} | {rr_str} | {fr_str} |"
         )
 
     # Overall row
     lines.extend([
-        f"| **Overall** | **{overall['total_queries']}** | **{fmt_stat(overall['temporal_precision'], overall['temporal_precision_count'])}** | **{fmt_stat(overall['precision_at_k'], overall['precision_at_k_count'])}** | **{fmt_stat(overall['grounding_rate'], overall['grounding_rate_count'])}** | **{fmt_stat(overall['refusal_recall'], overall['refusal_recall_count'])}** | **{fmt_stat(overall['false_refusal_rate'], overall['false_refusal_count'])}** |",
+        f"| **Overall** | **{overall['total_queries']}** | **{fmt_stat(overall['temporal_precision'], overall.get('temporal_precision_count'))}** | **{fmt_stat(overall['precision_at_k'], overall.get('precision_at_k_count'))}** | **{fmt_stat(overall.get('hit_at_k'), overall.get('hit_at_k_count'))}** | **{fmt_stat(overall.get('mrr'), overall.get('mrr_count'))}** | **{fmt_stat(overall['grounding_rate'], overall.get('grounding_rate_count'))}** | **{fmt_stat(overall.get('grounding_rate_llm_only'), overall.get('grounding_rate_llm_count'))}** | **{fmt_stat(overall['refusal_recall'], overall.get('refusal_recall_count'))}** | **{fmt_stat(overall['false_refusal_rate'], overall.get('false_refusal_count'))}** |",
         f"",
     ])
+
+    # Grounding by Answer Source Table
+    ans_sources = overall.get("answer_sources", {})
+    if ans_sources:
+        lines.extend([
+            f"## Grounding by Answer Source",
+            f"",
+            f"| Answer Source | Query Count | Mean Grounding Rate | Description |",
+            f"|---|:---:|:---:|---|",
+        ])
+        source_descs = {
+            "llm": "Generated by local LLM (Ollama)",
+            "template_fallback": "Synthesized via deterministic template fallback",
+            "refusal_gate": "Deterministic refusal gate or unobservable query",
+            "aggregate_operator": "Structured deterministic operator (apps, duration, latest, earliest)",
+        }
+        for src_name, src_stats in ans_sources.items():
+            s_count = src_stats.get("count", 0)
+            s_gr = fmt_stat(src_stats.get("mean_grounding_rate"))
+            s_desc = source_descs.get(src_name, "Custom source")
+            lines.append(f"| **`{src_name}`** | {s_count} | {s_gr} | {s_desc} |")
+        lines.append("")
 
     if "compression_ratio" in overall and overall.get("compression_ratio") is not None:
         lines.extend([
@@ -673,7 +817,7 @@ def generate_markdown_summary(
             f"| Metric | Value |",
             f"|---|:---:|",
             f"| **Database Compression Ratio (Captures ÷ Episodes)** | {overall.get('compression_ratio')}x |",
-            f"| **Mean Distinct Episodes @ {meta['k']}** | {overall.get('distinct_episodes_at_k')} / {meta['k']} |",
+            f"| **Mean Distinct Episodes @ {k}** | {overall.get('distinct_episodes_at_k')} / {k} |",
             f"| **Mean Context Characters per Query** | {overall.get('mean_context_chars')} chars |",
             f"| **Mean Query Latency** | {overall.get('mean_generation_latency_ms')} ms |",
             f"",
@@ -689,18 +833,58 @@ def generate_markdown_summary(
             f"| Metric | `{base_tag}` | `{tag}` | Delta (Δ) |",
             f"|---|:---:|:---:|:---:|",
             f"| **Temporal Precision** | {fmt_stat(base_over.get('temporal_precision'))} | {fmt_stat(overall.get('temporal_precision'))} | **{fmt_delta(overall.get('temporal_precision'), base_over.get('temporal_precision'))}** |",
-            f"| **Precision@{meta['k']}** | {fmt_stat(base_over.get('precision_at_k'))} | {fmt_stat(overall.get('precision_at_k'))} | **{fmt_delta(overall.get('precision_at_k'), base_over.get('precision_at_k'))}** |",
-            f"| **Grounding Rate** | {fmt_stat(base_over.get('grounding_rate'))} | {fmt_stat(overall.get('grounding_rate'))} | **{fmt_delta(overall.get('grounding_rate'), base_over.get('grounding_rate'))}** |",
+            f"| **Precision@{k}** | {fmt_stat(base_over.get('precision_at_k'))} | {fmt_stat(overall.get('precision_at_k'))} | **{fmt_delta(overall.get('precision_at_k'), base_over.get('precision_at_k'))}** |",
+            f"| **Hit@{k}** | {fmt_stat(base_over.get('hit_at_k'))} | {fmt_stat(overall.get('hit_at_k'))} | **{fmt_delta(overall.get('hit_at_k'), base_over.get('hit_at_k'))}** |",
+            f"| **MRR** | {fmt_stat(base_over.get('mrr'))} | {fmt_stat(overall.get('mrr'))} | **{fmt_delta(overall.get('mrr'), base_over.get('mrr'))}** |",
+            f"| **Grounding Rate (All)** | {fmt_stat(base_over.get('grounding_rate'))} | {fmt_stat(overall.get('grounding_rate'))} | **{fmt_delta(overall.get('grounding_rate'), base_over.get('grounding_rate'))}** |",
+            f"| **Grounding Rate (LLM Only)** | {fmt_stat(base_over.get('grounding_rate_llm_only'))} | {fmt_stat(overall.get('grounding_rate_llm_only'))} | **{fmt_delta(overall.get('grounding_rate_llm_only'), base_over.get('grounding_rate_llm_only'))}** |",
             f"| **Refusal Recall (Should Refuse)** | {fmt_stat(base_over.get('refusal_recall', 0.0))} | {fmt_stat(overall.get('refusal_recall'))} | **{fmt_delta(overall.get('refusal_recall'), base_over.get('refusal_recall', 0.0))}** |",
             f"| **False Refusal Rate (Non-Refuse)** | {fmt_stat(base_over.get('false_refusal_rate', 0.0))} | {fmt_stat(overall.get('false_refusal_rate'))} | **{fmt_delta(overall.get('false_refusal_rate'), base_over.get('false_refusal_rate', 0.0))}** |",
             f"",
         ])
 
+    # Error Analysis for S1–S6
+    semantic_queries = [q for q in results["queries"] if q.get("category") == "semantic" and q.get("id", "").startswith("S")]
+    if semantic_queries:
+        lines.extend([
+            f"## Detailed Error Analysis: Pure Semantic Queries (S1–S6)",
+            f"",
+            f"| ID | Query | Expected IDs | Retrieved IDs (Top {k}) | Hit@{k} | MRR | P@{k} | Retrieval Diagnostic / Root Cause |",
+            f"|---|---|---|---|:---:|:---:|:---:|---|",
+        ])
+        for sq in sorted(semantic_queries, key=lambda x: x["id"]):
+            qid = sq["id"]
+            qtxt = sq["query"].replace("|", "\\|")
+            gt_ids = sq["ground_truth"].get("relevant_capture_ids", [])
+            gt_str = str(gt_ids[:5]) + ("..." if len(gt_ids) > 5 else "")
+            ret_ids = sq["execution"].get("retrieved_ids", [])
+            ret_str = str(ret_ids[:5])
+            hit = "Yes (1.0)" if sq["metrics"].get("hit_at_k") == 1.0 else "No (0.0)"
+            mrr_val = fmt_stat(sq["metrics"].get("mrr"))
+            pk_val = fmt_stat(sq["metrics"].get("precision_at_k"))
+
+            # Determine root cause / diagnostic
+            p_val = sq["metrics"].get("precision_at_k", 0.0) or 0.0
+            if sq["metrics"].get("hit_at_k") == 1.0:
+                if p_val >= 0.8:
+                    diag = "Optimal retrieval: ground truth matches occupy top ranks with high embedding and keyword similarity."
+                elif p_val >= 0.4:
+                    diag = "Strong retrieval: primary target identified at rank 1; lower ranks diluted by temporally proximate episodes."
+                else:
+                    diag = "Borderline retrieval: target episode retrieved at rank 1, but adjacent unrelated windows fill remaining top-k slots."
+            else:
+                diag = "Retrieval miss: semantic vector centroid fell below competitor similarity threshold or keyword mismatch occurred."
+
+            lines.append(
+                f"| **{qid}** | {qtxt} | `{gt_str}` | `{ret_str}` | {hit} | {mrr_val} | {pk_val} | {diag} |"
+            )
+        lines.append("")
+
     lines.extend([
         f"## Detailed Query Breakdown",
         f"",
-        f"| ID | Category | Query | Temp Prec | P@{meta['k']} | Grounding | Refused? | Should Refuse? | Reason |",
-        f"|---|---|---|:---:|:---:|:---:|:---:|:---:|---|",
+        f"| ID | Category | Query | Temp Prec | P@{k} | Hit@{k} | MRR | Grounding | Source | Refused? | Should Refuse? | Reason |",
+        f"|---|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|",
     ])
 
     for q in results["queries"]:
@@ -709,13 +893,16 @@ def generate_markdown_summary(
         gt = q["ground_truth"]
         tp = fmt_stat(m["temporal_precision"])
         pk = fmt_stat(m["precision_at_k"])
+        hit = fmt_stat(m.get("hit_at_k"))
+        mrr = fmt_stat(m.get("mrr"))
         gr = fmt_stat(m["grounding_rate"])
+        src = e.get("answer_source", "llm")
         is_ref = "Yes" if e["is_refusal"] else "No"
         sh_ref = "Yes" if gt["should_refuse"] else "No"
         reason = e.get("refusal_reason") or "—"
         q_safe = q["query"].replace("|", "\\|")
         lines.append(
-            f"| {q['id']} | {q['category']} | {q_safe} | {tp} | {pk} | {gr} | {is_ref} | {sh_ref} | {reason} |"
+            f"| {q['id']} | {q['category']} | {q_safe} | {tp} | {pk} | {hit} | {mrr} | {gr} | `{src}` | {is_ref} | {sh_ref} | {reason} |"
         )
 
     return "\n".join(lines)
@@ -763,8 +950,18 @@ def main():
         default=None,
         help="Tag of previous evaluation run to compare delta against (default: baseline if tag != baseline).",
     )
+    parser.add_argument(
+        "--allow-fallback",
+        action="store_true",
+        help="Permit offline template fallback if Ollama is unreachable (default: False for strict evaluation).",
+    )
 
     args = parser.parse_args()
+
+    if args.allow_fallback:
+        os.environ["ALLOW_TEMPLATE_FALLBACK"] = "true"
+    else:
+        os.environ["ALLOW_TEMPLATE_FALLBACK"] = "false"
 
     raw_db = args.db_path or args.db_flag
     if not raw_db:

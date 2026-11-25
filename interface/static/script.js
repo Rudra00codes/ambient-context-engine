@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'info') iconName = 'info';
 
         toast.innerHTML = `
-            <i data-lucide="${iconName}" class="icon-xs text-lime"></i>
+            <i data-lucide="${iconName}" class="icon-xs text-accent"></i>
             <span>${escapeHtml(message)}</span>
         `;
         toastContainer.appendChild(toast);
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.className = `palette-item ${idx === paletteSelectedIndex ? 'selected' : ''}`;
             el.setAttribute('data-idx', idx);
             el.innerHTML = `
-                <i data-lucide="${item.icon || 'arrow-right'}" class="icon-xs" style="color:var(--accent-neon)"></i>
+                <i data-lucide="${item.icon || 'arrow-right'}" class="icon-xs" style="color:var(--accent-text)"></i>
                 <div class="palette-item-text">
                     <strong>${escapeHtml(item.title)}</strong>
                     <small>${escapeHtml(item.desc || '')}</small>
@@ -663,13 +663,13 @@ document.addEventListener('DOMContentLoaded', () => {
             captureRunning = !captureRunning;
             if (captureRunning) {
                 schedStatusLabel.innerText = 'Continuous Capture (5s)';
-                schedLiveDot.style.backgroundColor = 'var(--accent-green)';
-                btnPowerToggle.style.color = 'var(--accent-neon)';
+                schedLiveDot.style.backgroundColor = 'var(--accent-fill)';
+                btnPowerToggle.style.color = 'var(--accent-text)';
                 showToast('Continuous capture loop: Active (5s)', 'success');
             } else {
                 schedStatusLabel.innerText = 'Continuous Capture (Paused)';
-                schedLiveDot.style.backgroundColor = 'var(--text-muted)';
-                btnPowerToggle.style.color = 'var(--text-muted)';
+                schedLiveDot.style.backgroundColor = 'var(--text-dim)';
+                btnPowerToggle.style.color = 'var(--text-dim)';
                 showToast('Continuous capture loop: Standby', 'warn');
             }
         });
@@ -773,10 +773,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (ollamaStatusDot) {
                 if (data.ollama_online) {
-                    ollamaStatusDot.style.backgroundColor = 'var(--accent-neon)';
+                    ollamaStatusDot.style.backgroundColor = 'var(--accent-fill)';
                     ollamaStatusDot.title = 'Ollama Local LLM: Online';
                 } else {
-                    ollamaStatusDot.style.backgroundColor = 'var(--accent-amber)';
+                    ollamaStatusDot.style.backgroundColor = 'var(--text-dim)';
                     ollamaStatusDot.title = 'Offline Grounded Synthesizer: Active (Zero Telemetry)';
                 }
             }
@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.className = 'recent-nav-row';
                 row.title = ep.dominant_title || ep.process_name;
                 row.innerHTML = `
-                    <i data-lucide="file-code" class="icon-xs" style="color:var(--accent-neon)"></i>
+                    <i data-lucide="file-code" class="icon-xs" style="color:var(--text-dim)"></i>
                     <span style="overflow:hidden; text-overflow:ellipsis;">${escapeHtml(ep.dominant_title || ep.process_name)}</span>
                 `;
                 row.addEventListener('click', () => {
@@ -879,7 +879,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingEl.className = 'message ai';
         loadingEl.innerHTML = `
             <div class="msg-header">
-                <i data-lucide="cpu" class="icon-sm text-lime"></i>
+                <i data-lucide="cpu" class="icon-sm text-accent"></i>
                 <span>Ambient Agent</span>
                 <span class="latency-tag">Recalling context & verifying citations...</span>
             </div>
@@ -987,8 +987,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         msg.innerHTML = `
             <div class="msg-header">
-                <i data-lucide="cpu" class="icon-sm" style="color:var(--accent-neon)"></i>
-                <strong style="color:var(--text-primary); font-weight:600;">Ambient Agent</strong>
+                <i data-lucide="cpu" class="icon-sm" style="color:var(--accent-text)"></i>
+                <strong style="color:var(--text); font-weight:600;">Ambient Agent</strong>
                 <div class="msg-badges">
                     ${badgeHtml}
                     ${latencyHtml}
@@ -1219,7 +1219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error('Error loading episodes:', e);
             if (reset) {
-                timelineContainer.innerHTML = '<div style="color:var(--accent-rose); padding:2rem 0; text-align:center;">Failed to load episodes.</div>';
+                timelineContainer.innerHTML = '<div style="color:var(--accent-text); padding:2rem 0; text-align:center;">Failed to load episodes.</div>';
             }
         }
     }
@@ -1386,7 +1386,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <span style="font-size:0.75rem; color:var(--text-muted);">${formatIsoTime(ep.start_time)}</span>
                     </div>
-                    <strong style="font-size:0.9rem; color:var(--text-primary);">${escapeHtml(ep.dominant_title || '')}</strong>
+                    <strong style="font-size:0.9rem; color:var(--text);">${escapeHtml(ep.dominant_title || '')}</strong>
                     <div class="library-card-text">${highlightSearchTerm(ep.representative_text, q)}</div>
                 `;
                 card.addEventListener('click', () => openInspectorDrawer(ep.id));
@@ -1404,7 +1404,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <span style="font-size:0.75rem; color:var(--text-muted);">${formatIsoTime(cap.timestamp)}</span>
                     </div>
-                    <div style="font-size:0.85rem; color:var(--text-secondary);">${escapeHtml(cap.window_title || '')}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">${escapeHtml(cap.window_title || '')}</div>
                     <div class="library-card-text">${highlightSearchTerm(cap.text_content, q)}</div>
                 `;
                 libraryResultsContainer.appendChild(card);
@@ -1509,7 +1509,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.className = 'drawer-capture-item';
                     item.innerHTML = `
                         <div class="drawer-capture-top">
-                            <span style="font-family: 'JetBrains Mono', monospace; color:var(--accent-neon);">[C${c.id}]</span>
+                            <span style="font-family: var(--font-mono); color:var(--accent-text);">[C${c.id}]</span>
                             <span>${formatIsoTime(c.timestamp)}</span>
                         </div>
                         <div class="drawer-capture-snippet">${escapeHtml(c.text_content ? c.text_content.slice(0, 160) : '')}</div>
@@ -1539,7 +1539,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCopyDrawerText.addEventListener('click', () => {
             if (drawerRepText && drawerRepText.innerText) {
                 navigator.clipboard.writeText(drawerRepText.innerText);
-                btnCopyDrawerText.innerHTML = '<i data-lucide="check" class="icon-xs text-lime"></i>';
+                btnCopyDrawerText.innerHTML = '<i data-lucide="check" class="icon-xs text-accent"></i>';
                 lucide.createIcons({ root: btnCopyDrawerText });
                 showToast('Representative text copied to clipboard', 'info');
                 setTimeout(() => {
@@ -1648,7 +1648,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const escaped = escapeHtml(text.slice(0, 240));
         if (!term) return escaped;
         const re = new RegExp(`(${escapeHtml(term)})`, 'gi');
-        return escaped.replace(re, '<mark style="background:rgba(163,230,53,0.3); color:var(--text-primary); border-radius:2px; padding:0 2px;">$1</mark>');
+        return escaped.replace(re, '<mark style="background:var(--mark); color:var(--text); border-radius:2px; padding:0 2px;">$1</mark>');
     }
 
     // ─── Initial App Boot ────────────────────────────────────────────

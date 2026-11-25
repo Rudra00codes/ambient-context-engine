@@ -1,103 +1,104 @@
 #!/usr/bin/env python3
 """
-Model Benchmark Harness — Chunk 4
-Benchmarks quantized local LLM variants (llama3.2:3b, qwen2.5:3b at q4/q8, qwen2.5:1.5b)
-reporting p50/p95 end-to-end latency, tokens/s, grounding rate, and answer correctness.
+Model Benchmark Harness — Chunk 5
+
+Benchmarks quantized local LLM variants across the 24 evaluation queries using
+100% measured runtime metrics from Ollama (/api/generate response fields) and psutil:
+- tokens/sec from eval_count and eval_duration
+- TTFT (Time To First Token) from prompt_eval_duration
+- End-to-end latency from total_duration and retrieval time
+- Grounding rate computed via verify_grounding on actual outputs
+- Answer correctness scored against ground truth
+- Real RAM/VRAM consumption measured via psutil / /api/ps
+- 1 warm-up call per model discarded before timing
+- Raw per-query telemetry saved as JSON
+- Markdown report generated strictly from measured numbers (zero hand-written prose)
+- If Ollama is unreachable, harness aborts immediately (no fallback).
 """
 
+import argparse
 import json
 import logging
-import math
 import os
-import random
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
 import numpy as np
+import psutil
+import requests
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# Strict offline and evaluation flags
 os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["USE_TEMPORAL"] = "true"
 os.environ["USE_EPISODES"] = "true"
 os.environ["USE_GROUNDING"] = "true"
+os.environ["ALLOW_TEMPLATE_FALLBACK"] = "false"
 
+from config import OLLAMA_BASE_URL
 from storage.db import DatabaseManager
 from processing.embed import EmbeddingGenerator
 from intelligence.rag import RAGAgent
-from intelligence.grounding import verify_grounding, synthesize_grounded_answer
+from intelligence.grounding import verify_grounding
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-7s | %(message)s")
-logger = logging.getLogger("model_benchmark")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s",
+)
+logger = logging.getLogger("benchmark_models")
 
-# Model quantization profiles: parameters, bit-width, empirical CPU tok/s & TTFT
-BENCHMARK_MODELS = [
-    {
-        "id": "llama3.2:3b-q4",
-        "name": "Llama-3.2-3B-Instruct (q4_K_M)",
-        "family": "llama3.2",
-        "params_b": 3.2,
-        "quant": "q4_K_M",
-        "bits_per_weight": 4.5,
-        "ram_gb": 2.2,
-        "base_tok_per_sec": 38.5,
-        "prefill_tok_per_sec": 160.0,
-        "citation_adherence": 0.95,
-    },
-    {
-        "id": "llama3.2:3b-q8",
-        "name": "Llama-3.2-3B-Instruct (q8_0)",
-        "family": "llama3.2",
-        "params_b": 3.2,
-        "quant": "q8_0",
-        "bits_per_weight": 8.0,
-        "ram_gb": 3.6,
-        "base_tok_per_sec": 23.8,
-        "prefill_tok_per_sec": 95.0,
-        "citation_adherence": 0.98,
-    },
-    {
-        "id": "qwen2.5:3b-q4",
-        "name": "Qwen2.5-3B-Instruct (q4_K_M)",
-        "family": "qwen2.5",
-        "params_b": 3.1,
-        "quant": "q4_K_M",
-        "bits_per_weight": 4.5,
-        "ram_gb": 2.1,
-        "base_tok_per_sec": 41.2,
-        "prefill_tok_per_sec": 175.0,
-        "citation_adherence": 0.94,
-    },
-    {
-        "id": "qwen2.5:3b-q8",
-        "name": "Qwen2.5-3B-Instruct (q8_0)",
-        "family": "qwen2.5",
-        "params_b": 3.1,
-        "quant": "q8_0",
-        "bits_per_weight": 8.0,
-        "ram_gb": 3.5,
-        "base_tok_per_sec": 25.4,
-        "prefill_tok_per_sec": 105.0,
-        "citation_adherence": 0.97,
-    },
-    {
-        "id": "qwen2.5:1.5b-q4",
-        "name": "Qwen2.5-1.5B-Instruct (q4_K_M)",
-        "family": "qwen2.5",
-        "params_b": 1.5,
-        "quant": "q4_K_M",
-        "bits_per_weight": 4.5,
-        "ram_gb": 1.2,
-        "base_tok_per_sec": 54.0,
-        "prefill_tok_per_sec": 240.0,
-        "citation_adherence": 0.88,
-    },
-]
+
+def check_ollama_reachable() -> List[str]:
+    """Verify Ollama is reachable and return list of available model names. Abort if unreachable."""
+    try:
+        resp = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=(1.0, 3.0))
+        resp.raise_for_status()
+        models = resp.json().get("models", [])
+        return [m["name"] for m in models]
+    except Exception as e:
+        logger.critical(f"FATAL: Cannot connect to Ollama at {OLLAMA_BASE_URL}: {e}")
+        print(f"\n[ABORT] Cannot connect to Ollama at {OLLAMA_BASE_URL}. Make sure Ollama is running (`ollama serve`).\n")
+        raise RuntimeError(f"Ollama is unreachable at {OLLAMA_BASE_URL}. Benchmark harness aborts.") from e
+
+
+def measure_ollama_ram_gb(model_name: Optional[str] = None) -> float:
+    """Measure actual RAM/VRAM consumption in GB via Ollama /api/ps or psutil."""
+    # 1. Try Ollama /api/ps
+    try:
+        resp = requests.get(f"{OLLAMA_BASE_URL}/api/ps", timeout=(1.0, 2.0))
+        if resp.status_code == 200:
+            data = resp.json()
+            models = data.get("models", [])
+            for m in models:
+                if not model_name or model_name.split(":")[0] in m.get("name", ""):
+                    size = m.get("size", 0) or m.get("size_vram", 0)
+                    if size > 0:
+                        return round(size / (1024 ** 3), 2)
+    except Exception:
+        pass
+
+    # 2. Try psutil for running Ollama processes
+    try:
+        total_rss = 0
+        for proc in psutil.process_iter(["name", "memory_info"]):
+            p_name = proc.info.get("name", "").lower()
+            if "ollama" in p_name:
+                mem = proc.info.get("memory_info")
+                if mem and hasattr(mem, "rss"):
+                    total_rss += mem.rss
+        if total_rss > 0:
+            return round(total_rss / (1024 ** 3), 2)
+    except Exception:
+        pass
+
+    return 0.0
 
 
 def evaluate_correctness(answer: str, ground_truth: Dict[str, Any], is_refusal: bool) -> float:
@@ -114,7 +115,6 @@ def evaluate_correctness(answer: str, ground_truth: Dict[str, Any], is_refusal: 
         return 1.0
 
     ans_lower = answer.lower()
-    # Check for keyword matches in expected answer
     keywords = [w for w in expected.replace(",", " ").replace(".", " ").split() if len(w) > 3]
     if not keywords:
         return 1.0
@@ -123,162 +123,292 @@ def evaluate_correctness(answer: str, ground_truth: Dict[str, Any], is_refusal: 
     return matches / len(keywords)
 
 
-def run_model_benchmark():
-    db_path = PROJECT_ROOT / "data" / "context.db"
-    queries_path = PROJECT_ROOT / "evaluation" / "queries.json"
-
+def load_dev_queries(queries_path: Path) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Load evaluation queries and reference_now from JSON file."""
     with open(queries_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     reference_now = data.get("reference_now", "2026-11-23T22:05:00")
     queries = []
-    for cat in data["categories"]:
-        for q in cat["queries"]:
-            queries.append(q)
+    if "categories" in data:
+        for cat in data["categories"]:
+            for q in cat.get("queries", []):
+                q_copy = dict(q)
+                if "category" not in q_copy:
+                    q_copy["category"] = cat.get("id", "unknown")
+                queries.append(q_copy)
+    elif "queries" in data:
+        queries = data["queries"]
 
-    db = DatabaseManager(db_path)
+    return queries, reference_now
+
+
+def run_model_benchmark(
+    db_path: Path,
+    queries_path: Path,
+    output_dir: Path,
+    target_models: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """Execute real-measurement benchmark across models."""
+    available_models = check_ollama_reachable()
+    logger.info(f"Ollama reachable. Available models: {available_models}")
+
+    if target_models:
+        models_to_run = target_models
+    else:
+        # Default candidate list: pick what is available or standard default
+        candidates = [
+            "llama3.2:3b-instruct-q4_K_M",
+            "llama3.2:3b",
+            "llama3.2:3b-instruct-q8_0",
+            "qwen2.5:3b-instruct-q4_K_M",
+            "qwen2.5:3b-instruct-q8_0",
+            "qwen2.5:1.5b-instruct-q4_K_M",
+        ]
+        # Match candidates with available models
+        matched = [c for c in candidates if c in available_models]
+        if not matched:
+            matched = available_models[:5] if available_models else ["llama3.2:3b"]
+        models_to_run = matched
+
+    queries, reference_now = load_dev_queries(queries_path)
+    logger.info(f"Loaded {len(queries)} queries for benchmarking. Reference now: {reference_now}")
+
+    db = DatabaseManager(db_path=db_path)
     embedder = EmbeddingGenerator()
-    rag = RAGAgent(db, embedder)
+    rag = RAGAgent(db=db, embedder=embedder)
 
-    print(f"===========================================================================")
-    print(f"  OmniContext Model Quantization Benchmark (Chunk 4)")
-    print(f"  Queries: {len(queries)} | Models: {len(BENCHMARK_MODELS)}")
-    print(f"===========================================================================\n")
+    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    raw_query_rows: List[Dict[str, Any]] = []
+    aggregated_results: Dict[str, Any] = {}
 
-    benchmark_results = {}
+    print("\n" + "=" * 80)
+    print(f"  OmniContext Quantized LLM Benchmark (Chunk 5: Real Telemetry)")
+    print(f"  Database: {db_path.name} | Queries: {len(queries)} | Models: {models_to_run}")
+    print("=" * 80 + "\n")
 
-    for model_cfg in BENCHMARK_MODELS:
-        m_id = model_cfg["id"]
-        m_name = model_cfg["name"]
-        print(f"--> Benchmarking model: {m_name}...")
+    for model_id in models_to_run:
+        print(f"\n[Benchmarking Model: {model_id}]")
+        # Set target model in config and environment
+        os.environ["OLLAMA_MODEL"] = model_id
+        import config
+        config.OLLAMA_MODEL = model_id
 
-        e2e_latencies = []
-        gen_latencies = []
-        tokens_per_sec_list = []
-        grounding_rates = []
-        correctness_scores = []
-        total_tokens_gen = 0
+        # 1. Warm-up call (discarded from benchmark timing)
+        print("  -> Performing 1 warm-up call (discarded)...")
+        try:
+            rag.query("What was I doing at 9:50 PM on November 23?", reference_now=reference_now)
+        except Exception as warm_err:
+            logger.warning(f"Warm-up call warning for {model_id}: {warm_err}")
 
-        for q in queries:
-            qid = q["id"]
-            q_text = q["query"]
-            gt = q["ground_truth"]
+        # Measure RAM after warm-up
+        measured_ram = measure_ollama_ram_gb(model_id)
 
-            # Run retrieval & verification through pipeline
-            t_start = time.time()
-            rag_res = rag.query(q_text, reference_now=reference_now)
-            pipeline_time_ms = (time.time() - t_start) * 1000
+        # 2. Run dev queries
+        model_e2e_ms: List[float] = []
+        model_ttft_ms: List[float] = []
+        model_tok_s: List[float] = []
+        model_grounding: List[float] = []
+        model_correctness: List[float] = []
+        total_eval_tokens = 0
 
-            sources = rag_res.get("sources", [])
-            is_refusal = rag_res.get("refused", False)
-            ans = rag_res.get("answer", "")
+        for idx, q in enumerate(queries, start=1):
+            qid = q.get("id", f"Q{idx}")
+            q_text = q.get("query", "")
+            gt = q.get("ground_truth", {})
 
-            # Estimate token counts
-            prompt_chars = sum(len(s.get("text_content") or s.get("representative_text") or "") for s in sources[:5]) + len(q_text) + 200
-            prompt_tokens = max(10, int(prompt_chars / 4.0))
+            t0 = time.time()
+            rag_output = rag.query(q_text, reference_now=reference_now)
+            wall_e2e_ms = (time.time() - t0) * 1000
 
-            output_tokens = max(15, int(len(ans) / 4.0))
-            if is_refusal:
-                output_tokens = min(output_tokens, 35)
+            ans = rag_output.get("answer", "")
+            sources = rag_output.get("sources", [])
+            is_refusal = rag_output.get("refused", False)
+            ans_source = rag_output.get("answer_source", "llm")
+            stats = rag_output.get("ollama_stats", {})
 
-            # Execution simulation based on quantization model parameters
-            # Time to first token (prefill) + generation time
-            prefill_sec = prompt_tokens / model_cfg["prefill_tok_per_sec"]
-            # Add small random jitter (0.95 - 1.05) to emulate system latency
-            jitter = 0.95 + (hash(qid + m_id) % 100) / 1000.0
-            actual_tok_sec = model_cfg["base_tok_per_sec"] * jitter
-            gen_sec = output_tokens / actual_tok_sec
-            simulated_gen_ms = (prefill_sec + gen_sec) * 1000.0
+            eval_count = stats.get("eval_count", 0)
+            eval_dur_ns = stats.get("eval_duration", 0)
+            prompt_eval_dur_ns = stats.get("prompt_eval_duration", 0)
+            total_dur_ns = stats.get("total_duration", 0)
 
-            search_time_ms = rag_res.get("search_time_ms", 25.0)
-            e2e_ms = search_time_ms + simulated_gen_ms
-
-            # Grounding rate: adherence factor applies small degradation on smaller models
-            raw_grounding = rag_res.get("grounding_rate", 1.0)
-            if not is_refusal and raw_grounding is not None:
-                adherence = model_cfg["citation_adherence"]
-                model_grounding = min(1.0, max(0.0, raw_grounding * adherence))
+            # Compute tok/s from Ollama response fields
+            if eval_dur_ns > 0 and eval_count > 0:
+                tok_per_sec = eval_count / (eval_dur_ns / 1e9)
             else:
-                model_grounding = 1.0 if is_refusal else 0.0
+                tok_per_sec = 0.0
 
-            correctness = evaluate_correctness(ans, gt, is_refusal)
+            # Compute TTFT (Time To First Token / prompt evaluation duration)
+            ttft_ms = (prompt_eval_dur_ns / 1e6) if prompt_eval_dur_ns > 0 else 0.0
 
-            e2e_latencies.append(e2e_ms)
-            gen_latencies.append(simulated_gen_ms)
-            tokens_per_sec_list.append(actual_tok_sec)
-            grounding_rates.append(model_grounding)
-            correctness_scores.append(correctness)
-            total_tokens_gen += output_tokens
+            # Compute E2E latency: retrieval search_time_ms + total Ollama generation duration
+            ollama_gen_ms = (total_dur_ns / 1e6) if total_dur_ns > 0 else wall_e2e_ms
+            e2e_ms = rag_output.get("search_time_ms", 0.0) + ollama_gen_ms
 
-        e2e_arr = np.array(e2e_latencies)
-        p50_e2e = float(np.percentile(e2e_arr, 50))
-        p95_e2e = float(np.percentile(e2e_arr, 95))
-        mean_e2e = float(np.mean(e2e_arr))
-        mean_tok_sec = float(np.mean(tokens_per_sec_list))
-        mean_grounding = float(np.mean(grounding_rates))
-        mean_correctness = float(np.mean(correctness_scores))
+            # Compute grounding with verify_grounding on actual output
+            grounding_res = verify_grounding(
+                ans,
+                sources,
+                tolerance_minutes=config.CITATION_TOLERANCE_MINUTES,
+                min_grounding=config.GROUNDING_MIN,
+                is_refusal=is_refusal,
+            )
+            grounding_val = grounding_res.grounding_rate
 
-        benchmark_results[m_id] = {
-            "model_id": m_id,
-            "name": m_name,
-            "family": model_cfg["family"],
-            "params_b": model_cfg["params_b"],
-            "quant": model_cfg["quant"],
-            "ram_gb": model_cfg["ram_gb"],
-            "p50_e2e_ms": round(p50_e2e, 1),
-            "p95_e2e_ms": round(p95_e2e, 1),
-            "mean_e2e_ms": round(mean_e2e, 1),
-            "mean_tokens_per_sec": round(mean_tok_sec, 1),
-            "grounding_rate": round(mean_grounding * 100, 1),
-            "correctness": round(mean_correctness * 100, 1),
-            "total_tokens_generated": total_tokens_gen,
+            # Compute correctness against ground truth
+            correctness_val = evaluate_correctness(ans, gt, is_refusal)
+
+            total_eval_tokens += eval_count
+            model_e2e_ms.append(e2e_ms)
+            if ttft_ms > 0:
+                model_ttft_ms.append(ttft_ms)
+            if tok_per_sec > 0:
+                model_tok_s.append(tok_per_sec)
+            model_grounding.append(grounding_val)
+            model_correctness.append(correctness_val)
+
+            row_record = {
+                "timestamp": datetime.now().isoformat(),
+                "model": model_id,
+                "query_id": qid,
+                "query": q_text,
+                "answer_source": ans_source,
+                "eval_count": eval_count,
+                "eval_duration_ns": eval_dur_ns,
+                "prompt_eval_duration_ns": prompt_eval_dur_ns,
+                "total_duration_ns": total_dur_ns,
+                "tok_per_sec": round(tok_per_sec, 2),
+                "ttft_ms": round(ttft_ms, 2),
+                "e2e_ms": round(e2e_ms, 2),
+                "grounding_rate": round(grounding_val, 4),
+                "correctness": round(correctness_val, 4),
+            }
+            raw_query_rows.append(row_record)
+
+            print(
+                f"    [{idx:02d}/{len(queries):02d}] {qid} -> "
+                f"TTFT: {ttft_ms:.1f}ms | "
+                f"Throughput: {tok_per_sec:.1f} tok/s | "
+                f"E2E: {e2e_ms:.1f}ms | "
+                f"Grounding: {grounding_val*100:.1f}% | "
+                f"Correctness: {correctness_val*100:.1f}%"
+            )
+
+        e2e_arr = np.array(model_e2e_ms) if model_e2e_ms else np.array([0.0])
+        ttft_arr = np.array(model_ttft_ms) if model_ttft_ms else np.array([0.0])
+        tok_arr = np.array(model_tok_s) if model_tok_s else np.array([0.0])
+
+        aggregated_results[model_id] = {
+            "model_id": model_id,
+            "measured_ram_gb": measured_ram,
+            "p50_ttft_ms": round(float(np.percentile(ttft_arr, 50)), 1),
+            "p95_ttft_ms": round(float(np.percentile(ttft_arr, 95)), 1),
+            "mean_tok_per_sec": round(float(np.mean(tok_arr)), 1),
+            "p50_e2e_ms": round(float(np.percentile(e2e_arr, 50)), 1),
+            "p95_e2e_ms": round(float(np.percentile(e2e_arr, 95)), 1),
+            "mean_e2e_ms": round(float(np.mean(e2e_arr)), 1),
+            "mean_grounding_pct": round(float(np.mean(model_grounding)) * 100, 1),
+            "mean_correctness_pct": round(float(np.mean(model_correctness)) * 100, 1),
+            "total_tokens_generated": total_eval_tokens,
         }
-
-        print(f"    p50 Latency: {p50_e2e:.1f}ms | p95 Latency: {p95_e2e:.1f}ms | Speed: {mean_tok_sec:.1f} tok/s | Grounding: {mean_grounding*100:.1f}% | Correctness: {mean_correctness*100:.1f}%\n")
 
     db.close()
 
-    # Generate Markdown Table
-    out_dir = PROJECT_ROOT / "evaluation" / "results"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    # Output paths
+    output_dir.mkdir(parents=True, exist_ok=True)
+    raw_json_path = output_dir / f"model_benchmark_raw_{timestamp_str}.json"
+    summary_json_path = output_dir / "model_benchmark.json"
+    md_path = output_dir / "model_benchmark.md"
 
-    json_path = out_dir / "model_benchmark.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(benchmark_results, f, indent=2)
+    # Save raw records
+    with open(raw_json_path, "w", encoding="utf-8") as f:
+        json.dump(raw_query_rows, f, indent=2)
 
+    # Save summary json
+    with open(summary_json_path, "w", encoding="utf-8") as f:
+        json.dump(aggregated_results, f, indent=2)
+
+    # Generate Markdown table strictly from computed numbers (zero hand-written prose)
     md_lines = [
-        "# OmniContext Model Quantization Benchmark (Chunk 4)",
+        "# OmniContext Model Quantization Benchmark (Chunk 5)",
         "",
-        "Evaluation of local quantized models across end-to-end latency, inference throughput, citation grounding rate, and answer correctness.",
+        f"- **Benchmark Timestamp:** `{timestamp_str}`",
+        f"- **Database Snapshot:** `{db_path.name}`",
+        f"- **Evaluation Queries:** {len(queries)} dev queries",
+        f"- **Warm-up Discarded:** 1 call per model",
+        f"- **Ollama Base URL:** `{OLLAMA_BASE_URL}`",
         "",
-        "## Benchmark Results Table",
+        "## Measured Performance Results",
         "",
-        "| Model | Quantization | RAM (Est.) | Throughput (tok/s) | p50 E2E Latency | p95 E2E Latency | Grounding Rate | Answer Correctness |",
-        "|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|",
+        "| Model | Measured RAM (GB) | TTFT p50 (ms) | TTFT p95 (ms) | Throughput (tok/s) | p50 E2E Latency (ms) | p95 E2E Latency (ms) | Grounding Rate (%) | Correctness (%) |",
+        "|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|",
     ]
 
-    for m_id, r in benchmark_results.items():
+    for m_id, r in aggregated_results.items():
         md_lines.append(
-            f"| **{r['name']}** | `{r['quant']}` | ~{r['ram_gb']} GB | {r['mean_tokens_per_sec']} tok/s | {r['p50_e2e_ms']} ms | {r['p95_e2e_ms']} ms | {r['grounding_rate']}% | {r['correctness']}% |"
+            f"| **`{m_id}`** | {r['measured_ram_gb']} GB | {r['p50_ttft_ms']} ms | {r['p95_ttft_ms']} ms | {r['mean_tok_per_sec']} tok/s | {r['p50_e2e_ms']} ms | {r['p95_e2e_ms']} ms | {r['mean_grounding_pct']}% | {r['mean_correctness_pct']}% |"
         )
 
     md_lines.extend([
         "",
-        "## Key Observations",
+        "## Model Comparison Summary",
         "",
-        "1. **Latency vs Bit-Width:** At 4-bit (`q4_K_M`), throughput reaches ~38–41 tok/s with a p50 latency under 1.2s, making interaction fluid on CPU. At 8-bit (`q8_0`), throughput drops to ~24–25 tok/s with p50 latency rising to ~1.8s (+50%), while citation grounding improves marginally (+2–3%).",
-        "2. **Qwen2.5 vs Llama-3.2:** Qwen2.5-3B achieves ~7% higher throughput than Llama-3.2-3B due to architecture efficiency while preserving competitive grounding (83.9% vs 84.8% at q4).",
-        "3. **Lightweight 1.5B Tier:** Qwen2.5-1.5B provides ultra-fast generation (54.0 tok/s, p50 latency 840ms, ~1.2GB RAM), but exhibits a lower grounding adherence (78.6%) and higher citation omission rate under complex queries.",
-        "4. **Recommendation for Production Deployment:** `llama3.2:3b-instruct-q4_K_M` or `qwen2.5:3b-instruct-q4_K_M` offers the optimal sweet spot between memory consumption (~2.1–2.2GB), fast responsiveness (~38–41 tok/s), and high citation grounding fidelity (>83%).",
+        "| Model | Total Tokens | Mean E2E (ms) | Throughput (tok/s) | Grounding Rate (%) | Correctness (%) |",
+        "|---|:---:|:---:|:---:|:---:|:---:|",
     ])
 
-    md_path = out_dir / "model_benchmark.md"
+    for m_id, r in aggregated_results.items():
+        md_lines.append(
+            f"| **`{m_id}`** | {r['total_tokens_generated']} | {r['mean_e2e_ms']} ms | {r['mean_tok_per_sec']} tok/s | {r['mean_grounding_pct']}% | {r['mean_correctness_pct']}% |"
+        )
+
+    md_lines.append("")
+
     with open(md_path, "w", encoding="utf-8") as f:
         f.write("\n".join(md_lines))
 
-    print(f"Results written to:\n  • {json_path}\n  • {md_path}")
-    return benchmark_results
+    print("\n" + "=" * 80)
+    print(f"Benchmark finished successfully.")
+    print(f"  • Raw JSON:     {raw_json_path}")
+    print(f"  • Summary JSON: {summary_json_path}")
+    print(f"  • Markdown:     {md_path}")
+    print("=" * 80 + "\n")
+
+    return aggregated_results
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run 100% real measured Ollama model quantization benchmark.")
+    parser.add_argument(
+        "--db",
+        default=str(PROJECT_ROOT / "data" / "context.db"),
+        help="Path to context.db SQLite database snapshot.",
+    )
+    parser.add_argument(
+        "--queries",
+        default=str(PROJECT_ROOT / "evaluation" / "queries.json"),
+        help="Path to queries.json file.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=str(PROJECT_ROOT / "evaluation" / "results"),
+        help="Output directory for benchmark files.",
+    )
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        default=None,
+        help="Specific Ollama models to benchmark.",
+    )
+
+    args = parser.parse_args()
+    run_model_benchmark(
+        db_path=Path(args.db),
+        queries_path=Path(args.queries),
+        output_dir=Path(args.output_dir),
+        target_models=args.models,
+    )
 
 
 if __name__ == "__main__":
-    run_model_benchmark()
+    main()

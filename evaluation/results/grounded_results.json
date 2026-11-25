@@ -1,7 +1,7 @@
 {
   "metadata": {
     "tag": "grounded",
-    "timestamp": "20261124_033056",
+    "timestamp": "20261126_020326",
     "db_path": "X:\\InternProject\\ambient-context-engine\\data\\context.db",
     "queries_path": "X:\\InternProject\\ambient-context-engine\\evaluation\\queries.json",
     "reference_now": "2026-11-23T22:05:00",
@@ -9,32 +9,62 @@
   },
   "overall": {
     "total_queries": 24,
-    "temporal_precision": 0.7769,
+    "temporal_precision": 0.8538,
     "temporal_precision_count": "13/24",
     "precision_at_k": 0.4333,
     "precision_at_k_count": "24/24",
-    "grounding_rate": 0.8926,
+    "hit_at_k": 0.5833,
+    "hit_at_k_count": "24/24",
+    "mrr": 0.5677,
+    "mrr_count": "24/24",
+    "grounding_rate": 0.4569,
     "grounding_rate_count": "24/24",
-    "refusal_recall": 1.0,
-    "refusal_recall_count": "6/6",
+    "grounding_rate_llm_only": 0.2898,
+    "grounding_rate_llm_count": "15/24",
+    "refusal_recall": 0.8333,
+    "refusal_recall_count": "5/6",
     "false_refusal_rate": 0.0556,
     "false_refusal_count": "1/18",
-    "compression_ratio": 1.39,
-    "distinct_episodes_at_k": 3.75,
-    "mean_context_chars": 2818.2,
-    "mean_generation_latency_ms": 25.9
+    "compression_ratio": 1.42,
+    "distinct_episodes_at_k": 4.17,
+    "mean_context_chars": 3165.0,
+    "mean_generation_latency_ms": 3990.2,
+    "answer_sources": {
+      "llm": {
+        "count": 15,
+        "mean_grounding_rate": 0.2898
+      },
+      "template_fallback": {
+        "count": 0,
+        "mean_grounding_rate": null
+      },
+      "refusal_gate": {
+        "count": 5,
+        "mean_grounding_rate": 1.0
+      },
+      "aggregate_operator": {
+        "count": 4,
+        "mean_grounding_rate": 0.4047
+      }
+    }
   },
   "by_category": {
     "ambiguous": {
       "query_count": 6,
       "temporal_precision": 1.0,
       "temporal_precision_count": "1/6",
-      "precision_at_k": 0.8333,
+      "precision_at_k": 0.6667,
       "precision_at_k_count": "6/6",
-      "grounding_rate": 1.0,
+      "hit_at_k": 0.8333,
+      "hit_at_k_count": "6/6",
+      "mrr": 0.8333,
+      "mrr_count": "6/6",
+      "grounding_rate": 0.8333,
       "grounding_rate_count": "6/6",
-      "refusal_recall": 1.0,
-      "refusal_recall_count": "6/6",
+      "grounding_rate_llm_only": 0.0,
+      "grounding_rate_llm_count": "1/6",
+      "refusal_recall": 0.8333,
+      "refusal_recall_count": "5/6",
       "false_refusal_rate": null,
       "false_refusal_count": "N/A"
     },
@@ -44,12 +74,18 @@
       "temporal_precision_count": "6/6",
       "precision_at_k": 0.4667,
       "precision_at_k_count": "6/6",
-      "grounding_rate": 1.0,
+      "hit_at_k": 0.6667,
+      "hit_at_k_count": "6/6",
+      "mrr": 0.7153,
+      "mrr_count": "6/6",
+      "grounding_rate": 0.2407,
       "grounding_rate_count": "6/6",
+      "grounding_rate_llm_only": 0.2407,
+      "grounding_rate_llm_count": "6/6",
       "refusal_recall": null,
       "refusal_recall_count": "N/A",
-      "false_refusal_rate": 0.0,
-      "false_refusal_count": "0/6"
+      "false_refusal_rate": 0.1667,
+      "false_refusal_count": "1/6"
     },
     "semantic": {
       "query_count": 6,
@@ -57,8 +93,14 @@
       "temporal_precision_count": "0/6",
       "precision_at_k": 0.0667,
       "precision_at_k_count": "6/6",
-      "grounding_rate": 1.0,
+      "hit_at_k": 0.1667,
+      "hit_at_k_count": "6/6",
+      "mrr": 0.0555,
+      "mrr_count": "6/6",
+      "grounding_rate": 0.4838,
       "grounding_rate_count": "6/6",
+      "grounding_rate_llm_only": 0.4838,
+      "grounding_rate_llm_count": "6/6",
       "refusal_recall": null,
       "refusal_recall_count": "N/A",
       "false_refusal_rate": 0.0,
@@ -66,16 +108,22 @@
     },
     "temporal": {
       "query_count": 6,
-      "temporal_precision": 0.8333,
+      "temporal_precision": 1.0,
       "temporal_precision_count": "6/6",
-      "precision_at_k": 0.3667,
+      "precision_at_k": 0.5333,
       "precision_at_k_count": "6/6",
-      "grounding_rate": 0.5705,
+      "hit_at_k": 0.6667,
+      "hit_at_k_count": "6/6",
+      "mrr": 0.6667,
+      "mrr_count": "6/6",
+      "grounding_rate": 0.2698,
       "grounding_rate_count": "6/6",
+      "grounding_rate_llm_only": 0.0,
+      "grounding_rate_llm_count": "2/6",
       "refusal_recall": null,
       "refusal_recall_count": "N/A",
-      "false_refusal_rate": 0.1667,
-      "false_refusal_count": "1/6"
+      "false_refusal_rate": 0.0,
+      "false_refusal_count": "0/6"
     }
   },
   "queries": [
@@ -99,9 +147,9 @@
         "expected_answer": "Used Snipping Tool overlay, previewed Agent_Context.md in Antigravity IDE, and checked WhatsApp in Chrome."
       },
       "execution": {
-        "search_time_ms": 44.39187049865723,
-        "generate_time_ms": 4.453182220458984,
-        "total_time_ms": 56.90598487854004,
+        "search_time_ms": 43.07126998901367,
+        "generate_time_ms": 9073.20523262024,
+        "total_time_ms": 9121.239423751831,
         "retrieved_count": 10,
         "retrieved_ids": [
           28285,
@@ -113,16 +161,28 @@
         "distinct_episodes": 5,
         "context_chars": 4529,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 66,
+          "eval_duration": 1075883000,
+          "prompt_eval_duration": 32831000,
+          "prompt_eval_count": 3011,
+          "total_duration": 1126399400,
+          "load_duration": 4259800,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.0,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 21:55, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Preview Agent_Context.md' [E28285]. At 21:50, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Agent_Context.md' [E28267]. At 21:51, you were working in explorer.exe on 'Task Switching' [E28277]. At 21:42, you were working in chrome.exe on 'OmniContext - Claude - Google Chrome' [E28235].",
+      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
       "sources": [
         {
           "id": 28285,
@@ -141,7 +201,7 @@
             79
           ],
           "source": "episode",
-          "score": 0.028714859437751004,
+          "score": 0.02844163539403516,
           "cosine_sim": 0.06274215877056122,
           "keyword_match": true
         },
@@ -162,7 +222,7 @@
             59
           ],
           "source": "episode",
-          "score": 0.02639344262295082,
+          "score": 0.026666666666666665,
           "cosine_sim": 0.04853752627968788,
           "keyword_match": true
         },
@@ -255,9 +315,9 @@
         "expected_answer": "Antigravity IDE, Google Chrome, and Snipping Tool."
       },
       "execution": {
-        "search_time_ms": 1.6765594482421875,
-        "generate_time_ms": 3.5898685455322266,
-        "total_time_ms": 5.588054656982422,
+        "search_time_ms": 7.742404937744141,
+        "generate_time_ms": 5516.8137550354,
+        "total_time_ms": 5524.783372879028,
         "retrieved_count": 10,
         "retrieved_ids": [
           28233,
@@ -269,16 +329,28 @@
         "distinct_episodes": 5,
         "context_chars": 5000,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "aggregate_operator",
+        "ollama_stats": {
+          "eval_count": 356,
+          "eval_duration": 5279586000,
+          "prompt_eval_duration": 129764000,
+          "prompt_eval_count": 542,
+          "total_duration": 5512064400,
+          "load_duration": 4282200,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 0.2,
-        "grounding_rate": 0.9231,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
+        "grounding_rate": 0.7857,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "Applications and windows used between 2026-11-23T21:40:00 and 2026-11-23T22:00:00:\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - requirements.txt) [E28233]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Antigravity Settings) [E28242]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE) [E28252]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Agent_Context.md) [E28262]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Preview Agent_Context.md) [E28272]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - query_taxonomy.json) [E28281]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Settings) [E28291]\n- SnippingTool.exe (Window: Snipping Tool Overlay) [E28301]\n- chrome.exe (Window: OmniContext - Claude - Google Chrome) [E28311]\n- chrome.exe (Window: Annotate - Google Search - Google Chrome) [E28321]\n- chrome.exe (Window: WhatsApp - Google Chrome) [E28233]\n- explorer.exe (Window: Task Switching) [E28242]",
+      "answer": "Based on the provided context, I can answer the user's question. According to the captured activities, between 2026-11-23T21:40:00 and 2026-11-23T22:00:00, the user used the following applications:\n\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - requirements.txt) [E28233]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Antigravity Settings) [E28242]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE) [E28252]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Agent_Context.md) [E28262]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Preview Agent_Context.md) [E28272]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - query_taxonomy.json) [E28281]\n- Antigravity IDE.exe (Window: InternProject - Antigravity IDE - Settings) [E28291]\n- SnippingTool.exe (Window: Snipping Tool Overlay) [E28301]\n- chrome.exe (Window: OmniContext - Claude - Google Chrome) [E28311]\n- chrome.exe (Window: Annotate - Google Search - Google Chrome) [E28321]\n- chrome.exe (Window: WhatsApp - Google Chrome) [E28233]\n\nNote that the user also used explorer.exe (Window: Task Switching) [E28242] during this time period, but it is not clear if this was used between 9:40 PM and 10:00 PM specifically.",
       "sources": [
         {
           "id": 28233,
@@ -410,25 +482,153 @@
         "expected_answer": "Edited requirements.txt in Antigravity IDE, then browsed Claude and Google Search in Chrome."
       },
       "execution": {
-        "search_time_ms": 23.663759231567383,
-        "generate_time_ms": 0,
-        "total_time_ms": 24.04189109802246,
-        "retrieved_count": 0,
-        "retrieved_ids": [],
-        "distinct_episodes": 0,
-        "context_chars": 0,
-        "is_refusal": true,
-        "refusal_reason": "low_confidence_similarity"
+        "search_time_ms": 12.824535369873047,
+        "generate_time_ms": 3331.920862197876,
+        "total_time_ms": 3345.1521396636963,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          28235,
+          28242,
+          28240,
+          28241,
+          28236
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 5000,
+        "is_refusal": false,
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 43,
+          "eval_duration": 688254000,
+          "prompt_eval_duration": 31286000,
+          "prompt_eval_count": 2695,
+          "total_duration": 735471600,
+          "load_duration": 4028500,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
-        "temporal_precision": 0.0,
-        "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "temporal_precision": 1.0,
+        "precision_at_k": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
+        "grounding_rate": 0.0,
         "correctly_refused": null,
-        "falsely_refused": true
+        "falsely_refused": false
       },
-      "answer": "I could not find sufficient evidence or context in your activity history to answer that question (top match cosine similarity 0.20 is below the required floor of 0.35 and keyword search returned nothing).",
-      "sources": []
+      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
+      "sources": [
+        {
+          "id": 28235,
+          "episode_id": 28235,
+          "timestamp": "2026-11-23T21:42:35.907980",
+          "start_time": "2026-11-23T21:42:35.907980",
+          "end_time": "2026-11-23T21:42:35.907980",
+          "process_name": "chrome.exe",
+          "dominant_title": "OmniContext - Claude - Google Chrome",
+          "window_title": "OmniContext - Claude - Google Chrome",
+          "capture_count": 1,
+          "text_content": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\noa 100% local\u201d: your boot log showed HE calls at startup\u2019 Set (HF SHUBTOFFLINE=1) alter the first\na \u2014\ndownload and show itstill runs.\nfoRPATS-256 at rest: [didn't find any encryption code. Fither implement itor list it as future work!\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n}1'8 Day 1: data and ground truth: Run (scr ipts/check\u00a5data*py) today. You need at least 2 days,\n\u2018of real captures, so if youre short, start (python}main\u00a5 py, now and leave it\n\u2014\u2014 \u2014\u2014\nrunning Then copy ( toa frozen eval snapshot,so every number is reproducible\u2019\nAnnotate 20 queries from your taxonomy with relevant capture IDs!\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nun",
+          "representative_text": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\noa 100% local\u201d: your boot log showed HE calls at startup\u2019 Set (HF SHUBTOFFLINE=1) alter the first\na \u2014\ndownload and show itstill runs.\nfoRPATS-256 at rest: [didn't find any encryption code. Fither implement itor list it as future work!\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n}1'8 Day 1: data and ground truth: Run (scr ipts/check\u00a5data*py) today. You need at least 2 days,\n\u2018of real captures, so if youre short, start (python}main\u00a5 py, now and leave it\n\u2014\u2014 \u2014\u2014\nrunning Then copy ( toa frozen eval snapshot,so every number is reproducible\u2019\nAnnotate 20 queries from your taxonomy with relevant capture IDs!\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nun",
+          "representative_capture_id": 19,
+          "capture_ids": [
+            19
+          ],
+          "source": "episode",
+          "score": 0.016666666666666666,
+          "cosine_sim": 0.19832397997379303,
+          "keyword_match": false
+        },
+        {
+          "id": 28242,
+          "episode_id": 28242,
+          "timestamp": "2026-11-23T21:45:51.220675",
+          "start_time": "2026-11-23T21:45:51.220675",
+          "end_time": "2026-11-23T21:45:51.220675",
+          "process_name": "chrome.exe",
+          "dominant_title": "OmniContext - Claude - Google Chrome",
+          "window_title": "OmniContext - Claude - Google Chrome",
+          "capture_count": 1,
+          "text_content": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\n$5606 @emmmupanmamamenmp ss i ( t~\u201c\u2018(\u2018COC*C*C*C*C(\u2018#T\u2019\u2019N\u2019$#;CWE\u201cSCC IN BIN AM a\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\nfi] i) \u00a9 S50\nAnnotate 20 queries fi rom your taxonomy with relevant capture IDs.\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged. Metrics: temporal precision, precision@k, grounding, refusal accuracy. Do this\nbefore improving anything, or.you have nogbefore, number:\n139 Day 2-3: temporal decomposition: Use a rule-based parser. (Gatepar, Ear), \u2018ora small hand;\nd-Ceaetr-o ear a Aaa \u2014\u2014\u2014\nrolled one) that returns a((staqt end)) window plus the residual semantic query.Then pre,\nEE, a aa\nfilter the time range in Gearch\u00a5hybr id) before ranking.This is the biggest gain for the least\nwork, and itshould move temporal precision sharply.\nr4\u00a7 Day 3-4: episode segmentation: Cluster contiguous captures by embedding similarity and\nEo ttl pl ren pea pererepread\nprocess ",
+          "representative_text": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\n$5606 @emmmupanmamamenmp ss i ( t~\u201c\u2018(\u2018COC*C*C*C*C(\u2018#T\u2019\u2019N\u2019$#;CWE\u201cSCC IN BIN AM a\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\nfi] i) \u00a9 S50\nAnnotate 20 queries fi rom your taxonomy with relevant capture IDs.\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged. Metrics: temporal precision, precision@k, grounding, refusal accuracy. Do this\nbefore improving anything, or.you have nogbefore, number:\n139 Day 2-3: temporal decomposition: Use a rule-based parser. (Gatepar, Ear), \u2018ora small hand;\nd-Ceaetr-o ear a Aaa \u2014\u2014\u2014\nrolled one) that returns a((staqt end)) window plus the residual semantic query.Then pre,\nEE, a aa\nfilter the time range in Gearch\u00a5hybr id) before ranking.This is the biggest gain for the least\nwork, and itshould move temporal precision sharply.\nr4\u00a7 Day 3-4: episode segmentation: Cluster contiguous captures by embedding similarity and\nEo ttl pl ren pea pererepread\nprocess ",
+          "representative_capture_id": 30,
+          "capture_ids": [
+            30
+          ],
+          "source": "episode",
+          "score": 0.01639344262295082,
+          "cosine_sim": 0.13898414373397827,
+          "keyword_match": false
+        },
+        {
+          "id": 28240,
+          "episode_id": 28240,
+          "timestamp": "2026-11-23T21:43:46.031508",
+          "start_time": "2026-11-23T21:43:46.031508",
+          "end_time": "2026-11-23T21:44:16.074321",
+          "process_name": "chrome.exe",
+          "dominant_title": "OmniContext - Claude - Google Chrome",
+          "window_title": "OmniContext - Claude - Google Chrome",
+          "capture_count": 3,
+          "text_content": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\neee, EE EEE EE EE eee\nfoRPATS-256 at rest: [didn't find any encryption code. Fither implement itor list it as future work!\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n}1'8 Day 1: data and ground truth: Run (scr ipts/check\u00a5data*py) today. You need at least 2 days,\nof real captures,so if youre shortystart (python}main* py ken nos audio) now and leave it\nCO ememerd . \u2014\u2014\u2014\u2014\u2014\nrunning Then copy ( toa frozen eval snapshot,so every number is reproducible\u2019\nAnnotate 20 queries from your taxonomy with relevant capture IDs!\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged! Metrics: temporal precision\u2019 precision@k\u00a5grounding, refusal accuracy. Do this\nS",
+          "representative_text": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\neee, EE EEE EE EE eee\nfoRPATS-256 at rest: [didn't find any encryption code. Fither implement itor list it as future work!\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n}1'8 Day 1: data and ground truth: Run (scr ipts/check\u00a5data*py) today. You need at least 2 days,\nof real captures,so if youre shortystart (python}main* py ken nos audio) now and leave it\nCO ememerd . \u2014\u2014\u2014\u2014\u2014\nrunning Then copy ( toa frozen eval snapshot,so every number is reproducible\u2019\nAnnotate 20 queries from your taxonomy with relevant capture IDs!\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged! Metrics: temporal precision\u2019 precision@k\u00a5grounding, refusal accuracy. Do this\nS",
+          "representative_capture_id": 26,
+          "capture_ids": [
+            25,
+            26,
+            27
+          ],
+          "source": "episode",
+          "score": 0.016129032258064516,
+          "cosine_sim": 0.13590708374977112,
+          "keyword_match": false
+        },
+        {
+          "id": 28241,
+          "episode_id": 28241,
+          "timestamp": "2026-11-23T21:45:36.207833",
+          "start_time": "2026-11-23T21:45:36.207833",
+          "end_time": "2026-11-23T21:45:46.215726",
+          "process_name": "chrome.exe",
+          "dominant_title": "OmniContext - Claude - Google Chrome",
+          "window_title": "OmniContext - Claude - Google Chrome",
+          "capture_count": 2,
+          "text_content": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\nfi] 9 \u00a9 @sx0\nSS SSS\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n}1'8 Day 1: data and ground truth: Run (scr ipts/check\u00a5data*py) today. You need at least 2 days,\n\u2018of real captures, so if youre short, start (python}main\u00a5 py, now and leave it\nCO ememerd . \u2014\u2014\u2014\u2014\u2014\nrunning Then copy ( toa frozen eval snapshotyso every number is reproducible\u2019\n\u2018Annotate 20 queries from your taxonomy, with relevant capture Ms.\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged! Metrics: temporal precision\u2019 precision@k\u00a5grounding, refusal accuracy. Do this\nbefore improving anything, or.you have nogbefore, number:\n139 Day 2-3: temporal decomposition: Use a rule-based parser. (Ga",
+          "representative_text": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\nfi] 9 \u00a9 @sx0\nSS SSS\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n}1'8 Day 1: data and ground truth: Run (scr ipts/check\u00a5data*py) today. You need at least 2 days,\n\u2018of real captures, so if youre short, start (python}main\u00a5 py, now and leave it\nCO ememerd . \u2014\u2014\u2014\u2014\u2014\nrunning Then copy ( toa frozen eval snapshotyso every number is reproducible\u2019\n\u2018Annotate 20 queries from your taxonomy, with relevant capture Ms.\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged! Metrics: temporal precision\u2019 precision@k\u00a5grounding, refusal accuracy. Do this\nbefore improving anything, or.you have nogbefore, number:\n139 Day 2-3: temporal decomposition: Use a rule-based parser. (Ga",
+          "representative_capture_id": 28,
+          "capture_ids": [
+            28,
+            29
+          ],
+          "source": "episode",
+          "score": 0.015873015873015872,
+          "cosine_sim": 0.13388070464134216,
+          "keyword_match": false
+        },
+        {
+          "id": 28236,
+          "episode_id": 28236,
+          "timestamp": "2026-11-23T21:42:55.927327",
+          "start_time": "2026-11-23T21:42:55.927327",
+          "end_time": "2026-11-23T21:43:05.955429",
+          "process_name": "chrome.exe",
+          "dominant_title": "OmniContext - Claude - Google Chrome",
+          "window_title": "OmniContext - Claude - Google Chrome",
+          "capture_count": 2,
+          "text_content": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\neee, EE EEE EE EE eee\nfoRPATS-256 at rest: [didn't find any encryption code. Fither implement itor list it as future work!\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n+1 \u00a7 Day 1: data and ground Scripts/check\u00a5data\u00ae py) today. You need at least 2 days\nOf real Capturesyso If you maeaeaerart (py thon}main\u00a5 py, now and leave it\nutp =\nrunning.Then copy (context\u00ae db |to.a frozen eval Snapshot, so every number is reproducible:\nAnnotate 20 queries from your taxonomy with relevant capture IDs!\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged! Metrics: temporal precision\u2019 precision@k\u00a5grounding, refusal accuracy. Do this\nbefore improving anything, o",
+          "representative_text": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\neee, EE EEE EE EE eee\nfoRPATS-256 at rest: [didn't find any encryption code. Fither implement itor list it as future work!\nThe deliverable is one ablation table: naive baseline >.+ temporal D+ segmentation 9+ groundings\nwith the same metrics throughoutsThat is the quantifiable story.\n+1 \u00a7 Day 1: data and ground Scripts/check\u00a5data\u00ae py) today. You need at least 2 days\nOf real Capturesyso If you maeaeaerart (py thon}main\u00a5 py, now and leave it\nutp =\nrunning.Then copy (context\u00ae db |to.a frozen eval Snapshot, so every number is reproducible:\nAnnotate 20 queries from your taxonomy with relevant capture IDs!\n\u00a32 Day 1-2: bascline harness. Build (evaluation/_unt\u00a5eval\u00aepy)and run the current pipeline,\nunchanged! Metrics: temporal precision\u2019 precision@k\u00a5grounding, refusal accuracy. Do this\nbefore improving anything, o",
+          "representative_capture_id": 20,
+          "capture_ids": [
+            20,
+            21
+          ],
+          "source": "episode",
+          "score": 0.015625,
+          "cosine_sim": 0.12307468056678772,
+          "keyword_match": false
+        }
+      ]
     },
     {
       "id": "T4",
@@ -462,9 +662,9 @@
         "expected_answer": "Active in Chrome across Claude and Google Search from 21:42 to 21:47 (~5 minutes)."
       },
       "execution": {
-        "search_time_ms": 0.39577484130859375,
-        "generate_time_ms": 3.354787826538086,
-        "total_time_ms": 4.029512405395508,
+        "search_time_ms": 0.3650188446044922,
+        "generate_time_ms": 1626.2555122375488,
+        "total_time_ms": 1626.8587112426758,
         "retrieved_count": 10,
         "retrieved_ids": [
           19,
@@ -476,16 +676,28 @@
         "distinct_episodes": 5,
         "context_chars": 7481,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "aggregate_operator",
+        "ollama_stats": {
+          "eval_count": 101,
+          "eval_duration": 1464873000,
+          "prompt_eval_duration": 49743000,
+          "prompt_eval_count": 302,
+          "total_duration": 1603552200,
+          "load_duration": 5075600,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 1.0,
-        "grounding_rate": 0.5,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
+        "grounding_rate": 0.3333,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "You spent approximately 0.6 minutes active on Chrome between 2026-11-23T21:40:00 and 2026-11-23T21:50:00 [C19]. [Partially verified from context]",
+      "answer": "According to the captured context, the user spent approximately 0.6 minutes active on Chrome between 2026-11-23T21:40:00 and 2026-11-23T21:50:00 [C19]. [Partially verified from context]",
       "sources": [
         {
           "id": 19,
@@ -554,9 +766,9 @@
         "expected_answer": "Configuring Antigravity Settings in Antigravity IDE."
       },
       "execution": {
-        "search_time_ms": 0.9937286376953125,
-        "generate_time_ms": 3.2134056091308594,
-        "total_time_ms": 4.605293273925781,
+        "search_time_ms": 1.0526180267333984,
+        "generate_time_ms": 1232.192039489746,
+        "total_time_ms": 1233.5987091064453,
         "retrieved_count": 10,
         "retrieved_ids": [
           28328,
@@ -568,11 +780,23 @@
         "distinct_episodes": 5,
         "context_chars": 4285,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "aggregate_operator",
+        "ollama_stats": {
+          "eval_count": 79,
+          "eval_duration": 1139105000,
+          "prompt_eval_duration": 45186000,
+          "prompt_eval_count": 292,
+          "total_duration": 1204976400,
+          "load_duration": 4122600,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
         "grounding_rate": 0.0,
         "correctly_refused": null,
         "falsely_refused": false
@@ -692,9 +916,9 @@
         "expected_answer": "First capture recorded at 9:42 PM in Antigravity IDE on requirements.txt."
       },
       "execution": {
-        "search_time_ms": 0.43964385986328125,
-        "generate_time_ms": 3.04412841796875,
-        "total_time_ms": 3.6776065826416016,
+        "search_time_ms": 0.2903938293457031,
+        "generate_time_ms": 1071.8257427215576,
+        "total_time_ms": 1072.2601413726807,
         "retrieved_count": 10,
         "retrieved_ids": [
           28219,
@@ -706,16 +930,28 @@
         "distinct_episodes": 5,
         "context_chars": 49,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "aggregate_operator",
+        "ollama_stats": {
+          "eval_count": 70,
+          "eval_duration": 1006743000,
+          "prompt_eval_duration": 41821000,
+          "prompt_eval_count": 273,
+          "total_duration": 1068233600,
+          "load_duration": 4361900,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 0.0,
-        "grounding_rate": 0.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.5,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
+      "answer": "Therefore, it can be inferred that the user started working on November 23 at 10:00 AM [E28219]. [Partially verified from context]",
       "sources": [
         {
           "id": 28219,
@@ -829,30 +1065,42 @@
         "expected_answer": "Captures 15-18, 36, 43 viewing requirements.txt in Antigravity IDE."
       },
       "execution": {
-        "search_time_ms": 47.564029693603516,
-        "generate_time_ms": 3.4520626068115234,
-        "total_time_ms": 51.424503326416016,
+        "search_time_ms": 42.89817810058594,
+        "generate_time_ms": 11083.570003509521,
+        "total_time_ms": 11126.888036727905,
         "retrieved_count": 10,
         "retrieved_ids": [
           28682,
           28687,
-          28686,
           28233,
+          28686,
           28252
         ],
         "distinct_episodes": 5,
         "context_chars": 4646,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 84,
+          "eval_duration": 1384462000,
+          "prompt_eval_duration": 32555000,
+          "prompt_eval_count": 3065,
+          "total_duration": 1434582200,
+          "load_duration": 4913900,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 0.4,
-        "grounding_rate": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 0.3333,
+        "grounding_rate": 0.0541,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 23:57, you were working in WINWORD.EXE on 'We didn't find any Office products for this account.' [E28682]. At 23:57, you were working in WINWORD.EXE on 'INTERNSHIP_REPORT_Rudra_Pratap_Singh.docx - Word (Unlicensed Product)' [E28687]. At 21:42, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - requirements.txt' [E28233].",
+      "answer": "[E28234] \ud83d\udce6 Episode 28234 [2026-11-23T21:42:30.893347 to 2026-11-23T21:42:30.893347] App: Antigravity IDE.exe | Title: InternProject - Antigravity IDE - requirements.txt (1 captures) [E28252] \ud83d\udce6 Episode 28252 [2026-11-23T21:48:16.462860 to 2026-11-23T21:48:16.462860] App: Antigravity IDE.exe | Title: InternProject - Antigravity IDE - requirements.txt (1 captures) [Partially verified from context]",
       "sources": [
         {
           "id": 28682,
@@ -871,7 +1119,7 @@
             568
           ],
           "source": "episode",
-          "score": 0.0315136476426799,
+          "score": 0.03128054740957967,
           "cosine_sim": 0.35733938217163086,
           "keyword_match": true
         },
@@ -892,29 +1140,8 @@
             573
           ],
           "source": "episode",
-          "score": 0.026754075124025514,
+          "score": 0.024809741248097414,
           "cosine_sim": 0.25918880105018616,
-          "keyword_match": true
-        },
-        {
-          "id": 28686,
-          "episode_id": 28686,
-          "timestamp": "2026-11-23T23:57:43.879025",
-          "start_time": "2026-11-23T23:57:43.879025",
-          "end_time": "2026-11-23T23:57:43.879025",
-          "process_name": "WINWORD.EXE",
-          "dominant_title": "INTERNSHIP_REPORT_Rudra_Pratap_Singh.docx - Word (Unlicensed Product)",
-          "window_title": "INTERNSHIP_REPORT_Rudra_Pratap_Singh.docx - Word (Unlicensed Product)",
-          "capture_count": 1,
-          "text_content": "O\u00b0 @ o COMI + CaN o eM) @ cs_O KZ\n(=| @ OSX\u2019 re See =\n@ jaaican > G2 Gum Op Gt & & 9 Waume=mD SS\net eee a [fo eemoce: lke eee a |-5-| 21.2\ncis Of Prag P(Be Se feee Blaofoo Oe Toma JI No spac J totic Pa SL Headiea If Heaciea 2 tiie Gea ants | Gans cea\n@imm ty fz ty Gur ty ayes ty act eet Me Maretean BE cracr a\n@ PRODUCT NOTICE Most of ts features of Word Rave been disabled because it Rast Leon activated, x\na RARE AVIEETS<- 0 \u00abfe 0 of}e 0 oie 0 o Cn 0 oh 0 (hn 0 fie 0 ole 0 oh 0 E> 0 <I> 0 ip 0 GI 0 Eo E> 0 C/E ARN\nI, Rudra Pratap Singh, student of B. Tech in Computer Science & Engineering at Amity Unversity e\nPunyab, hereby declare that the internship work entitled \u201cCivic Track\" has beer cared out |\nindependently by :ne under the supervision of Mr. Anku Kumar, Epic Wed Service. This report is 0\nsubnntted in partial fulfilment of the requirements for the award of the degree of Bachelor of\n\u2018Technology in Compnter Science & Engineering of Amity Umversty Punjab for the academic\nyear 2024-20",
-          "representative_text": "O\u00b0 @ o COMI + CaN o eM) @ cs_O KZ\n(=| @ OSX\u2019 re See =\n@ jaaican > G2 Gum Op Gt & & 9 Waume=mD SS\net eee a [fo eemoce: lke eee a |-5-| 21.2\ncis Of Prag P(Be Se feee Blaofoo Oe Toma JI No spac J totic Pa SL Headiea If Heaciea 2 tiie Gea ants | Gans cea\n@imm ty fz ty Gur ty ayes ty act eet Me Maretean BE cracr a\n@ PRODUCT NOTICE Most of ts features of Word Rave been disabled because it Rast Leon activated, x\na RARE AVIEETS<- 0 \u00abfe 0 of}e 0 oie 0 o Cn 0 oh 0 (hn 0 fie 0 ole 0 oh 0 E> 0 <I> 0 ip 0 GI 0 Eo E> 0 C/E ARN\nI, Rudra Pratap Singh, student of B. Tech in Computer Science & Engineering at Amity Unversity e\nPunyab, hereby declare that the internship work entitled \u201cCivic Track\" has beer cared out |\nindependently by :ne under the supervision of Mr. Anku Kumar, Epic Wed Service. This report is 0\nsubnntted in partial fulfilment of the requirements for the award of the degree of Bachelor of\n\u2018Technology in Compnter Science & Engineering of Amity Umversty Punjab for the academic\nyear 2024-20",
-          "representative_capture_id": 572,
-          "capture_ids": [
-            572
-          ],
-          "source": "episode",
-          "score": 0.022780159216166565,
-          "cosine_sim": 0.2248380482196808,
           "keyword_match": true
         },
         {
@@ -936,8 +1163,29 @@
             17
           ],
           "source": "episode",
-          "score": 0.02162353775257001,
+          "score": 0.020695242303726616,
           "cosine_sim": 0.19900977611541748,
+          "keyword_match": true
+        },
+        {
+          "id": 28686,
+          "episode_id": 28686,
+          "timestamp": "2026-11-23T23:57:43.879025",
+          "start_time": "2026-11-23T23:57:43.879025",
+          "end_time": "2026-11-23T23:57:43.879025",
+          "process_name": "WINWORD.EXE",
+          "dominant_title": "INTERNSHIP_REPORT_Rudra_Pratap_Singh.docx - Word (Unlicensed Product)",
+          "window_title": "INTERNSHIP_REPORT_Rudra_Pratap_Singh.docx - Word (Unlicensed Product)",
+          "capture_count": 1,
+          "text_content": "O\u00b0 @ o COMI + CaN o eM) @ cs_O KZ\n(=| @ OSX\u2019 re See =\n@ jaaican > G2 Gum Op Gt & & 9 Waume=mD SS\net eee a [fo eemoce: lke eee a |-5-| 21.2\ncis Of Prag P(Be Se feee Blaofoo Oe Toma JI No spac J totic Pa SL Headiea If Heaciea 2 tiie Gea ants | Gans cea\n@imm ty fz ty Gur ty ayes ty act eet Me Maretean BE cracr a\n@ PRODUCT NOTICE Most of ts features of Word Rave been disabled because it Rast Leon activated, x\na RARE AVIEETS<- 0 \u00abfe 0 of}e 0 oie 0 o Cn 0 oh 0 (hn 0 fie 0 ole 0 oh 0 E> 0 <I> 0 ip 0 GI 0 Eo E> 0 C/E ARN\nI, Rudra Pratap Singh, student of B. Tech in Computer Science & Engineering at Amity Unversity e\nPunyab, hereby declare that the internship work entitled \u201cCivic Track\" has beer cared out |\nindependently by :ne under the supervision of Mr. Anku Kumar, Epic Wed Service. This report is 0\nsubnntted in partial fulfilment of the requirements for the award of the degree of Bachelor of\n\u2018Technology in Compnter Science & Engineering of Amity Umversty Punjab for the academic\nyear 2024-20",
+          "representative_text": "O\u00b0 @ o COMI + CaN o eM) @ cs_O KZ\n(=| @ OSX\u2019 re See =\n@ jaaican > G2 Gum Op Gt & & 9 Waume=mD SS\net eee a [fo eemoce: lke eee a |-5-| 21.2\ncis Of Prag P(Be Se feee Blaofoo Oe Toma JI No spac J totic Pa SL Headiea If Heaciea 2 tiie Gea ants | Gans cea\n@imm ty fz ty Gur ty ayes ty act eet Me Maretean BE cracr a\n@ PRODUCT NOTICE Most of ts features of Word Rave been disabled because it Rast Leon activated, x\na RARE AVIEETS<- 0 \u00abfe 0 of}e 0 oie 0 o Cn 0 oh 0 (hn 0 fie 0 ole 0 oh 0 E> 0 <I> 0 ip 0 GI 0 Eo E> 0 C/E ARN\nI, Rudra Pratap Singh, student of B. Tech in Computer Science & Engineering at Amity Unversity e\nPunyab, hereby declare that the internship work entitled \u201cCivic Track\" has beer cared out |\nindependently by :ne under the supervision of Mr. Anku Kumar, Epic Wed Service. This report is 0\nsubnntted in partial fulfilment of the requirements for the award of the degree of Bachelor of\n\u2018Technology in Compnter Science & Engineering of Amity Umversty Punjab for the academic\nyear 2024-20",
+          "representative_capture_id": 572,
+          "capture_ids": [
+            572
+          ],
+          "source": "episode",
+          "score": 0.020676691729323307,
+          "cosine_sim": 0.2248380482196808,
           "keyword_match": true
         },
         {
@@ -957,7 +1205,7 @@
             43
           ],
           "source": "episode",
-          "score": 0.020397902750843928,
+          "score": 0.01952265090951222,
           "cosine_sim": 0.186029851436615,
           "keyword_match": true
         }
@@ -981,34 +1229,46 @@
         "expected_answer": "In Chrome window titled WhatsApp - Google Chrome."
       },
       "execution": {
-        "search_time_ms": 35.82191467285156,
-        "generate_time_ms": 3.7691593170166016,
-        "total_time_ms": 39.801836013793945,
+        "search_time_ms": 57.12413787841797,
+        "generate_time_ms": 3747.3738193511963,
+        "total_time_ms": 3804.732322692871,
         "retrieved_count": 10,
         "retrieved_ids": [
-          28817,
-          28995,
-          29519,
-          29489,
-          28992
+          30029,
+          30207,
+          30731,
+          30204,
+          30701
         ],
         "distinct_episodes": 5,
         "context_chars": 411,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 215,
+          "eval_duration": 3285135000,
+          "prompt_eval_duration": 351408000,
+          "prompt_eval_count": 1162,
+          "total_duration": 3742931200,
+          "load_duration": 4979600,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.8,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 01:01, you were working in chrome.exe on 'WhatsApp call - Google Chrome' [E28817].",
+      "answer": "According to the captured context, the user saw the word 'WhatsApp' in the following instances:\n\n* In the title of the Google Chrome window, which was open from [E30029] to [E30098] ([E30029], [E30098], and [E30204] show the title as \"WhatsApp call - Google Chrome\").\n* In the URL of the WhatsApp website, which was accessed from [E30204] ([E30204] shows the URL as \"whatsapp.com\").\n* In the content of the WhatsApp messages, which were displayed from [E30029] to [E31572] ([E30029], [E30207], [E30731], [E30701], [E31277], [E30284], and [E30404] show various messages with the word \"WhatsApp\" or the WhatsApp website's URL).\n\nNote that the user also accessed the WhatsApp website directly from [E30404] and [E31572], but this is not explicitly mentioned as part of a WhatsApp call.",
       "sources": [
         {
-          "id": 28817,
-          "episode_id": 28817,
+          "id": 30029,
+          "episode_id": 30029,
           "timestamp": "2026-11-24T01:01:30.441249",
           "start_time": "2026-11-24T01:01:30.441249",
           "end_time": "2026-11-24T01:01:30.441249",
@@ -1028,8 +1288,8 @@
           "keyword_match": true
         },
         {
-          "id": 28995,
-          "episode_id": 28995,
+          "id": 30207,
+          "episode_id": 30207,
           "timestamp": "2026-11-24T01:16:26.861309",
           "start_time": "2026-11-24T01:16:26.861309",
           "end_time": "2026-11-24T01:16:26.861309",
@@ -1049,8 +1309,8 @@
           "keyword_match": true
         },
         {
-          "id": 29519,
-          "episode_id": 29519,
+          "id": 30731,
+          "episode_id": 30731,
           "timestamp": "2026-11-24T02:03:26.282004",
           "start_time": "2026-11-24T02:03:26.282004",
           "end_time": "2026-11-24T02:03:26.282004",
@@ -1065,34 +1325,13 @@
             1414
           ],
           "source": "episode",
-          "score": 0.026140526140526144,
+          "score": 0.025794938351719664,
           "cosine_sim": 0.20480039715766907,
           "keyword_match": true
         },
         {
-          "id": 29489,
-          "episode_id": 29489,
-          "timestamp": "2026-11-24T02:00:46.069522",
-          "start_time": "2026-11-24T02:00:46.069522",
-          "end_time": "2026-11-24T02:00:46.069522",
-          "process_name": "chrome.exe",
-          "dominant_title": "WhatsApp call - Google Chrome",
-          "window_title": "WhatsApp call - Google Chrome",
-          "capture_count": 1,
-          "text_content": "@ome ee\nSNES\n=",
-          "representative_text": "@ome ee\nSNES\n=",
-          "representative_capture_id": 1384,
-          "capture_ids": [
-            1384
-          ],
-          "source": "episode",
-          "score": 0.024448419797257006,
-          "cosine_sim": 0.2281901240348816,
-          "keyword_match": true
-        },
-        {
-          "id": 28992,
-          "episode_id": 28992,
+          "id": 30204,
+          "episode_id": 30204,
           "timestamp": "2026-11-24T01:16:11.834037",
           "start_time": "2026-11-24T01:16:11.834037",
           "end_time": "2026-11-24T01:16:11.834037",
@@ -1107,8 +1346,29 @@
             883
           ],
           "source": "episode",
-          "score": 0.023647238837112255,
+          "score": 0.024706420619185605,
           "cosine_sim": 0.22571387887001038,
+          "keyword_match": true
+        },
+        {
+          "id": 30701,
+          "episode_id": 30701,
+          "timestamp": "2026-11-24T02:00:46.069522",
+          "start_time": "2026-11-24T02:00:46.069522",
+          "end_time": "2026-11-24T02:00:46.069522",
+          "process_name": "chrome.exe",
+          "dominant_title": "WhatsApp call - Google Chrome",
+          "window_title": "WhatsApp call - Google Chrome",
+          "capture_count": 1,
+          "text_content": "@ome ee\nSNES\n=",
+          "representative_text": "@ome ee\nSNES\n=",
+          "representative_capture_id": 1384,
+          "capture_ids": [
+            1384
+          ],
+          "source": "episode",
+          "score": 0.02252925068459049,
+          "cosine_sim": 0.2281901240348816,
           "keyword_match": true
         }
       ]
@@ -1142,34 +1402,46 @@
         "expected_answer": "Agent_Context.md describing major major project thesis on ambient context engine."
       },
       "execution": {
-        "search_time_ms": 37.05549240112305,
-        "generate_time_ms": 3.3812522888183594,
-        "total_time_ms": 40.71855545043945,
+        "search_time_ms": 39.84808921813965,
+        "generate_time_ms": 7030.890226364136,
+        "total_time_ms": 7070.933103561401,
         "retrieved_count": 10,
         "retrieved_ids": [
-          28722,
-          29674,
+          29934,
+          30886,
           28397,
-          28444,
-          28446
+          31030,
+          28444
         ],
         "distinct_episodes": 5,
-        "context_chars": 4198,
+        "context_chars": 4001,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 104,
+          "eval_duration": 1719909000,
+          "prompt_eval_duration": 32122999,
+          "prompt_eval_count": 3160,
+          "total_duration": 1770131800,
+          "load_duration": 4075900,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.0,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 00:02, you were working in olk.exe on 'Mail - RUDRA PRATAP SINGH - Outlook' [E28722]. At 02:20, you were working in Antigravity IDE.exe on 'Major Project - Antigravity IDE - esp32_cam_streamer.ino' [E29674]. At 22:53, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Preview baseline_summary.md' [E28397]. At 23:06, you were working in explorer.exe on 'Untitled' [E28444]. At 23:06, you were working in chrome.exe on 'OmniContext - Claude - Google Chrome' [E28446].",
+      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
       "sources": [
         {
-          "id": 28722,
-          "episode_id": 28722,
+          "id": 29934,
+          "episode_id": 29934,
           "timestamp": "2026-11-24T00:02:04.346902",
           "start_time": "2026-11-24T00:02:04.346902",
           "end_time": "2026-11-24T00:02:14.363165",
@@ -1186,13 +1458,13 @@
             611
           ],
           "source": "episode",
-          "score": 0.030536130536130537,
+          "score": 0.02749719416386083,
           "cosine_sim": 0.26783207058906555,
           "keyword_match": true
         },
         {
-          "id": 29674,
-          "episode_id": 29674,
+          "id": 30886,
+          "episode_id": 30886,
           "timestamp": "2026-11-24T02:20:58.027233",
           "start_time": "2026-11-24T02:20:58.027233",
           "end_time": "2026-11-24T02:20:58.027233",
@@ -1207,7 +1479,7 @@
             1581
           ],
           "source": "episode",
-          "score": 0.028629032258064516,
+          "score": 0.027271052146674038,
           "cosine_sim": 0.24226081371307373,
           "keyword_match": true
         },
@@ -1229,8 +1501,29 @@
             216
           ],
           "source": "episode",
-          "score": 0.028283227848101264,
+          "score": 0.0261986301369863,
           "cosine_sim": 0.24298939108848572,
+          "keyword_match": true
+        },
+        {
+          "id": 31030,
+          "episode_id": 31030,
+          "timestamp": "2026-11-24T02:43:20.369062",
+          "start_time": "2026-11-24T02:43:20.369062",
+          "end_time": "2026-11-24T02:43:20.369062",
+          "process_name": "explorer.exe",
+          "dominant_title": "Task View",
+          "window_title": "Task View",
+          "capture_count": 1,
+          "text_content": "fAcroStreamO= End Sem Project Oemo Launcher, Major Projects Antigtiavity IDE (63 exp32.cam streamer | Arduino IDE 2 3.1\n=aaee a a ; +0.\n; erences Sf PS =\u201d BS Rae oo\nSa ee = BS fh Pipes \u2018\n1 Gioe Ree foe Caracal om, Stier femme =a BR G2 FSS.\n(ESS ae \u2014y he\n20 =\u2014_ eS = =~ rn ay\nee = = ne .\n: = == se\nao =| |e\nBES =\n==> 78 SS ee a | ;\nSe oo | Ogres Agrees a enn 7 .\n[Destion Oesktop 2) [New desktop]\ntee 3\" Ke ie",
+          "representative_text": "fAcroStreamO= End Sem Project Oemo Launcher, Major Projects Antigtiavity IDE (63 exp32.cam streamer | Arduino IDE 2 3.1\n=aaee a a ; +0.\n; erences Sf PS =\u201d BS Rae oo\nSa ee = BS fh Pipes \u2018\n1 Gioe Ree foe Caracal om, Stier femme =a BR G2 FSS.\n(ESS ae \u2014y he\n20 =\u2014_ eS = =~ rn ay\nee = = ne .\n: = == se\nao =| |e\nBES =\n==> 78 SS ee a | ;\nSe oo | Ogres Agrees a enn 7 .\n[Destion Oesktop 2) [New desktop]\ntee 3\" Ke ie",
+          "representative_capture_id": 1757,
+          "capture_ids": [
+            1757
+          ],
+          "source": "episode",
+          "score": 0.02558175373709354,
+          "cosine_sim": 0.21420219540596008,
           "keyword_match": true
         },
         {
@@ -1252,35 +1545,8 @@
             279
           ],
           "source": "episode",
-          "score": 0.02584097859327217,
+          "score": 0.02391304347826087,
           "cosine_sim": 0.3006739616394043,
-          "keyword_match": true
-        },
-        {
-          "id": 28446,
-          "episode_id": 28446,
-          "timestamp": "2026-11-23T23:06:43.891460",
-          "start_time": "2026-11-23T23:06:43.891460",
-          "end_time": "2026-11-23T23:07:33.968432",
-          "process_name": "chrome.exe",
-          "dominant_title": "OmniContext - Claude - Google Chrome",
-          "window_title": "OmniContext - Claude - Google Chrome",
-          "capture_count": 7,
-          "text_content": "\u00a9) @ (@ump 8 (Ocmam 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 9 OR share)\nSSS\nbaseline*summ,\nrary.)\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\na\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\nfa Reviewing why keyword search misses natural language questions} 33sp4\ne @ \u00a9\u00b00\n[sonnet 5.s] Medium) |",
-          "representative_text": "\u00a9) @ (@ump 8 (Ocmam 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 9 OR share)\nSSS\nbaseline*summ,\nrary.)\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\na\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\nfa Reviewing why keyword search misses natural language questions} 33sp4\ne @ \u00a9\u00b00\n[sonnet 5.s] Medium) |",
-          "representative_capture_id": 282,
-          "capture_ids": [
-            281,
-            282,
-            283,
-            284,
-            285,
-            286,
-            287
-          ],
-          "source": "episode",
-          "score": 0.02540245163195983,
-          "cosine_sim": 0.2914734184741974,
           "keyword_match": true
         }
       ]
@@ -1302,34 +1568,67 @@
         "expected_answer": "README.md, requirements.txt, Agent_Context.md, query_taxonomy.json, and Settings."
       },
       "execution": {
-        "search_time_ms": 35.250186920166016,
-        "generate_time_ms": 12.556791305541992,
-        "total_time_ms": 48.06399345397949,
+        "search_time_ms": 40.335655212402344,
+        "generate_time_ms": 14232.640266418457,
+        "total_time_ms": 14273.181915283203,
         "retrieved_count": 10,
         "retrieved_ids": [
-          29602,
+          31062,
+          30814,
+          32030,
           28519,
-          28343,
-          29618,
-          28439
+          28343
         ],
         "distinct_episodes": 5,
-        "context_chars": 4835,
+        "context_chars": 4420,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 512,
+          "eval_duration": 8611640000,
+          "prompt_eval_duration": 32601999,
+          "prompt_eval_count": 3171,
+          "total_duration": 8662929300,
+          "load_duration": 3452500,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.4444,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 02:11, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE' [E29602]. At 22:18, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Antigravity Settings' [E28343].",
+      "answer": "One possible file is mentioned in [E28343], where the user is working on \"exp \\inteenProject\" and \"De) 000 exp @am Models & Usage RC\". Another possible file is mentioned in [E28519], where the user is working on \"Empirical Findings (Validating the Core Thesis)\" and \"Antigiavity IDE Ocqummmho\". In [E32030], the user is working on \"tim amexsimaibo gran\" and \"keyboard ec Cesabke Ravbae\", which could be a file name or a section of a file. In [E32034], the user is working on \"tim amexstmai gin\" and \"Gi Oeng\", which could be a file name or a section of a file. [Partially verified from context]",
       "sources": [
         {
-          "id": 29602,
-          "episode_id": 29602,
+          "id": 31062,
+          "episode_id": 31062,
+          "timestamp": "2026-11-24T02:48:20.809084",
+          "start_time": "2026-11-24T02:48:20.809084",
+          "end_time": "2026-11-24T02:48:20.809084",
+          "process_name": "Antigravity IDE.exe",
+          "dominant_title": "Major Project - Antigravity IDE",
+          "window_title": "Major Project - Antigravity IDE",
+          "capture_count": 1,
+          "text_content": "A O@ eM citim tp \u00a9 an tut) mp Pierrot pay CO0OS16 - \u00a9 &\n@4a 8o@ ot =\nPrrctest ancy ALD\n@ thes CC 214\" \u00b0 &\nColca saat ta @er>\nSn ei cite atis S\u00a9amazp &\na \u00a5en oS@eaa\nre | 1 Gcemengmmommsl \u00a9\nYO around tasth @\nHow to Re-Flash and Verify, seep\nantigravity IDE S@amm \u00ae\ncea\nemia Qos Gry) d@aatp e\nSea\nSoc\u00bb\nCg @\nOeaumemyagemn\ni) oo Ocmamm\n\u2014 amma\n\u2018 q & cate\nte an Ga (a) ao Gm Gam MG\u00b0I100)] Cam\na SA AMAA oe a) SGUEEIETD\nChak _ SOCEIIIED\n| Open ED \u00a9 (Gast) |\nfnew er)\nORrrtrtaim\nCOO ax\n[Ask anythin @ 10 mentonn/ foe achor]\no exam pax\n| | | Dy Tamadine |\nBy 20 on OCA DK cape Ge Oki da CatemicD",
+          "representative_text": "A O@ eM citim tp \u00a9 an tut) mp Pierrot pay CO0OS16 - \u00a9 &\n@4a 8o@ ot =\nPrrctest ancy ALD\n@ thes CC 214\" \u00b0 &\nColca saat ta @er>\nSn ei cite atis S\u00a9amazp &\na \u00a5en oS@eaa\nre | 1 Gcemengmmommsl \u00a9\nYO around tasth @\nHow to Re-Flash and Verify, seep\nantigravity IDE S@amm \u00ae\ncea\nemia Qos Gry) d@aatp e\nSea\nSoc\u00bb\nCg @\nOeaumemyagemn\ni) oo Ocmamm\n\u2014 amma\n\u2018 q & cate\nte an Ga (a) ao Gm Gam MG\u00b0I100)] Cam\na SA AMAA oe a) SGUEEIETD\nChak _ SOCEIIIED\n| Open ED \u00a9 (Gast) |\nfnew er)\nORrrtrtaim\nCOO ax\n[Ask anythin @ 10 mentonn/ foe achor]\no exam pax\n| | | Dy Tamadine |\nBy 20 on OCA DK cape Ge Oki da CatemicD",
+          "representative_capture_id": 1794,
+          "capture_ids": [
+            1794
+          ],
+          "source": "episode",
+          "score": 0.03229166666666666,
+          "cosine_sim": 0.4847728908061981,
+          "keyword_match": true
+        },
+        {
+          "id": 30814,
+          "episode_id": 30814,
           "timestamp": "2026-11-24T02:11:32.113373",
           "start_time": "2026-11-24T02:11:32.113373",
           "end_time": "2026-11-24T02:11:32.113373",
@@ -1344,8 +1643,29 @@
             1500
           ],
           "source": "episode",
-          "score": 0.030309988518943745,
+          "score": 0.02749719416386083,
           "cosine_sim": 0.48203152418136597,
+          "keyword_match": true
+        },
+        {
+          "id": 32030,
+          "episode_id": 32030,
+          "timestamp": "2026-11-25T23:27:22.161890",
+          "start_time": "2026-11-25T23:27:22.161890",
+          "end_time": "2026-11-25T23:27:22.161890",
+          "process_name": "Antigravity IDE.exe",
+          "dominant_title": "InternProject - Antigravity IDE",
+          "window_title": "InternProject - Antigravity IDE",
+          "capture_count": 1,
+          "text_content": "& @\u00ae @@ cit ta & Gp tu) mp [interaProject  Antizyavity IDE} BCOOOL1\u00ae - \u00a9 8\nGot \u00a9 % ext TRoisnc catest son @ (cy\ng STAI WPATEN TT Yoantrontrxtepalnttoyy i)\ntim amexsimaibo gran) BOO ap\nkeyboard ec Cesabke Ravbae (ONTO (Walch PRET\nCine aietaw? Paina? &\nET RALOMAOCIO eg ID [reach coed Or snmasted pert evoRs) @\n[lignesDark tocyie Patton \u2018enywtiere, it Olimar untied table the harness\neborts, with no template fellbac k during evel,\nCo Ucn paascriptiagre ea Key CSS vsti) 8\n[rare Qtecte lig ererinereregeand Ratdy CenEEMEEAT\nCHRD CPCI \u00ae\n[verification] Grebo Antigravity IDE 8\nSISAL OES EROINE Ww RILURARY a A) wee )\n0 CAN EEO CL \u00b0 [te wer Art) Gro)\nThat 1G AREY (Olour varubtesor hand coded (S5\u00a2 Olours Drusn che px Ege rranagers tay Ole a CB bec we)\nreman (any the pire paint srpTs bel hex may wid Looe) Qnexncrmtod f :\n[oPiavascript synta [ogre neemtedd coon ath)\nCIMAPAD aA [F.Tattow test Olisma connection with bypass sandbox?\nfol Ftask API & Asset Routes Ren pythony auaittest] python dk iapastyurl",
+          "representative_text": "& @\u00ae @@ cit ta & Gp tu) mp [interaProject  Antizyavity IDE} BCOOOL1\u00ae - \u00a9 8\nGot \u00a9 % ext TRoisnc catest son @ (cy\ng STAI WPATEN TT Yoantrontrxtepalnttoyy i)\ntim amexsimaibo gran) BOO ap\nkeyboard ec Cesabke Ravbae (ONTO (Walch PRET\nCine aietaw? Paina? &\nET RALOMAOCIO eg ID [reach coed Or snmasted pert evoRs) @\n[lignesDark tocyie Patton \u2018enywtiere, it Olimar untied table the harness\neborts, with no template fellbac k during evel,\nCo Ucn paascriptiagre ea Key CSS vsti) 8\n[rare Qtecte lig ererinereregeand Ratdy CenEEMEEAT\nCHRD CPCI \u00ae\n[verification] Grebo Antigravity IDE 8\nSISAL OES EROINE Ww RILURARY a A) wee )\n0 CAN EEO CL \u00b0 [te wer Art) Gro)\nThat 1G AREY (Olour varubtesor hand coded (S5\u00a2 Olours Drusn che px Ege rranagers tay Ole a CB bec we)\nreman (any the pire paint srpTs bel hex may wid Looe) Qnexncrmtod f :\n[oPiavascript synta [ogre neemtedd coon ath)\nCIMAPAD aA [F.Tattow test Olisma connection with bypass sandbox?\nfol Ftask API & Asset Routes Ren pythony auaittest] python dk iapastyurl",
+          "representative_capture_id": 3382,
+          "capture_ids": [
+            3382
+          ],
+          "source": "episode",
+          "score": 0.027118043247075507,
+          "cosine_sim": 0.37330520153045654,
           "keyword_match": true
         },
         {
@@ -1365,7 +1685,7 @@
             363
           ],
           "source": "episode",
-          "score": 0.029857397504456328,
+          "score": 0.026397515527950312,
           "cosine_sim": 0.4551968276500702,
           "keyword_match": true
         },
@@ -1386,50 +1706,8 @@
             154
           ],
           "source": "episode",
-          "score": 0.027655677655677655,
+          "score": 0.025827404887101765,
           "cosine_sim": 0.33932971954345703,
-          "keyword_match": true
-        },
-        {
-          "id": 29618,
-          "episode_id": 29618,
-          "timestamp": "2026-11-24T02:13:37.303537",
-          "start_time": "2026-11-24T02:13:37.303537",
-          "end_time": "2026-11-24T02:13:37.303537",
-          "process_name": "Antigravity IDE.exe",
-          "dominant_title": "InternProject - Antigravity IDE",
-          "window_title": "InternProject - Antigravity IDE",
-          "capture_count": 1,
-          "text_content": "Q& @ GQ Ciuts ti E> Aw tue) op [iternbrojecte Antiyavity 10] COOOLS1@ - \u00a9 &\n@8 eum 8co@ op \u00a9\nEMG, InterniProjecl 2\nCod tories toma aves (ony rekias ay) ty ewe am ed S@aqxts\nexit CBee O\n- Saat,\n\u201c4 Structured Aggregate Operators & Octerministic Retusals ( \u00ae intelligence/rag.py): ry\n0 COA ED Soamm &\n\u00b0 e ED @\nem\n\u00b0\nlemon 18\n\u00a9 in Pee CECE CLINT OC Veni\nSOazb\n0 Cimmitthrttngmtincitciinanin eae Oqssem &\nOcmEaeD 16)\nGhityGireipentaimigmms om@mn)\n\u2018o*Config & Ablation Flags (% config. py) antigravity IDE > Ocamin e\n0 MOGI CYP GY | oan x)\nCHOPPED. Da aie GEL enc Gr@) S@cmm=p\nCiti pa Seas\na DOazm,\nBP neh py,\n2 [Unit Tests ( tests/test temporal oN etm)\nDea\n00\u00b0 ahyaimrammamarnap oSae\n020 cain amma Oammp\nSame cnaiy aii cin Ogiu=p\nOene Qu aimga mea | edema)\nBove engi MME am eiyex> (t)= Qatar Go 08 10) 8 sap\nEDD OGmRaTaiio\nOme dp citar ALD mento ep Carats cep (Deis com LID a OO) apa ODD\n3 Peer Agent Context md GounteenProertambeen contest pecan Agent (anlest.md 4 (ppd) Pune ibza traced OdizsyO ttre Jf I",
-          "representative_text": "Q& @ GQ Ciuts ti E> Aw tue) op [iternbrojecte Antiyavity 10] COOOLS1@ - \u00a9 &\n@8 eum 8co@ op \u00a9\nEMG, InterniProjecl 2\nCod tories toma aves (ony rekias ay) ty ewe am ed S@aqxts\nexit CBee O\n- Saat,\n\u201c4 Structured Aggregate Operators & Octerministic Retusals ( \u00ae intelligence/rag.py): ry\n0 COA ED Soamm &\n\u00b0 e ED @\nem\n\u00b0\nlemon 18\n\u00a9 in Pee CECE CLINT OC Veni\nSOazb\n0 Cimmitthrttngmtincitciinanin eae Oqssem &\nOcmEaeD 16)\nGhityGireipentaimigmms om@mn)\n\u2018o*Config & Ablation Flags (% config. py) antigravity IDE > Ocamin e\n0 MOGI CYP GY | oan x)\nCHOPPED. Da aie GEL enc Gr@) S@cmm=p\nCiti pa Seas\na DOazm,\nBP neh py,\n2 [Unit Tests ( tests/test temporal oN etm)\nDea\n00\u00b0 ahyaimrammamarnap oSae\n020 cain amma Oammp\nSame cnaiy aii cin Ogiu=p\nOene Qu aimga mea | edema)\nBove engi MME am eiyex> (t)= Qatar Go 08 10) 8 sap\nEDD OGmRaTaiio\nOme dp citar ALD mento ep Carats cep (Deis com LID a OO) apa ODD\n3 Peer Agent Context md GounteenProertambeen contest pecan Agent (anlest.md 4 (ppd) Pune ibza traced OdizsyO ttre Jf I",
-          "representative_capture_id": 1522,
-          "capture_ids": [
-            1522
-          ],
-          "source": "episode",
-          "score": 0.027031963470319637,
-          "cosine_sim": 0.4358731210231781,
-          "keyword_match": true
-        },
-        {
-          "id": 28439,
-          "episode_id": 28439,
-          "timestamp": "2026-11-23T23:03:28.591972",
-          "start_time": "2026-11-23T23:03:28.591972",
-          "end_time": "2026-11-23T23:03:28.591972",
-          "process_name": "Antigravity IDE.exe",
-          "dominant_title": "InternProject - Antigravity IDE",
-          "window_title": "InternProject - Antigravity IDE",
-          "capture_count": 1,
-          "text_content": "A @ AD Sito to @ to tui) op [itescrroseenAneigavty 104) GOOGM1@ - \u00a9 &\nGs = em \u00a9\n: q mI BEOO\n) Ma OmniGontext/Baseline)Evaluation)Results} .eamy &\n\u2014\u2014__ V@atieammam O\n(oY Run Tag: Gavel ian) POwtite\n(eh Timestamp: ([REDACTED_CREDIT_CARD]) > \u00a9cgimp \u00ae\nPoy Database Shapshot [X1) Iareacigu inet lash leat Contest ongiar\\data\\cont at7an) ASKED\n[Joueries evatustec 74] \u00a9 can @\nfo] Evaluation Metric Top-K: 5 W) cma\nOamama \u00ae@\nSi Tab! @ a=) RAS) GAD \u00b0\nsummarygrable per,Category) le per.Category, DGD \u00b0 8\nOCEhyEisO\ns Temporal] [Grounding] [Refusal] OC@=iIna=mo\n[Category ME Queries]\na 6 fon] a 3 i] Sacemamee\u00ae |G\n@ [way LPoory a Locoxy Antigravity, IDE Oquemz==rp [\u00a9\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014 ;\nom 6 Cay 3 [iorox] Ou \u00a9\n6  \u2014  \u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014 even)\ncipED 6 a a ence \u2018eo nia > Oca\nx > Gent\n[Overall] 124) \u00a312.3%) $10.8%) 0.07%) 75.0% \u2014\u2014\nGan\nDetailed Query, Breakdown) Query, Breakdown > Oca\nPOuz\ntp [Rotursa] Oa\n\u00a9 ey ay Co SS Gxtp 5 Cam Samp\n\u2014\u2014\u2014\u2014\u2014 O\u00a2guap\n@Ogmyinnan 0\n| TBE tempore \u20180.0% 0.0%\" \u20180.0% 100.0%. No + Oat\ncD",
-          "representative_text": "A @ AD Sito to @ to tui) op [itescrroseenAneigavty 104) GOOGM1@ - \u00a9 &\nGs = em \u00a9\n: q mI BEOO\n) Ma OmniGontext/Baseline)Evaluation)Results} .eamy &\n\u2014\u2014__ V@atieammam O\n(oY Run Tag: Gavel ian) POwtite\n(eh Timestamp: ([REDACTED_CREDIT_CARD]) > \u00a9cgimp \u00ae\nPoy Database Shapshot [X1) Iareacigu inet lash leat Contest ongiar\\data\\cont at7an) ASKED\n[Joueries evatustec 74] \u00a9 can @\nfo] Evaluation Metric Top-K: 5 W) cma\nOamama \u00ae@\nSi Tab! @ a=) RAS) GAD \u00b0\nsummarygrable per,Category) le per.Category, DGD \u00b0 8\nOCEhyEisO\ns Temporal] [Grounding] [Refusal] OC@=iIna=mo\n[Category ME Queries]\na 6 fon] a 3 i] Sacemamee\u00ae |G\n@ [way LPoory a Locoxy Antigravity, IDE Oquemz==rp [\u00a9\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014 ;\nom 6 Cay 3 [iorox] Ou \u00a9\n6  \u2014  \u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014 even)\ncipED 6 a a ence \u2018eo nia > Oca\nx > Gent\n[Overall] 124) \u00a312.3%) $10.8%) 0.07%) 75.0% \u2014\u2014\nGan\nDetailed Query, Breakdown) Query, Breakdown > Oca\nPOuz\ntp [Rotursa] Oa\n\u00a9 ey ay Co SS Gxtp 5 Cam Samp\n\u2014\u2014\u2014\u2014\u2014 O\u00a2guap\n@Ogmyinnan 0\n| TBE tempore \u20180.0% 0.0%\" \u20180.0% 100.0%. No + Oat\ncD",
-          "representative_capture_id": 263,
-          "capture_ids": [
-            263
-          ],
-          "source": "episode",
-          "score": 0.026151315789473682,
-          "cosine_sim": 0.30974239110946655,
           "keyword_match": true
         }
       ]
@@ -1455,34 +1733,46 @@
         "expected_answer": "Claude AI, Google Search (Annotate), WhatsApp Web, and Ambient Context Engine."
       },
       "execution": {
-        "search_time_ms": 33.660888671875,
-        "generate_time_ms": 3.8809776306152344,
-        "total_time_ms": 37.77599334716797,
+        "search_time_ms": 46.770572662353516,
+        "generate_time_ms": 4317.623138427734,
+        "total_time_ms": 4364.6087646484375,
         "retrieved_count": 10,
         "retrieved_ids": [
-          29391,
+          30603,
           28490,
-          29587,
-          29215,
-          29590
+          31228,
+          28489,
+          30258
         ],
         "distinct_episodes": 5,
-        "context_chars": 591,
+        "context_chars": 725,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 242,
+          "eval_duration": 3731639000,
+          "prompt_eval_duration": 394306000,
+          "prompt_eval_count": 1267,
+          "total_duration": 4312929000,
+          "load_duration": 7757200,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.9375,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 01:52, you were working in chrome.exe on 'WhatsApp call - Google Chrome' [E29391]. At 23:19, you were working in chrome.exe on 'New tab - Google Chrome' [E28490].",
+      "answer": "Based on the captured context, it appears that the user was visiting various websites on Google Chrome, including:\n\n* Google Search ([E28490] and [E28489])\n* Google Translate ([E28489])\n* Google Ads ([E28490] and [E28489])\n* Google Analytics ([E28490] and [E28489])\n* Google Adsense ([E28490] and [E28489])\n* Google AI Studio ([E28490])\n* Google AI Mode ([E28490])\n* Google Antigravity ([E28490])\n* Google Colab ([E28489])\n* Google Meet ([E28489])\n* Google Flow ([E28490])\n* Google Gemini ([E28490])\n* Google Colab ([E28489])\n* Google Search ([E28490] and [E28489])\n\nAdditionally, the user was also visiting WhatsApp ([E30603], [E31228], [E28490], [E28489], [E30258], [E30427], [E30799], [E30808], and [E31224]) and a website with the title \"Campa 3\" ([E28490]).",
       "sources": [
         {
-          "id": 29391,
-          "episode_id": 29391,
+          "id": 30603,
+          "episode_id": 30603,
           "timestamp": "2026-11-24T01:52:10.253441",
           "start_time": "2026-11-24T01:52:10.253441",
           "end_time": "2026-11-24T01:52:10.253441",
@@ -1497,7 +1787,7 @@
             1285
           ],
           "source": "episode",
-          "score": 0.026742581090407176,
+          "score": 0.02792120864410021,
           "cosine_sim": 0.47084298729896545,
           "keyword_match": true
         },
@@ -1518,71 +1808,71 @@
             333
           ],
           "source": "episode",
-          "score": 0.02459016393442623,
+          "score": 0.024259113558877526,
           "cosine_sim": 0.3147364556789398,
           "keyword_match": true
         },
         {
-          "id": 29587,
-          "episode_id": 29587,
-          "timestamp": "2026-11-24T02:09:16.884313",
-          "start_time": "2026-11-24T02:09:16.884313",
-          "end_time": "2026-11-24T02:09:16.884313",
+          "id": 31228,
+          "episode_id": 31228,
+          "timestamp": "2026-11-24T03:06:22.579358",
+          "start_time": "2026-11-24T03:06:22.579358",
+          "end_time": "2026-11-24T03:06:22.579358",
           "process_name": "chrome.exe",
           "dominant_title": "WhatsApp call - Google Chrome",
           "window_title": "WhatsApp call - Google Chrome",
           "capture_count": 1,
-          "text_content": "[\u00a9 wrscton cat cooge nome) Googie Chrome, e @ 8\n(ETRINN\nvon\nBe Oe @",
-          "representative_text": "[\u00a9 wrscton cat cooge nome) Googie Chrome, e @ 8\n(ETRINN\nvon\nBe Oe @",
-          "representative_capture_id": 1483,
+          "text_content": "\u00a9) viratsipn im S Google Creome) oe (@)\nBe Qe - | a &",
+          "representative_text": "\u00a9) viratsipn im S Google Creome) oe (@)\nBe Qe - | a &",
+          "representative_capture_id": 1971,
           "capture_ids": [
-            1483
+            1971
           ],
           "source": "episode",
-          "score": 0.02347781217750258,
-          "cosine_sim": 0.4482092261314392,
+          "score": 0.02280163599182004,
+          "cosine_sim": 0.2194826900959015,
           "keyword_match": true
         },
         {
-          "id": 29215,
-          "episode_id": 29215,
-          "timestamp": "2026-11-24T01:36:13.813949",
-          "start_time": "2026-11-24T01:36:13.813949",
-          "end_time": "2026-11-24T01:36:13.813949",
+          "id": 28489,
+          "episode_id": 28489,
+          "timestamp": "2026-11-23T23:19:05.107009",
+          "start_time": "2026-11-23T23:19:05.107009",
+          "end_time": "2026-11-23T23:19:05.107009",
           "process_name": "chrome.exe",
-          "dominant_title": "WhatsApp call - Google Chrome",
-          "window_title": "WhatsApp call - Google Chrome",
+          "dominant_title": "New tab - Google Chrome",
+          "window_title": "New tab - Google Chrome",
           "capture_count": 1,
-          "text_content": "[\u00a9 wrscton cat cooge nome) Gaver Chrome e @ 8\n@aummepmp\nLt * . ew\nOe Oe @",
-          "representative_text": "[\u00a9 wrscton cat cooge nome) Gaver Chrome e @ 8\n@aummepmp\nLt * . ew\nOe Oe @",
-          "representative_capture_id": 1107,
+          "text_content": "(\u00a9) Ccxmpemene 5 (Ome B\\o (Ceexs)] \u00ab @ 8\ne\u00a296@ VOies\nB) Gomemem Claumpane Goriztum Cammmitn Dimi Ha Camitemtm PROM + Stn \u00ae\nry\nGeogle\nQ_ google - Google Search )\nQ_ google translate\nQ goo\nQ_ google flow\nQ_ google gemini\nQ_ google colab\nQ google meet 1\nZA customise ome)\n0 apaclo cha v",
+          "representative_text": "(\u00a9) Ccxmpemene 5 (Ome B\\o (Ceexs)] \u00ab @ 8\ne\u00a296@ VOies\nB) Gomemem Claumpane Goriztum Cammmitn Dimi Ha Camitemtm PROM + Stn \u00ae\nry\nGeogle\nQ_ google - Google Search )\nQ_ google translate\nQ goo\nQ_ google flow\nQ_ google gemini\nQ_ google colab\nQ google meet 1\nZA customise ome)\n0 apaclo cha v",
+          "representative_capture_id": 332,
           "capture_ids": [
-            1107
+            332
           ],
           "source": "episode",
-          "score": 0.02293175334649989,
-          "cosine_sim": 0.4716401994228363,
+          "score": 0.020877747555686246,
+          "cosine_sim": 0.14014580845832825,
           "keyword_match": true
         },
         {
-          "id": 29590,
-          "episode_id": 29590,
-          "timestamp": "2026-11-24T02:09:31.912673",
-          "start_time": "2026-11-24T02:09:31.912673",
-          "end_time": "2026-11-24T02:09:31.912673",
+          "id": 30258,
+          "episode_id": 30258,
+          "timestamp": "2026-11-24T01:20:57.257807",
+          "start_time": "2026-11-24T01:20:57.257807",
+          "end_time": "2026-11-24T01:20:57.257807",
           "process_name": "chrome.exe",
           "dominant_title": "WhatsApp call - Google Chrome",
           "window_title": "WhatsApp call - Google Chrome",
           "capture_count": 1,
-          "text_content": "[\u00a9 wrscton cat cooge nome) Gaver Chrome e @ 8\n@aummepmp\nFAD \u201cA :\nGe Oe @",
-          "representative_text": "[\u00a9 wrscton cat cooge nome) Gaver Chrome e @ 8\n@aummepmp\nFAD \u201cA :\nGe Oe @",
-          "representative_capture_id": 1486,
+          "text_content": "Boe Gl-) &",
+          "representative_text": "Boe Gl-) &",
+          "representative_capture_id": 937,
           "capture_ids": [
-            1486
+            937
           ],
           "source": "episode",
-          "score": 0.021682129891085117,
-          "cosine_sim": 0.44864851236343384,
+          "score": 0.020319835680751172,
+          "cosine_sim": 0.14402994513511658,
           "keyword_match": true
         }
       ]
@@ -1606,9 +1896,9 @@
         "expected_answer": "Captures 103-110 in Antigravity IDE viewing query_taxonomy.json."
       },
       "execution": {
-        "search_time_ms": 34.13081169128418,
-        "generate_time_ms": 3.878355026245117,
-        "total_time_ms": 38.285017013549805,
+        "search_time_ms": 46.92792892456055,
+        "generate_time_ms": 4687.6220703125,
+        "total_time_ms": 4734.780788421631,
         "retrieved_count": 10,
         "retrieved_ids": [
           28332,
@@ -1620,16 +1910,28 @@
         "distinct_episodes": 5,
         "context_chars": 4097,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 194,
+          "eval_duration": 3295811000,
+          "prompt_eval_duration": 1276165000,
+          "prompt_eval_count": 3451,
+          "total_duration": 4679787300,
+          "load_duration": 5040000,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.6667,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 22:05, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Antigravity Settings' [E28332].",
+      "answer": "Based on the captured context, it appears that the user was looking at `query_taxonomy.json` in the Antigravity IDE, specifically in the `Gemini Modets O)` context. The user also mentioned `query_taxonomy.json` in the context of `Bund trokabon/aaenat py, (onthe Toren DB SRR sp eee Oars (u)` [E28315] and `Bund trokabon/aaenat py, (onthe Toren DB SRR ST T_W]\u2014TWY-NNW HH S@cmm` [E28323].\n\nAdditionally, the user mentioned `query_taxonomy.json` in the context of `I lquery taxonomy json pa [Gemin) Modets O) S@extp &` [E28323] and `I lquery taxonomy json [Gemin) Modets O) S@extp &` [E28326].",
       "sources": [
         {
           "id": 28332,
@@ -1669,7 +1971,7 @@
             113
           ],
           "source": "episode",
-          "score": 0.029166666666666667,
+          "score": 0.02886178861788618,
           "cosine_sim": 0.37419554591178894,
           "keyword_match": true
         },
@@ -1690,7 +1992,7 @@
             112
           ],
           "source": "episode",
-          "score": 0.029051670471052088,
+          "score": 0.0287391216352965,
           "cosine_sim": 0.3152303099632263,
           "keyword_match": true
         },
@@ -1711,7 +2013,7 @@
             137
           ],
           "source": "episode",
-          "score": 0.02877846790890269,
+          "score": 0.028577260665441927,
           "cosine_sim": 0.22129718959331512,
           "keyword_match": true
         },
@@ -1733,7 +2035,7 @@
             124
           ],
           "source": "episode",
-          "score": 0.02821869488536155,
+          "score": 0.02792120864410021,
           "cosine_sim": 0.28202295303344727,
           "keyword_match": true
         }
@@ -1788,9 +2090,9 @@
         "expected_answer": "Agent_Context.md and Preview Agent_Context.md in Antigravity IDE."
       },
       "execution": {
-        "search_time_ms": 17.473459243774414,
-        "generate_time_ms": 3.9942264556884766,
-        "total_time_ms": 21.88873291015625,
+        "search_time_ms": 10.80179214477539,
+        "generate_time_ms": 2716.8052196502686,
+        "total_time_ms": 2729.2492389678955,
         "retrieved_count": 10,
         "retrieved_ids": [
           28256,
@@ -1802,16 +2104,28 @@
         "distinct_episodes": 5,
         "context_chars": 4789,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 40,
+          "eval_duration": 657485000,
+          "prompt_eval_duration": 32973000,
+          "prompt_eval_count": 3189,
+          "total_duration": 712435500,
+          "load_duration": 4557500,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 0.6,
-        "grounding_rate": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
+        "grounding_rate": 0.0,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 21:48, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Agent_Context.md' [E28256]. At 21:51, you were working in chrome.exe on 'WhatsApp - Google Chrome' [E28276]. At 22:01, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Antigravity Settings' [E28322]. At 21:55, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Preview Agent_Context.md' [E28289].",
+      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
       "sources": [
         {
           "id": 28256,
@@ -1950,9 +2264,9 @@
         "expected_answer": "OmniContext Claude chat in Google Chrome."
       },
       "execution": {
-        "search_time_ms": 28.445720672607422,
-        "generate_time_ms": 3.5393238067626953,
-        "total_time_ms": 32.436370849609375,
+        "search_time_ms": 22.815704345703125,
+        "generate_time_ms": 4270.053863525391,
+        "total_time_ms": 4293.346166610718,
         "retrieved_count": 10,
         "retrieved_ids": [
           28274,
@@ -1964,16 +2278,28 @@
         "distinct_episodes": 5,
         "context_chars": 2460,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 78,
+          "eval_duration": 1310161000,
+          "prompt_eval_duration": 32451000,
+          "prompt_eval_count": 3298,
+          "total_duration": 1361229200,
+          "load_duration": 3781100,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 0.5,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.1667,
+        "grounding_rate": 0.0,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 21:51, you were working in chrome.exe on 'WhatsApp - Google Chrome' [E28274]. At 21:43, you were working in chrome.exe on 'Annotate - Google Search - Google Chrome' [E28239].",
+      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
       "sources": [
         {
           "id": 28274,
@@ -2101,9 +2427,9 @@
         "expected_answer": "Annotate Google Search in Chrome."
       },
       "execution": {
-        "search_time_ms": 21.490812301635742,
-        "generate_time_ms": 3.7736892700195312,
-        "total_time_ms": 25.686264038085938,
+        "search_time_ms": 18.753528594970703,
+        "generate_time_ms": 2731.691598892212,
+        "total_time_ms": 2750.812292098999,
         "retrieved_count": 10,
         "retrieved_ids": [
           28283,
@@ -2115,16 +2441,28 @@
         "distinct_episodes": 5,
         "context_chars": 5000,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 49,
+          "eval_duration": 799591000,
+          "prompt_eval_duration": 32601000,
+          "prompt_eval_count": 2951,
+          "total_duration": 851088500,
+          "load_duration": 3409600,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 0.2,
         "precision_at_k": 0.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.125,
+        "grounding_rate": 0.0,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 21:54, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Preview Agent_Context.md' [E28283]. At 21:48, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Agent_Context.md' [E28260]. At 21:46, you were working in chrome.exe on 'OmniContext - Claude - Google Chrome' [E28243].",
+      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
       "sources": [
         {
           "id": 28283,
@@ -2253,9 +2591,9 @@
         "expected_answer": "requirements.txt in Antigravity IDE."
       },
       "execution": {
-        "search_time_ms": 25.88939666748047,
-        "generate_time_ms": 3.6292076110839844,
-        "total_time_ms": 29.98828887939453,
+        "search_time_ms": 12.0849609375,
+        "generate_time_ms": 4993.175268173218,
+        "total_time_ms": 5005.6610107421875,
         "retrieved_count": 8,
         "retrieved_ids": [
           28234,
@@ -2266,17 +2604,29 @@
         ],
         "distinct_episodes": 5,
         "context_chars": 4180,
-        "is_refusal": false,
-        "refusal_reason": null
+        "is_refusal": true,
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 216,
+          "eval_duration": 3627956000,
+          "prompt_eval_duration": 1108487000,
+          "prompt_eval_count": 3055,
+          "total_duration": 4986272800,
+          "load_duration": 4688600,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 0.4,
-        "grounding_rate": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
+        "grounding_rate": 0.6667,
         "correctly_refused": null,
-        "falsely_refused": false
+        "falsely_refused": true
       },
-      "answer": "At 21:42, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - requirements.txt' [E28234]. At 21:43, you were working in chrome.exe on 'Annotate - Google Search - Google Chrome' [E28238]. At 21:42, you were working in chrome.exe on 'OmniContext - Claude - Google Chrome' [E28236].",
+      "answer": "Based on the captured context, I do not have sufficient information to answer the user's question accurately. The provided timestamps do not match the timestamps of the captured activities, which are:\n\n* [E28234] 2026-11-23T21:42:30.893347\n* [E28233] 2026-11-23T21:42:10.878095\n* [E28236] 2026-11-23T21:42:55.927327\n* [E28235] 2026-11-23T21:42:35.907980\n* [E28239] 2026-11-23T21:43:20.987807\n* [E28237] 2026-11-23T21:43:10.972386\n\nThese timestamps do not include the 9:42 PM to 9:45 PM time frame, and therefore, I cannot determine which file was open in Antigravity IDE during that specific time period.",
       "sources": [
         {
           "id": 28234,
@@ -2410,9 +2760,9 @@
         "expected_answer": "Yes, active on WhatsApp in Google Chrome from 21:50:56 to 21:51:26."
       },
       "execution": {
-        "search_time_ms": 28.74016761779785,
-        "generate_time_ms": 3.416776657104492,
-        "total_time_ms": 32.58395195007324,
+        "search_time_ms": 14.69731330871582,
+        "generate_time_ms": 4768.779516220093,
+        "total_time_ms": 4783.920764923096,
         "retrieved_count": 10,
         "retrieved_ids": [
           28275,
@@ -2424,16 +2774,28 @@
         "distinct_episodes": 5,
         "context_chars": 3043,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 83,
+          "eval_duration": 1374743000,
+          "prompt_eval_duration": 32845000,
+          "prompt_eval_count": 3237,
+          "total_duration": 1427322500,
+          "load_duration": 4777700,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 0.4,
         "precision_at_k": 0.8,
-        "grounding_rate": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
+        "grounding_rate": 0.3333,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 21:51, you were working in chrome.exe on 'WhatsApp - Google Chrome' [E28275].",
+      "answer": "This is evident from the timestamp of the captured activity, which is [E28275] \ud83d\udce6 Episode 28275 [2026-11-23T21:51:11.736086 to 2026-11-23T21:51:11.736086] App: chrome.exe | Title: WhatsApp - Google Chrome (1 captures]. [Partially verified from context]",
       "sources": [
         {
           "id": 28275,
@@ -2584,9 +2946,9 @@
         "expected_answer": "Viewing and editing Agent_Context.md and previewing markdown in Antigravity IDE."
       },
       "execution": {
-        "search_time_ms": 19.890308380126953,
-        "generate_time_ms": 3.273487091064453,
-        "total_time_ms": 23.637056350708008,
+        "search_time_ms": 13.291120529174805,
+        "generate_time_ms": 5505.136966705322,
+        "total_time_ms": 5518.887281417847,
         "retrieved_count": 10,
         "retrieved_ids": [
           28290,
@@ -2598,16 +2960,28 @@
         "distinct_episodes": 5,
         "context_chars": 5000,
         "is_refusal": false,
-        "refusal_reason": null
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 50,
+          "eval_duration": 808282000,
+          "prompt_eval_duration": 32402000,
+          "prompt_eval_count": 2933,
+          "total_duration": 859642600,
+          "load_duration": 4421300,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 1.0,
-        "grounding_rate": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
+        "grounding_rate": 0.4444,
         "correctly_refused": null,
         "falsely_refused": false
       },
-      "answer": "At 21:55, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Agent_Context.md' [E28290]. At 21:55, you were working in Antigravity IDE.exe on 'InternProject - Antigravity IDE - Preview Agent_Context.md' [E28289].",
+      "answer": "* Reviewing and editing the document to ensure that the context was correctly understood [E28289] * Discussing design trade-offs and taxonomy for the coding agent [E28291] * Reviewing the document to ensure that the context was correctly understood and that the taxonomy was accurate [E28288] * Reviewing the document to ensure that the context was correctly understood and that the taxonomy was accurate [E28286] [Partially verified from context]",
       "sources": [
         {
           "id": 28290,
@@ -2728,25 +3102,157 @@
         "expected_answer": "Refusal: No audio transcripts captured."
       },
       "execution": {
-        "search_time_ms": 36.64422035217285,
-        "generate_time_ms": 0,
-        "total_time_ms": 37.0173454284668,
-        "retrieved_count": 0,
-        "retrieved_ids": [],
-        "distinct_episodes": 0,
-        "context_chars": 0,
-        "is_refusal": true,
-        "refusal_reason": "modality_unsupported_no_audio"
+        "search_time_ms": 44.84128952026367,
+        "generate_time_ms": 3105.668067932129,
+        "total_time_ms": 3150.8865356445312,
+        "retrieved_count": 10,
+        "retrieved_ids": [
+          28444,
+          28446,
+          28587,
+          28445,
+          30886
+        ],
+        "distinct_episodes": 5,
+        "context_chars": 3801,
+        "is_refusal": false,
+        "refusal_reason": null,
+        "answer_source": "llm",
+        "ollama_stats": {
+          "eval_count": 53,
+          "eval_duration": 864890000,
+          "prompt_eval_duration": 32755000,
+          "prompt_eval_count": 3016,
+          "total_duration": 915235300,
+          "load_duration": 4222800,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
-        "precision_at_k": 1.0,
-        "grounding_rate": 1.0,
-        "correctly_refused": true,
+        "precision_at_k": 0.0,
+        "hit_at_k": 0.0,
+        "mrr": 0.0,
+        "grounding_rate": 0.0,
+        "correctly_refused": false,
         "falsely_refused": null
       },
-      "answer": "I cannot answer that question because no audio transcripts or call recordings were captured for that period. Screen monitoring does not record audio calls.",
-      "sources": []
+      "answer": "Context was retrieved, but claims could not be verified against the citation timestamps.",
+      "sources": [
+        {
+          "id": 28444,
+          "episode_id": 28444,
+          "timestamp": "2026-11-23T23:06:18.847580",
+          "start_time": "2026-11-23T23:06:18.847580",
+          "end_time": "2026-11-23T23:06:33.876699",
+          "process_name": "explorer.exe",
+          "dominant_title": "Untitled",
+          "window_title": "Untitled",
+          "capture_count": 3,
+          "text_content": "(\u00b0) @(@a=m 8 (Gextammans 8)\\ \u00a9 (Gerexss)) - @ 8\n\u00a25 66 @ammmumeanmenmenmm  \u00a9@6@81I@8148\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\nSE\nbaseline*summ,\nrary.\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\neR te eS\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\n[wm Questioning the refusal accuracy and dataset sizefl3spy\no@ \u00a9\u00b00 (\n175C: rat\nOB 08@G8OO600O8HOGOK a]8 F 000 awe",
+          "representative_text": "(\u00b0) @(@a=m 8 (Gextammans 8)\\ \u00a9 (Gerexss)) - @ 8\n\u00a25 66 @ammmumeanmenmenmm  \u00a9@6@81I@8148\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\nSE\nbaseline*summ,\nrary.\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\neR te eS\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\n[wm Questioning the refusal accuracy and dataset sizefl3spy\no@ \u00a9\u00b00 (\n175C: rat\nOB 08@G8OO600O8HOGOK a]8 F 000 awe",
+          "representative_capture_id": 278,
+          "capture_ids": [
+            277,
+            278,
+            279
+          ],
+          "source": "episode",
+          "score": 0.03306010928961749,
+          "cosine_sim": 0.3285590410232544,
+          "keyword_match": true
+        },
+        {
+          "id": 28446,
+          "episode_id": 28446,
+          "timestamp": "2026-11-23T23:06:43.891460",
+          "start_time": "2026-11-23T23:06:43.891460",
+          "end_time": "2026-11-23T23:07:33.968432",
+          "process_name": "chrome.exe",
+          "dominant_title": "OmniContext - Claude - Google Chrome",
+          "window_title": "OmniContext - Claude - Google Chrome",
+          "capture_count": 7,
+          "text_content": "\u00a9) @ (@ump 8 (Ocmam 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 9 OR share)\nSSS\nbaseline*summ,\nrary.)\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\na\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\nfa Reviewing why keyword search misses natural language questions} 33sp4\ne @ \u00a9\u00b00\n[sonnet 5.s] Medium) |",
+          "representative_text": "\u00a9) @ (@ump 8 (Ocmam 8| (Cerexs)] \u00ab @ 8\ne\u00a2\u00a95E664 lauiderai/chaty /DAAAb2 Abd AA? P19 Te IASCDEE \u00a9e)BI@ECBIA 8\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 9 OR share)\nSSS\nbaseline*summ,\nrary.)\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\na\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\nfa Reviewing why keyword search misses natural language questions} 33sp4\ne @ \u00a9\u00b00\n[sonnet 5.s] Medium) |",
+          "representative_capture_id": 282,
+          "capture_ids": [
+            281,
+            282,
+            283,
+            284,
+            285,
+            286,
+            287
+          ],
+          "source": "episode",
+          "score": 0.03200204813108039,
+          "cosine_sim": 0.27795445919036865,
+          "keyword_match": true
+        },
+        {
+          "id": 28587,
+          "episode_id": 28587,
+          "timestamp": "2026-11-23T23:45:27.659588",
+          "start_time": "2026-11-23T23:45:27.659588",
+          "end_time": "2026-11-23T23:45:27.659588",
+          "process_name": "chrome.exe",
+          "dominant_title": "OmniContext - Claude - Google Chrome",
+          "window_title": "OmniContext - Claude - Google Chrome",
+          "capture_count": 1,
+          "text_content": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2$o6@04 Cin denisclaty DAALADABDRd MAA Ben JOTI Ne MOC DEE Ge) BSIegBRISAEB\nBI) @Oeummm Jemma Oooo Oa Gan Hamme Ou Gememe Ocmate ) @arma\nfi] 9 (SD) \u2018OmniContext Tier2 Agent Prompts. MD. Glen \u00bb) &f &\nas .\nChunk 1 Temporal decomposition + time-filtered retricval\nWe are done with baseline evaluation to proceed forthe tier2 problems. Since my, (tag: (Cemporal))\nInternship Evaluation is near.so we'll have to larget larger chunks of the project with Ort \" , fg? \" 9 '\n\u00a2 Sogteerrarmary Nay\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume ale separate the temporal constraint from (ne semantic constraint\nworthy project \u2018before retrieval, then retrieve only inside the time window)\n13(intell igence/tenporal\u2122 PY ap Jae rule-based parser, (regex x small\nhelpers, ng LLM rng heavy. deps): (parse temporal (quecycAsta moony\ndatetime) [o>ytemporalParse) with tields (Starty (end) (Naive local ISO)\nRan a command, read memory, and 3 mo",
+          "representative_text": "(\u00a9) @1@amp 8 (Oca 8| (Cerexs)] \u00ab @ 8\ne\u00a2$o6@04 Cin denisclaty DAALADABDRd MAA Ben JOTI Ne MOC DEE Ge) BSIegBRISAEB\nBI) @Oeummm Jemma Oooo Oa Gan Hamme Ou Gememe Ocmate ) @arma\nfi] 9 (SD) \u2018OmniContext Tier2 Agent Prompts. MD. Glen \u00bb) &f &\nas .\nChunk 1 Temporal decomposition + time-filtered retricval\nWe are done with baseline evaluation to proceed forthe tier2 problems. Since my, (tag: (Cemporal))\nInternship Evaluation is near.so we'll have to larget larger chunks of the project with Ort \" , fg? \" 9 '\n\u00a2 Sogteerrarmary Nay\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume ale separate the temporal constraint from (ne semantic constraint\nworthy project \u2018before retrieval, then retrieve only inside the time window)\n13(intell igence/tenporal\u2122 PY ap Jae rule-based parser, (regex x small\nhelpers, ng LLM rng heavy. deps): (parse temporal (quecycAsta moony\ndatetime) [o>ytemporalParse) with tields (Starty (end) (Naive local ISO)\nRan a command, read memory, and 3 mo",
+          "representative_capture_id": 448,
+          "capture_ids": [
+            448
+          ],
+          "source": "episode",
+          "score": 0.03131881575727918,
+          "cosine_sim": 0.3119755983352661,
+          "keyword_match": true
+        },
+        {
+          "id": 28445,
+          "episode_id": 28445,
+          "timestamp": "2026-11-23T23:06:38.885337",
+          "start_time": "2026-11-23T23:06:38.885337",
+          "end_time": "2026-11-23T23:06:38.885337",
+          "process_name": "explorer.exe",
+          "dominant_title": "Untitled",
+          "window_title": "Untitled",
+          "capture_count": 1,
+          "text_content": "(\u00b0) @(@a=m 8 (Gextammans 8)\\ \u00a9 (Gerexss)) - @ 8\n\u00a25 66 @ammmumeanmenmenmm  \u00a9@6@81I@8148\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\nSE\nbaseline*summ,\nrary.\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\neR te eS\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\nChecking how the keyword search handles natural language queries\u00a523s}>}\no@ \u00a9\u00b00 (\n175C: rat\nOB H@S80OG00O8AOGK [a]8 F 000 aw",
+          "representative_text": "(\u00b0) @(@a=m 8 (Gextammans 8)\\ \u00a9 (Gerexss)) - @ 8\n\u00a25 66 @ammmumeanmenmenmm  \u00a9@6@81I@8148\n8B) @\u00a9auwmmm Jemtoum Oem Oam oan Hammam oom Genmmme Otmmmm, ( \u00aearmm\n0 2 \u00a9 am\nSE\nbaseline*summ,\nrary.\n\u20189? lines)\nWe are done with baseline evaluation to proceed for, the tier2 problems: Since my,\nInternship Evaluation is near so we'll have to target larger chunks of the project with\neR te eS\n\u2018good pace to get a quantifiable and quality work done to showcase a A grade resume,\nworthy project\u2019\nChecking how the keyword search handles natural language queries\u00a523s}>}\no@ \u00a9\u00b00 (\n175C: rat\nOB H@S80OG00O8AOGK [a]8 F 000 aw",
+          "representative_capture_id": 280,
+          "capture_ids": [
+            280
+          ],
+          "source": "episode",
+          "score": 0.028949545078577336,
+          "cosine_sim": 0.2075187861919403,
+          "keyword_match": true
+        },
+        {
+          "id": 30886,
+          "episode_id": 30886,
+          "timestamp": "2026-11-24T02:20:58.027233",
+          "start_time": "2026-11-24T02:20:58.027233",
+          "end_time": "2026-11-24T02:20:58.027233",
+          "process_name": "Antigravity IDE.exe",
+          "dominant_title": "Major Project - Antigravity IDE - esp32_cam_streamer.ino",
+          "window_title": "Major Project - Antigravity IDE - esp32_cam_streamer.ino",
+          "capture_count": 1,
+          "text_content": "A Gb AM Cit tk EG am tie) op BOOOLS1I\u00ae - o &\n(O] @% wan mnegren @ 0 @ (Oumemetmymiens | eq 8] QOCd=] exp om (0)\nosiinannl hatora ite aap 1) Can TD AT Do Canep) 3 CAN Aiwa A \u00b0 rs\nQ ex / is ; i ae EA STO Geran D = N Major Project 2\nWit (ot Car (apr sid aan Elune dg software Wi Gal ompress on gQual il yg Wy predic rigs ompac tga, Ig kB froaes es | A ood \u00b0\nET) GO GF ceo @| lo aaigcirmemminae@Dpalaanmsaamiindi  ke= Seis\nFo enact On i Oe ame @|| fo OF o| SSam=p\nCian 2 9 Cray Citas oaah| SOc &\na . CED WD Cit Gxnids Crm ans GD a (08 aa> fi Hl o@ap\n|| Jo Gx gr orp day @ GID Many Go axa amd ea ve tammiearas\n\u2014_\u2014-_ @| fo geendip pean fal a) ecamamemsnam @\niar = Soran Wl\nf? 7 BEES ALON (STA) Pte Bronce ye cance taptolexi sting Wilh if/fechile}icrspot Pere 2 rc round tath r3)\nHow to Flash the Updated Firmware, QB lo Qe e COIRVAROLOA ee? seep\n@| Iv ae | Gam\nry a> | ce \u00ae\nane Nein kins\nagp ep Eger Pom | SSaxt e\nD Comaieap Bey Sap\nORINDA ANID 2) SSeS > Sx | Sam ol?\nota ansamDED \u00ae|| Quik dame (f= STO\n0 C",
+          "representative_text": "A Gb AM Cit tk EG am tie) op BOOOLS1I\u00ae - o &\n(O] @% wan mnegren @ 0 @ (Oumemetmymiens | eq 8] QOCd=] exp om (0)\nosiinannl hatora ite aap 1) Can TD AT Do Canep) 3 CAN Aiwa A \u00b0 rs\nQ ex / is ; i ae EA STO Geran D = N Major Project 2\nWit (ot Car (apr sid aan Elune dg software Wi Gal ompress on gQual il yg Wy predic rigs ompac tga, Ig kB froaes es | A ood \u00b0\nET) GO GF ceo @| lo aaigcirmemminae@Dpalaanmsaamiindi  ke= Seis\nFo enact On i Oe ame @|| fo OF o| SSam=p\nCian 2 9 Cray Citas oaah| SOc &\na . CED WD Cit Gxnids Crm ans GD a (08 aa> fi Hl o@ap\n|| Jo Gx gr orp day @ GID Many Go axa amd ea ve tammiearas\n\u2014_\u2014-_ @| fo geendip pean fal a) ecamamemsnam @\niar = Soran Wl\nf? 7 BEES ALON (STA) Pte Bronce ye cance taptolexi sting Wilh if/fechile}icrspot Pere 2 rc round tath r3)\nHow to Flash the Updated Firmware, QB lo Qe e COIRVAROLOA ee? seep\n@| Iv ae | Gam\nry a> | ce \u00ae\nane Nein kins\nagp ep Eger Pom | SSaxt e\nD Comaieap Bey Sap\nORINDA ANID 2) SSeS > Sx | Sam ol?\nota ansamDED \u00ae|| Quik dame (f= STO\n0 C",
+          "representative_capture_id": 1581,
+          "capture_ids": [
+            1581
+          ],
+          "source": "episode",
+          "score": 0.025645240835114255,
+          "cosine_sim": 0.20963425934314728,
+          "keyword_match": true
+        }
+      ]
     },
     {
       "id": "A2",
@@ -2764,22 +3270,34 @@
       "execution": {
         "search_time_ms": 0,
         "generate_time_ms": 0,
-        "total_time_ms": 1.3377666473388672,
+        "total_time_ms": 65.63401222229004,
         "retrieved_count": 0,
         "retrieved_ids": [],
         "distinct_episodes": 0,
         "context_chars": 0,
         "is_refusal": true,
-        "refusal_reason": "no_data_in_range"
+        "refusal_reason": "no_data_in_range",
+        "answer_source": "refusal_gate",
+        "ollama_stats": {
+          "eval_count": 53,
+          "eval_duration": 864890000,
+          "prompt_eval_duration": 32755000,
+          "prompt_eval_count": 3016,
+          "total_duration": 915235300,
+          "load_duration": 4222800,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": 1.0,
         "precision_at_k": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
         "grounding_rate": 1.0,
         "correctly_refused": true,
         "falsely_refused": null
       },
-      "answer": "I don't have any captured context between 2026-08-15T00:00:00 and 2026-08-15T23:59:59. My recorded activity only covers from 2026-11-23T10:00:00 to 2026-11-24T03:31:10.023434.",
+      "answer": "I don't have any captured context between 2026-08-15T00:00:00 and 2026-08-15T23:59:59. My recorded activity only covers from 2026-11-23T10:00:00 to 2026-11-26T02:05:01.867917.",
       "sources": []
     },
     {
@@ -2793,9 +3311,9 @@
         "expected_answer": "Refusal: Internal intent cannot be inferred from screen captures."
       },
       "execution": {
-        "search_time_ms": 26.732206344604492,
+        "search_time_ms": 44.16155815124512,
         "generate_time_ms": 0,
-        "total_time_ms": 27.020931243896484,
+        "total_time_ms": 44.37065124511719,
         "retrieved_count": 10,
         "retrieved_ids": [
           28276,
@@ -2807,11 +3325,23 @@
         "distinct_episodes": 5,
         "context_chars": 3043,
         "is_refusal": true,
-        "refusal_reason": "unobservable_internal_intent"
+        "refusal_reason": "unobservable_internal_intent",
+        "answer_source": "refusal_gate",
+        "ollama_stats": {
+          "eval_count": 53,
+          "eval_duration": 864890000,
+          "prompt_eval_duration": 32755000,
+          "prompt_eval_count": 3016,
+          "total_duration": 915235300,
+          "load_duration": 4222800,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 0.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
         "grounding_rate": 1.0,
         "correctly_refused": true,
         "falsely_refused": null
@@ -2939,22 +3469,34 @@
       "execution": {
         "search_time_ms": 0,
         "generate_time_ms": 0,
-        "total_time_ms": 1.2378692626953125,
+        "total_time_ms": 0.7736682891845703,
         "retrieved_count": 0,
         "retrieved_ids": [],
         "distinct_episodes": 0,
         "context_chars": 0,
         "is_refusal": true,
-        "refusal_reason": "future_time"
+        "refusal_reason": "future_time",
+        "answer_source": "refusal_gate",
+        "ollama_stats": {
+          "eval_count": 53,
+          "eval_duration": 864890000,
+          "prompt_eval_duration": 32755000,
+          "prompt_eval_count": 3016,
+          "total_duration": 915235300,
+          "load_duration": 4222800,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
         "grounding_rate": 1.0,
         "correctly_refused": true,
         "falsely_refused": null
       },
-      "answer": "I cannot predict future activities. My context only covers past recorded activities up to 2026-11-24T03:31:10.023434.",
+      "answer": "I cannot predict future activities. My context only covers past recorded activities up to 2026-11-26T02:05:01.867917.",
       "sources": []
     },
     {
@@ -2970,22 +3512,34 @@
       "execution": {
         "search_time_ms": 0,
         "generate_time_ms": 0,
-        "total_time_ms": 0.6873607635498047,
+        "total_time_ms": 0.4031658172607422,
         "retrieved_count": 0,
         "retrieved_ids": [],
         "distinct_episodes": 0,
         "context_chars": 0,
         "is_refusal": true,
-        "refusal_reason": "future_time"
+        "refusal_reason": "future_time",
+        "answer_source": "refusal_gate",
+        "ollama_stats": {
+          "eval_count": 53,
+          "eval_duration": 864890000,
+          "prompt_eval_duration": 32755000,
+          "prompt_eval_count": 3016,
+          "total_duration": 915235300,
+          "load_duration": 4222800,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
         "grounding_rate": 1.0,
         "correctly_refused": true,
         "falsely_refused": null
       },
-      "answer": "I cannot predict future activities. My context only covers past recorded activities up to 2026-11-24T03:31:10.023434.",
+      "answer": "I cannot predict future activities. My context only covers past recorded activities up to 2026-11-26T02:05:01.867917.",
       "sources": []
     },
     {
@@ -2999,19 +3553,31 @@
         "expected_answer": "Refusal: External physical event unobservable."
       },
       "execution": {
-        "search_time_ms": 32.7916145324707,
+        "search_time_ms": 122.4660873413086,
         "generate_time_ms": 0,
-        "total_time_ms": 33.0355167388916,
+        "total_time_ms": 122.66373634338379,
         "retrieved_count": 0,
         "retrieved_ids": [],
         "distinct_episodes": 0,
         "context_chars": 0,
         "is_refusal": true,
-        "refusal_reason": "unobservable_physical_event"
+        "refusal_reason": "unobservable_physical_event",
+        "answer_source": "refusal_gate",
+        "ollama_stats": {
+          "eval_count": 53,
+          "eval_duration": 864890000,
+          "prompt_eval_duration": 32755000,
+          "prompt_eval_count": 3016,
+          "total_duration": 915235300,
+          "load_duration": 4222800,
+          "model": "llama3.2:3b-instruct-q4_K_M"
+        }
       },
       "metrics": {
         "temporal_precision": null,
         "precision_at_k": 1.0,
+        "hit_at_k": 1.0,
+        "mrr": 1.0,
         "grounding_rate": 1.0,
         "correctly_refused": true,
         "falsely_refused": null

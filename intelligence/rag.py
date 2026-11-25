@@ -91,32 +91,55 @@ class RAGAgent:
     """Local RAG agent that queries the captures database and generates
     answers using a local LLM via Ollama."""
 
-    def __init__(self, db: DatabaseManager, embedder: EmbeddingGenerator):
+    def __init__(
+        self,
+        db: DatabaseManager,
+        embedder: EmbeddingGenerator,
+        model: Optional[str] = None,
+    ):
         self.db = db
         self.embedder = embedder
+        self.model = model
         self.last_ollama_stats: Dict[str, Any] = {}
         self._verify_ollama()
 
+    def get_model(self) -> str:
+        """Get the model to use, checking instance attribute, env var, or config dynamically."""
+        if getattr(self, "model", None):
+            return self.model
+        env_model = os.environ.get("OLLAMA_MODEL")
+        if env_model:
+            return env_model
+        return getattr(config, "OLLAMA_MODEL", "llama3.2:3b-instruct-q4_K_M")
+
     def _verify_ollama(self):
         """Check that Ollama is running and the model is available."""
+        target_model = self.get_model()
         try:
             resp = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=(1.0, 2.0))
             resp.raise_for_status()
             models = resp.json().get("models", [])
             model_names = [m["name"] for m in models]
 
-            if OLLAMA_MODEL not in model_names:
-                # Try matching without tag
-                base_names = [m["name"].split(":")[0] for m in models]
-                if OLLAMA_MODEL.split(":")[0] not in base_names:
+            if target_model not in model_names:
+                # Try matching by base name / prefix if not an exact match
+                base_target = target_model.split(":")[0]
+                matching = [m["name"] for m in models if m["name"].startswith(base_target)]
+                if matching:
+                    logger.info(
+                        f"Target model '{target_model}' resolved to available model '{matching[0]}'."
+                    )
+                    self.model = matching[0]
+                    target_model = self.model
+                else:
                     logger.warning(
-                        f"Model '{OLLAMA_MODEL}' not found in Ollama. "
+                        f"Model '{target_model}' not found in Ollama. "
                         f"Available: {model_names}. "
-                        f"Run: ollama pull {OLLAMA_MODEL}"
+                        f"Run: ollama pull {target_model}"
                     )
                     return
 
-            logger.info(f"Ollama verified: model '{OLLAMA_MODEL}' available")
+            logger.info(f"Ollama verified: model '{target_model}' available")
 
         except requests.ConnectionError:
             logger.warning(
@@ -829,15 +852,21 @@ class RAGAgent:
         else:
             return self.db.search_hybrid(query_text, query_embedding, limit=top_k)
 
-    def _call_ollama(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    def _call_ollama(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        model: Optional[str] = None,
+    ) -> str:
         """Call the Ollama API to generate a response."""
         sys_prompt = system_prompt or SYSTEM_PROMPT
+        active_model = model or self.get_model()
         self.last_ollama_stats = {}
         try:
             resp = requests.post(
                 f"{OLLAMA_BASE_URL}/api/generate",
                 json={
-                    "model": OLLAMA_MODEL,
+                    "model": active_model,
                     "prompt": prompt,
                     "system": sys_prompt,
                     "stream": False,
@@ -859,7 +888,7 @@ class RAGAgent:
                 "prompt_eval_count": data.get("prompt_eval_count", 0),
                 "total_duration": data.get("total_duration", 0),
                 "load_duration": data.get("load_duration", 0),
-                "model": data.get("model", OLLAMA_MODEL),
+                "model": data.get("model", active_model),
             }
             return data.get("response", "").strip()
 

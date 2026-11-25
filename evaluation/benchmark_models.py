@@ -189,7 +189,8 @@ def run_model_benchmark(
 
     for model_id in models_to_run:
         print(f"\n[Benchmarking Model: {model_id}]")
-        # Set target model in config and environment
+        # Set target model on RAG agent, config, and environment
+        rag.model = model_id
         os.environ["OLLAMA_MODEL"] = model_id
         import config
         config.OLLAMA_MODEL = model_id

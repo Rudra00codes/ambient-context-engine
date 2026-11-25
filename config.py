@@ -44,7 +44,7 @@ EMBEDDING_DIM = 384                # Output dimension of all-MiniLM-L6-v2
 
 # ─── Ollama / LLM Settings ──────────────────────────────────────────
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2:3b")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2:3b-instruct-q4_K_M")
 LLM_CONTEXT_MAX_CHARS = 6000      # Max chars of retrieved context to send to LLM
 ALLOW_TEMPLATE_FALLBACK = os.environ.get("ALLOW_TEMPLATE_FALLBACK", "true").lower() in ("true", "1", "yes")
 
